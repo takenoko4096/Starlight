@@ -1,0 +1,36 @@
+{
+    "schemaVersion": 1,
+    "id": "starlight",
+    "version": "${version}",
+    "name": "Starlight",
+    "description": "",
+    "authors": [],
+    "contact": {},
+    "license": "All-Rights-Reserved",
+    "icon": "assets/starlight/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "fabric-datagen": [
+            "io.github.takenoko4096.starlight.client.datagen.StarlightDataGenerator"
+        ],
+        "client": [
+            "io.github.takenoko4096.starlight.client.StarlightClient"
+        ],
+        "main": [
+            "io.github.takenoko4096.starlight.StarlightModInitializer"
+        ]
+    },
+    "mixins": [
+        "starlight.mixins.json",
+        {
+            "config": "starlight.client.mixins.json",
+            "environment": "client"
+        }
+    ],
+    "depends": {
+        "fabricloader": ">=${loader_version}",
+        "fabric-language-kotlin": ">=${kotlin_loader_version}",
+        "fabric-api": ">={fabric_api_version}",
+        "minecraft": "${minecraft_version}"
+    }
+}
