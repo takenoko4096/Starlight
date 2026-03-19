@@ -10,10 +10,6 @@ abstract class StarlightModInitializer : ModInitializer {
 
     abstract fun getBlockRegistry(): ModBlockRegistry
 
-    object Test {
-
-    }
-
     override fun onInitialize() {
         ModBlockRegistry(this).run {
             val whiteLeaves = register("white_leaves") {
