@@ -9,11 +9,17 @@ import java.util.concurrent.CompletableFuture
 abstract class StarlightDataGenerator : DataGeneratorEntrypoint {
     override fun onInitializeDataGenerator(fabricDataGenerator: FabricDataGenerator) {
         val pack = fabricDataGenerator.createPack()
+
         pack.addProvider { output: FabricDataOutput ->
             StarlightModelProvider(output)
         }
+
         pack.addProvider { output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightJapaneseLanguageProvider(output, registryLookup)
+            AbstractStarlightLanguageProvider.EnUs(output, registryLookup)
+        }
+
+        pack.addProvider { output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
+            AbstractStarlightLanguageProvider.JaJp(output, registryLookup)
         }
     }
 }

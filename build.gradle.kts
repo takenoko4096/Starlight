@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "2.3.10"
-    id("fabric-loom") version "1.15-SNAPSHOT"
+    id("net.fabricmc.fabric-loom-remap")
 }
 
 version = "1.0-SNAPSHOT"
@@ -34,9 +34,9 @@ loom {
 }
 
 fabricApi {
-    configureDataGeneration {
+    /*configureDataGeneration {
         client = true
-    }
+    }*/
 }
 
 repositories {

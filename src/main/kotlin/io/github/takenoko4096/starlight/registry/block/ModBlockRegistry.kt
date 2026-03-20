@@ -22,14 +22,6 @@ class ModBlockRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
         return blocks[resourceKey] ?: throw IllegalStateException()
     }
 
-    fun getChunkSectionLayerForClient(configuration: ModBlockConfiguration): ModBlockConfiguration.BlockRenderingConfiguration.NonClientChunkSectionLayer {
-        return configuration.renderingConfig.chunkSectionLayer
-    }
-
-    fun getBlockModelForClient(configuration: ModBlockConfiguration): ModBlockConfiguration.BlockRenderingConfiguration.BlockModel {
-        return configuration.renderingConfig.blockModelConfig.model
-    }
-
     fun getConfigurations(): Set<ModBlockConfiguration> {
         return configurations.toSet()
     }

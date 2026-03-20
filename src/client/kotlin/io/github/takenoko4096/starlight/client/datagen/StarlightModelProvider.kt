@@ -6,8 +6,8 @@ import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.ItemModelGenerators
-import net.minecraft.client.data.models.model.ModelTemplates
 import net.minecraft.client.data.models.model.TexturedModel
+import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
 
 class StarlightModelProvider(output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
@@ -17,13 +17,37 @@ class StarlightModelProvider(output: FabricDataOutput) : FabricModelProvider(out
 
         for (configuration in blockRegistry.getConfigurations()) {
             val block = blockRegistry.getBlock(configuration.resourceKey)
-            val model = blockRegistry.getBlockModelForClient(configuration)
+            val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
 
-            when (model) {
-                is ModBlockConfiguration.BlockRenderingConfiguration.TrivialBlockModel -> {
+            when (val model = accessor.blockModel()) {
+                is ModBlockConfiguration.BlockRenderingConfiguration.SingleArgBlockModel -> {
                     when (model.textureMap) {
-                        ModBlockConfiguration.BlockRenderingConfiguration.TrivialBlockModel.TrivialBlockTextureMap.CUBE -> {
+                        SingleArgBlockTextureMap.TRIVIAL_CUBE -> {
                             blockModelGenerators.createTrivialCube(block)
+                        }
+                        SingleArgBlockTextureMap.TRIVIAL_COLUMN -> {
+                            blockModelGenerators.createTrivialBlock(block, TexturedModel.COLUMN)
+                        }
+                        SingleArgBlockTextureMap.TRIVIAL_COLUMN_ALT -> {
+                            blockModelGenerators.createTrivialBlock(block, TexturedModel.COLUMN_ALT)
+                        }
+                        SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL -> {
+                            blockModelGenerators.createTrivialBlock(block, TexturedModel.COLUMN_HORIZONTAL)
+                        }
+                        SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL_ALT -> {
+                            blockModelGenerators.createTrivialBlock(block, TexturedModel.COLUMN_HORIZONTAL_ALT)
+                        }
+                        SingleArgBlockTextureMap.GENRIC_CUBE -> {
+                            blockModelGenerators.createGenericCube(block)
+                        }
+                        SingleArgBlockTextureMap.ANVIL -> {
+                            blockModelGenerators.createAnvil(block)
+                        }
+                        SingleArgBlockTextureMap.DOOR -> {
+                            blockModelGenerators.createDoor(block)
+                        }
+                        SingleArgBlockTextureMap.LANTERN -> {
+                            blockModelGenerators.createLantern(block)
                         }
                     }
                 }

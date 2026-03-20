@@ -5,10 +5,13 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.util.StringRepresentable
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
@@ -20,8 +23,11 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty
 import net.minecraft.world.level.block.state.properties.EnumProperty
 import net.minecraft.world.level.block.state.properties.IntegerProperty
 import net.minecraft.world.level.block.state.properties.Property
+import net.minecraft.world.level.material.MapColor
+import net.minecraft.world.level.material.PushReaction
 import net.minecraft.world.level.storage.loot.LootTable
-import java.util.Optional
+import java.util.*
+import java.util.function.BiConsumer
 import kotlin.reflect.KClass
 
 @StarlightDSL
@@ -38,6 +44,8 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
     internal var customBehaviourCreator: ((BlockBehaviour.Properties) -> Block) = { Block(it) }
 
     internal var renderingConfig: BlockRenderingConfiguration = BlockRenderingConfiguration()
+
+    internal var translation = TranslationConfiguration()
 
     fun blockProperties(callback: BlockPropertiesConfiguration.() -> Unit) {
         val bpc = BlockPropertiesConfiguration(this, callback)
@@ -61,17 +69,21 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
         customBehaviourCreator = cbc.build()
     }
 
+    fun translation(callback: TranslationConfiguration.() -> Unit) {
+
+    }
+
     internal fun register(): Block {
         if (blockProperties == null) throw IllegalStateException()
 
         val block = Blocks.register(
             resourceKey,
             customBehaviourCreator,
-            blockProperties
+            blockProperties!!
         )
 
         if (itemProperties != null) {
-            Items.registerBlock(block, itemProperties)
+            Items.registerBlock(block, itemProperties!!)
         }
 
         return block
@@ -83,13 +95,21 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             callback()
         }
 
-        var strength: Float = 1f
+        var destroyTime: Float = 1f
 
         var sound: SoundType = SoundType.STONE
 
         var occlusion = true
 
         var collision = true
+
+        var friction = 0.6f
+
+        var speedFactor = 1f
+
+        var jumpFactor = 1f
+
+        var pushReaction: PushReaction = PushReaction.NORMAL
 
         var lootTable: ResourceKey<LootTable>? = null
 
@@ -101,9 +121,15 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
 
         var explosionResistance: Float = 1f
 
+        private var mapColorProvider: (BlockState) -> MapColor = { MapColor.STONE }
+
+        fun mapColor(callback: (BlockState) -> MapColor) {
+            mapColorProvider = callback
+        }
+
         internal fun build(): BlockBehaviour.Properties {
             val properties = BlockBehaviour.Properties.of()
-            properties.strength(strength)
+            properties.destroyTime(destroyTime)
             properties.sound(sound)
             if (!occlusion) properties.noOcclusion()
             if (!collision) properties.noCollision()
@@ -112,6 +138,11 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             if (isReplaceable) properties.replaceable()
             if (requiresCorrectToolForDrops) properties.requiresCorrectToolForDrops()
             properties.explosionResistance(explosionResistance)
+            properties.friction(friction)
+            properties.speedFactor(speedFactor)
+            properties.jumpFactor(jumpFactor)
+            properties.pushReaction(pushReaction)
+            properties.mapColor(mapColorProvider)
             return properties
         }
     }
@@ -135,7 +166,7 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
         internal fun build(): Item.Properties {
             val properties = Item.Properties()
             if (translationKey == null) throw IllegalStateException()
-            else properties.overrideDescription(translationKey)
+            else properties.overrideDescription(translationKey!!)
             return properties
         }
     }
@@ -144,7 +175,7 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
     class CustomBehaviourConfiguration {
         var propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>> = setOf()
 
-        var eventHandlers: Set<BlockEventsConfiguration.BlockEventHandler<*, *>> = setOf()
+        var eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher = BlockEventsConfiguration.BlockEventDispatcher(setOf())
 
         fun blockStates(callback: BlockStatesConfiguration.() -> Unit) {
             val bsc = BlockStatesConfiguration()
@@ -155,12 +186,12 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
         fun events(callback: BlockEventsConfiguration.() -> Unit) {
             val bec = BlockEventsConfiguration()
             bec.callback()
-            eventHandlers = bec.build()
+            eventDispatcher = bec.build()
         }
 
         internal fun build(): (BlockBehaviour.Properties) -> CustomBlock {
             return {
-                CustomBlock(it, propertyDefinitions, eventHandlers)
+                CustomBlock(it, propertyDefinitions, eventDispatcher)
             }
         }
     }
@@ -189,12 +220,12 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             states.add(config.build())
         }
 
-        fun <T> enumerationProperty(name: String, callback: EnumerationPropertyConfiguration<T>.() -> Unit) where T : Enum<T>, T : StringRepresentable {
+        fun <T> enumerationProperty(name: String, clazz: KClass<T>, callback: EnumerationPropertyConfiguration<T>.() -> Unit) where T : Enum<T>, T : StringRepresentable {
             if (states.any { it.property.name == name }) {
                 throw IllegalStateException()
             }
 
-            val config = EnumerationPropertyConfiguration<T>(name)
+            val config = EnumerationPropertyConfiguration(name, clazz)
             config.callback()
             states.add(config.build())
         }
@@ -240,19 +271,14 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             }
         }
 
-        class EnumerationPropertyConfiguration<T> internal constructor(name: String) : PropertyConfiguration<T>(name) where T : Enum<T>, T : StringRepresentable {
-            var clazz: KClass<T>? = null
-
+        class EnumerationPropertyConfiguration<T> internal constructor(name: String, private val clazz: KClass<T>) : PropertyConfiguration<T>(name) where T : Enum<T>, T : StringRepresentable {
             override fun build(): PropertyDefinition<T> {
                 if (defaultValue == null) {
                     throw IllegalStateException()
                 }
-                else if (clazz == null) {
-                    throw IllegalStateException()
-                }
 
                 return PropertyDefinition(
-                    EnumProperty.create(name, clazz!!.java),
+                    EnumProperty.create(name, clazz.java),
                     defaultValue!!
                 )
             }
@@ -261,7 +287,11 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
         class PropertyDefinition<T : Comparable<T>> internal constructor(
             val property: Property<T>,
             val defaultValue: T
-        )
+        ) {
+            internal fun setDefaultValueTo(blockState: BlockState) {
+                blockState.setValue(property, defaultValue)
+            }
+        }
     }
 
     @StarlightDSL
@@ -275,24 +305,66 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             ))
         }
 
-        abstract class BlockEvent internal constructor() {}
+        fun onStepOn(callback: StepOnEvent.() -> Unit) {
+            handlers.add(BlockEventHandler(
+                StepOnEvent::class,
+                callback
+            ))
+        }
 
-        class BlockEventHandler<T : BlockEvent, R> internal constructor(
+        fun onExplosionHit(callback: ExplosionHitEvent.() -> Unit) {
+            handlers.add(BlockEventHandler(
+                ExplosionHitEvent::class,
+                callback
+            ))
+        }
+
+        abstract class BlockEvent<R> internal constructor() {}
+
+        class BlockEventHandler<T : BlockEvent<R>, R> internal constructor(
             val clazz: KClass<T>,
-            val callback: (T) -> R
+            val callback: T.() -> R
         )
+
+        class BlockEventDispatcher internal constructor(private val set: Set<BlockEventHandler<*, *>>) {
+            internal fun <T : BlockEvent<R>, R> dispatch(clazz: KClass<T>, event: T) {
+                set.filter { it.clazz == clazz }
+                    .forEach { (it.callback as T.() -> R)(event) }
+            }
+        }
 
         class FallOnEvent internal constructor(
             val level: Level,
             val blockState: BlockState,
             val blockPos: BlockPos,
             val entity: Entity,
-            val distance: Double,
+            var distance: Double,
             var causeDamage: Boolean = true
-        ) : BlockEvent()
+        ) : BlockEvent<Unit>()
 
-        internal fun build(): Set<BlockEventHandler<*, *>> {
-            return handlers.toSet()
+        class StepOnEvent internal constructor(
+            val level: Level,
+            val blockState: BlockState,
+            val blockPos: BlockPos,
+            val entity: Entity
+        ) : BlockEvent<Unit>()
+
+        class ExplosionHitEvent internal constructor(
+            val serverLevel: ServerLevel,
+            val blockState: BlockState,
+            val blockPos: BlockPos,
+            val explosion: Explosion,
+            var ignore: Boolean = false,
+            var dropHandle: (ExplosionDrop) -> Unit
+        ) : BlockEvent<Unit>() {
+            class ExplosionDrop internal constructor(
+                val itemStack: ItemStack,
+                val blockPos: BlockPos
+            )
+        }
+
+        internal fun build(): BlockEventDispatcher {
+            return BlockEventDispatcher(handlers.toSet())
         }
     }
 
@@ -344,22 +416,62 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
 
         @StarlightDSL
         class BlockModelConfiguration internal constructor() {
-            internal var model: BlockModel = TrivialBlockModel(TrivialBlockModel.TrivialBlockTextureMap.CUBE)
+            internal var model: BlockModel = SingleArgBlockModel(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_CUBE)
 
-            fun trivial(textureMap: TrivialBlockModel.TrivialBlockTextureMap) {
-                model = TrivialBlockModel(textureMap)
+            private fun singleArg(textureMap: SingleArgBlockModel.SingleArgBlockTextureMap) {
+                model = SingleArgBlockModel(textureMap)
             }
 
             fun trivialCube() {
-                trivial(TrivialBlockModel.TrivialBlockTextureMap.CUBE)
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_CUBE)
+            }
+
+            fun trivialColumn() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN)
+            }
+
+            fun trivialColumnAlt() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN_ALT)
+            }
+
+            fun trivialColumnHorizontal() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL)
+            }
+
+            fun trivialColumnHorizontalAlt() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL_ALT)
+            }
+
+            fun genericCube() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.GENRIC_CUBE)
+            }
+
+            fun anvil() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.ANVIL)
+            }
+
+            fun door() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.DOOR)
+            }
+
+            fun lantern() {
+                singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.LANTERN)
             }
         }
 
         abstract class BlockModel internal constructor()
 
-        class TrivialBlockModel internal constructor(val textureMap: TrivialBlockTextureMap) : BlockModel() {
-            enum class TrivialBlockTextureMap {
-                CUBE
+        class SingleArgBlockModel internal constructor(val textureMap: SingleArgBlockTextureMap) : BlockModel() {
+            enum class SingleArgBlockTextureMap {
+                TRIVIAL_CUBE,
+                TRIVIAL_COLUMN,
+                TRIVIAL_COLUMN_ALT,
+                TRIVIAL_COLUMN_HORIZONTAL,
+                TRIVIAL_COLUMN_HORIZONTAL_ALT,
+                GENRIC_CUBE,
+                ANVIL,
+                DOOR,
+                LANTERN
             }
         }
     }
@@ -367,13 +479,13 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
     open class CustomBlock internal constructor(
         properties: Properties,
         private val propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>>,
-        private val eventHandlers: Set<BlockEventsConfiguration.BlockEventHandler<*, *>>
+        private val eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher
     ) : Block(properties) {
         init {
             val defaultState = defaultBlockState()
 
             for (definition in propertyDefinitions) {
-                defaultState.setValue(definition.property, definition.defaultValue)
+                definition.setDefaultValueTo(defaultState)
             }
 
             registerDefaultState(defaultState)
@@ -385,17 +497,56 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             }
         }
 
+        override fun stepOn(level: Level, blockPos: BlockPos, blockState: BlockState, entity: Entity) {
+            val event = BlockEventsConfiguration.StepOnEvent(level, blockState, blockPos, entity)
+            eventDispatcher.dispatch(BlockEventsConfiguration.StepOnEvent::class, event)
+        }
+
         override fun fallOn(level: Level, blockState: BlockState, blockPos: BlockPos, entity: Entity, d: Double) {
             val event = BlockEventsConfiguration.FallOnEvent(level, blockState, blockPos, entity, d)
-
-            eventHandlers.filter { it.clazz == BlockEventsConfiguration.FallOnEvent::class }
-                .forEach {
-                    (it.callback as (BlockEventsConfiguration.FallOnEvent) -> Unit)(event)
-                }
+            eventDispatcher.dispatch(BlockEventsConfiguration.FallOnEvent::class, event)
 
             if (event.causeDamage) {
-                super.fallOn(level, blockState, blockPos, entity, d)
+                super.fallOn(level, blockState, blockPos, entity, event.distance)
             }
+        }
+
+        override fun onExplosionHit(blockState: BlockState, serverLevel: ServerLevel, blockPos: BlockPos, explosion: Explosion, biConsumer: BiConsumer<ItemStack, BlockPos>) {
+            val event = BlockEventsConfiguration.ExplosionHitEvent(serverLevel, blockState, blockPos, explosion, false) {
+                biConsumer.accept(it.itemStack, it.blockPos)
+            }
+
+            if (!event.ignore) {
+                super.onExplosionHit(blockState, serverLevel, blockPos, explosion) { itemStack, blockPos ->
+                    event.dropHandle(BlockEventsConfiguration.ExplosionHitEvent.ExplosionDrop(itemStack, blockPos))
+                }
+            }
+        }
+    }
+
+    class TranslationConfiguration internal constructor() {
+        var enUs: String? = null
+
+        var jaJp: String? = null
+    }
+
+    class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {
+        fun chunkSectionLayer(): BlockRenderingConfiguration.NonClientChunkSectionLayer {
+            return configuration.renderingConfig.chunkSectionLayer
+        }
+
+        fun blockModel(): BlockRenderingConfiguration.BlockModel {
+            return configuration.renderingConfig.blockModelConfig.model
+        }
+
+        fun translation(): TranslationConfiguration {
+            return configuration.translation
+        }
+    }
+
+    companion object {
+        fun getAccessorForClient(configuration: ModBlockConfiguration): AccessorForClient {
+            return AccessorForClient(configuration)
         }
     }
 }

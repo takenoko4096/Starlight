@@ -10,9 +10,11 @@ class StarlightClient : ClientModInitializer {
     override fun onInitializeClient() {
         val blockRegistry = StarlightRegistryAccess.getBlockRegistry()
         for (configuration in blockRegistry.getConfigurations()) {
+            val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
+
             BlockRenderLayerMap.putBlock(
                 blockRegistry.getBlock(configuration.resourceKey),
-                when (blockRegistry.getChunkSectionLayerForClient(configuration)) {
+                when (accessor.chunkSectionLayer()) {
                     ModBlockConfiguration.BlockRenderingConfiguration.NonClientChunkSectionLayer.SOLID -> ChunkSectionLayer.SOLID
                     ModBlockConfiguration.BlockRenderingConfiguration.NonClientChunkSectionLayer.CUTOUT -> ChunkSectionLayer.CUTOUT
                     ModBlockConfiguration.BlockRenderingConfiguration.NonClientChunkSectionLayer.TRANSLUCENT -> ChunkSectionLayer.TRANSLUCENT
