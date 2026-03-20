@@ -1,6 +1,6 @@
 package io.github.takenoko4096.starlight.client.datagen
 
-import io.github.takenoko4096.starlight.registry.StarlightRegistryAccess
+import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -9,11 +9,11 @@ import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.model.TexturedModel
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
 
-class StarlightModelProvider(output: FabricDataOutput) : FabricModelProvider(output) {
+class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
         // ここでエラーが出るかどうか、すべてはrunDatagenの内部実装にかかっている
         // 多分内部でminecraft mainを起動してるだけだからいけるとは思うんだけどね
-        val blockRegistry = StarlightRegistryAccess.getBlockRegistry()
+        val blockRegistry = mod.blockRegistry
 
         for (configuration in blockRegistry.getConfigurations()) {
             val block = blockRegistry.getBlock(configuration.resourceKey)

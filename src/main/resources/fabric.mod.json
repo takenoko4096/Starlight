@@ -10,15 +10,9 @@
     "icon": "assets/starlight/icon.png",
     "environment": "*",
     "entrypoints": {
-        "fabric-datagen": [
-            "io.github.takenoko4096.starlight.client.datagen.StarlightDataGenerator"
-        ],
-        "client": [
-            "io.github.takenoko4096.starlight.client.StarlightClient"
-        ],
-        "main": [
-            "io.github.takenoko4096.starlight.StarlightModInitializer"
-        ]
+        "fabric-datagen": [],
+        "client": [],
+        "main": []
     },
     "mixins": [
         "starlight.mixins.json",

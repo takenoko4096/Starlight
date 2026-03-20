@@ -1,14 +1,14 @@
 package io.github.takenoko4096.starlight.client
 
-import io.github.takenoko4096.starlight.registry.StarlightRegistryAccess
+import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer
 
-class StarlightClient : ClientModInitializer {
+abstract class StarlightClient(private val mod: StarlightModInitializer) : ClientModInitializer {
     override fun onInitializeClient() {
-        val blockRegistry = StarlightRegistryAccess.getBlockRegistry()
+        val blockRegistry = mod.blockRegistry
         for (configuration in blockRegistry.getConfigurations()) {
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
 
@@ -22,5 +22,9 @@ class StarlightClient : ClientModInitializer {
                 }
             )
         }
+
+        onInitialize()
     }
+
+    abstract fun onInitialize()
 }

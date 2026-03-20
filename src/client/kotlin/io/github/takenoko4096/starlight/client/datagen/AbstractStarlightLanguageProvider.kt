@@ -1,17 +1,17 @@
 package io.github.takenoko4096.starlight.client.datagen
 
-import io.github.takenoko4096.starlight.registry.StarlightRegistryAccess
+import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
 
-abstract class AbstractStarlightLanguageProvider(output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : FabricLanguageProvider(output, "ja_jp", registryLookup) {
+abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : FabricLanguageProvider(output, "ja_jp", registryLookup) {
     protected abstract fun getLanguage(translationConfiguration: ModBlockConfiguration.TranslationConfiguration): String?
 
     override fun generateTranslations(holderLookupProvider: HolderLookup.Provider, translationBuilder: TranslationBuilder) {
-        val blockRegistry = StarlightRegistryAccess.getBlockRegistry()
+        val blockRegistry = mod.blockRegistry
         for (configuration in blockRegistry.getConfigurations()) {
             val block = blockRegistry.getBlock(configuration.resourceKey)
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
@@ -27,13 +27,13 @@ abstract class AbstractStarlightLanguageProvider(output: FabricDataOutput, regis
         return "StarlightLanguageProvider"
     }
 
-    class EnUs(output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(output, registryLookup) {
+    class EnUs(mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(mod, output, registryLookup) {
         override fun getLanguage(translationConfiguration: ModBlockConfiguration.TranslationConfiguration): String? {
             return translationConfiguration.enUs
         }
     }
 
-    class JaJp(output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(output, registryLookup) {
+    class JaJp(mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(mod, output, registryLookup) {
         override fun getLanguage(translationConfiguration: ModBlockConfiguration.TranslationConfiguration): String? {
             return translationConfiguration.jaJp
         }
