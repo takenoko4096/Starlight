@@ -63,14 +63,17 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
         renderingConfig = brc
     }
 
-    fun customBehaviour(callback: CustomBehaviourConfiguration.() -> Unit) {
+    fun customBehaviour(callback: CustomBehaviourConfiguration.() -> Unit): CustomBehaviourInfo {
         val cbc = CustomBehaviourConfiguration()
         cbc.callback()
         customBehaviourCreator = cbc.build()
+        return CustomBehaviourInfo(Properties(cbc.propertyDefinitions.toSet()))
     }
 
     fun translation(callback: TranslationConfiguration.() -> Unit) {
-
+        val tc = TranslationConfiguration()
+        tc.callback()
+        translation = tc
     }
 
     internal fun register(): Block {
@@ -123,8 +126,14 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
 
         private var mapColorProvider: (BlockState) -> MapColor = { MapColor.STONE }
 
+        private var lightLevelProvider: (BlockState) -> Int = { 0 }
+
         fun mapColor(callback: (BlockState) -> MapColor) {
             mapColorProvider = callback
+        }
+
+        fun lightLevel(callback: (BlockState) -> Int) {
+            lightLevelProvider = callback
         }
 
         internal fun build(): BlockBehaviour.Properties {
@@ -143,6 +152,7 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
             properties.jumpFactor(jumpFactor)
             properties.pushReaction(pushReaction)
             properties.mapColor(mapColorProvider)
+            properties.lightLevel(lightLevelProvider)
             return properties
         }
     }
@@ -173,14 +183,15 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
 
     @StarlightDSL
     class CustomBehaviourConfiguration {
-        var propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>> = setOf()
+        internal var propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>> = setOf()
 
-        var eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher = BlockEventsConfiguration.BlockEventDispatcher(setOf())
+        private var eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher = BlockEventsConfiguration.BlockEventDispatcher(setOf())
 
-        fun blockStates(callback: BlockStatesConfiguration.() -> Unit) {
+        fun blockStates(callback: BlockStatesConfiguration.() -> Unit): Properties {
             val bsc = BlockStatesConfiguration()
             bsc.callback()
             propertyDefinitions = bsc.build()
+            return Properties(propertyDefinitions.toSet())
         }
 
         fun events(callback: BlockEventsConfiguration.() -> Unit) {
@@ -524,11 +535,42 @@ class ModBlockConfiguration(private val registry: ModBlockRegistry, private val 
         }
     }
 
+    @StarlightDSL
     class TranslationConfiguration internal constructor() {
         var enUs: String? = null
 
         var jaJp: String? = null
     }
+
+    class Properties internal constructor(private val definitions: Set<BlockStatesConfiguration.PropertyDefinition<*>>) {
+        private fun getProperty(name: String): Property<*> {
+            val def = definitions.find { it.property.name == name }
+            if (def == null) throw IllegalArgumentException()
+            return def.property
+        }
+
+        fun boolean(name: String): BooleanProperty {
+            return getProperty(name) as? BooleanProperty ?: throw IllegalArgumentException()
+        }
+
+        fun integer(name: String): IntegerProperty {
+            return getProperty(name) as? IntegerProperty ?: throw IllegalArgumentException()
+        }
+
+        fun <T> enumeration(name: String, clazz: KClass<T>): EnumProperty<T> where T : Enum<T>, T : StringRepresentable {
+            val property = getProperty(name) as? EnumProperty<*> ?: throw IllegalArgumentException()
+            if (property.valueClass == clazz.java) {
+                return property as EnumProperty<T>
+            }
+            else {
+                throw IllegalArgumentException()
+            }
+        }
+    }
+
+    class CustomBehaviourInfo internal constructor(
+        val properties: Properties
+    )
 
     class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {
         fun chunkSectionLayer(): BlockRenderingConfiguration.NonClientChunkSectionLayer {

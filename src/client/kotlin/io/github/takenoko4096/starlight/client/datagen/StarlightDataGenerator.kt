@@ -22,5 +22,11 @@ abstract class StarlightDataGenerator(private val mod: StarlightModInitializer) 
         pack.addProvider { output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
             AbstractStarlightLanguageProvider.JaJp(mod, output, registryLookup)
         }
+
+        onInitialize(fabricDataGenerator)
+    }
+
+    open fun onInitialize(fabricDataGenerator: FabricDataGenerator) {
+
     }
 }

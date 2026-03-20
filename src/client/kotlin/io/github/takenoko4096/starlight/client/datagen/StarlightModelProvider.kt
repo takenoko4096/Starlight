@@ -8,6 +8,7 @@ import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.model.TexturedModel
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
+import net.minecraft.client.data.models.MultiVariant
 
 class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {

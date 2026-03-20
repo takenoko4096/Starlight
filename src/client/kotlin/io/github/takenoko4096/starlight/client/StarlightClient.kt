@@ -26,5 +26,7 @@ abstract class StarlightClient(private val mod: StarlightModInitializer) : Clien
         onInitialize()
     }
 
-    abstract fun onInitialize()
+    open fun onInitialize() {
+
+    }
 }
