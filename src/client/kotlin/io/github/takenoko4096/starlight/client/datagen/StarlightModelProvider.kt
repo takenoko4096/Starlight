@@ -1,14 +1,14 @@
 package io.github.takenoko4096.starlight.client.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.model.TexturedModel
-import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
-import net.minecraft.client.data.models.MultiVariant
+import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
 
 class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
@@ -21,7 +21,7 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
 
             when (val model = accessor.blockModel()) {
-                is ModBlockConfiguration.BlockRenderingConfiguration.SingleArgBlockModel -> {
+                is BlockRenderingConfiguration.SingleArgBlockModel -> {
                     when (model.textureMap) {
                         SingleArgBlockTextureMap.TRIVIAL_CUBE -> {
                             blockModelGenerators.createTrivialCube(block)
@@ -51,6 +51,9 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
                             blockModelGenerators.createLantern(block)
                         }
                     }
+                }
+                is BlockRenderingConfiguration.FlexibleBlockModel -> {
+
                 }
             }
         }

@@ -2,13 +2,14 @@ package io.github.takenoko4096.starlight.client.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
+import io.github.takenoko4096.starlight.registry.block.TranslationConfiguration
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
 
 abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : FabricLanguageProvider(output, "ja_jp", registryLookup) {
-    protected abstract fun getLanguage(translationConfiguration: ModBlockConfiguration.TranslationConfiguration): String?
+    protected abstract fun getLanguage(translationConfiguration: TranslationConfiguration): String?
 
     override fun generateTranslations(holderLookupProvider: HolderLookup.Provider, translationBuilder: TranslationBuilder) {
         val blockRegistry = mod.blockRegistry
@@ -28,13 +29,13 @@ abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModIn
     }
 
     class EnUs(mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(mod, output, registryLookup) {
-        override fun getLanguage(translationConfiguration: ModBlockConfiguration.TranslationConfiguration): String? {
+        override fun getLanguage(translationConfiguration: TranslationConfiguration): String? {
             return translationConfiguration.enUs
         }
     }
 
     class JaJp(mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(mod, output, registryLookup) {
-        override fun getLanguage(translationConfiguration: ModBlockConfiguration.TranslationConfiguration): String? {
+        override fun getLanguage(translationConfiguration: TranslationConfiguration): String? {
             return translationConfiguration.jaJp
         }
     }

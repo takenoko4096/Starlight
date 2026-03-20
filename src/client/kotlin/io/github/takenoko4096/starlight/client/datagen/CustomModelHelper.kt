@@ -7,9 +7,11 @@ import net.minecraft.resources.Identifier
 import java.util.Optional
 
 class CustomModelHelper(private val mod: StarlightModInitializer) {
-    private fun template(directory: String, variant: String?, vararg textureSlots: TextureSlot): ModelTemplate {
+    private fun modelTemplate(directory: String, variant: String?, vararg textureSlots: TextureSlot): ModelTemplate {
         return ModelTemplate(
-            Optional.of(Identifier.fromNamespaceAndPath(mod.identifier, "$directory/")),
+            Optional.of(
+                Identifier.fromNamespaceAndPath(mod.identifier, "$directory/")
+            ),
             if (variant == null) Optional.empty() else Optional.of(variant),
             *textureSlots
         )
