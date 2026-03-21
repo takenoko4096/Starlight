@@ -123,7 +123,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     class Models internal constructor(private val mod: StarlightModInitializer, val defaultTexturePath: TexturePath) {
-        fun cubeDirectional(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath): BlockModel {
+        fun cubeDirectional(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath): NonClientBlockModel {
             return NonClientBlockModel(
                 mod,
                 listOf(),
@@ -137,7 +137,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             )
         }
 
-        fun cubeAll(all: TexturePath): BlockModel {
+        fun cubeAll(all: TexturePath): NonClientBlockModel {
             return NonClientBlockModel(
                 mod,
                 listOf(),
