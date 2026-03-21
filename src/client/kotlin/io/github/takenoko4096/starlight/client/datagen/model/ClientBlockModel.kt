@@ -36,7 +36,7 @@ class ClientBlockModel internal constructor(
 
         identifier = template.createWithSuffix(
             registrar.block,
-            if (nonClient.suffix.isEmpty()) "" else '_' + nonClient.suffix,
+            nonClient.getSuffix(),
             mapping,
             registrar.blockModelGenerators.modelOutput
         )

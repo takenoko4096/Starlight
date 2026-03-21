@@ -176,7 +176,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     class NonClientBlockModel(
         val mod: StarlightModInitializer,
         val blockModelConfiguration: BlockModelConfiguration,
-        val suffix: String,
+        private val suffix: String,
         vararg paths: Pair<String, TexturePath>
     ) : BlockModel() {
         val mapping: Map<String, Identifier> = paths.associate { it.first to it.second.identifier }
@@ -191,6 +191,10 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         fun setToDefaultItemModel() {
             blockModelConfiguration.itemModel = this
+        }
+
+        fun getSuffix(): String {
+            return if (suffix.isEmpty()) "" else "_$suffix"
         }
 
         override fun equals(other: Any?): Boolean {
