@@ -99,7 +99,9 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.LANTERN)
         }
 
-        val models: Models = Models(configuration.registry.mod, TexturePath.defaultPath(configuration.resourceKey))
+        val defaultTexturePath = TexturePath.defaultPath(configuration.resourceKey)
+
+        val models: Models = Models(configuration.registry.mod)
 
         fun <T : Comparable<T>> propertyVariants(property: Property<T>, callback: VariantsByProperties1<T>.() -> Unit) {
             val vp1 = VariantsByProperties1(property)
@@ -122,7 +124,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         }
     }
 
-    class Models internal constructor(private val mod: StarlightModInitializer, val defaultTexturePath: TexturePath) {
+    class Models internal constructor(private val mod: StarlightModInitializer) {
         fun cubeDirectional(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath): NonClientBlockModel {
             return NonClientBlockModel(
                 mod,
@@ -178,10 +180,10 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     class VariantsByProperties1<T : Comparable<T>> internal constructor(val property: Property<T>) : VariantsByProperties() {
         val selects: MutableSet<NonClientSelect1<T>> = mutableSetOf()
 
-        fun NonClientBlockModel.useWhen(value: T) {
+        fun NonClientBlockModel.useWhen(value1: T) {
             selects.add(
                 NonClientSelect1(
-                    value,
+                    value1,
                     this
                 )
             )
