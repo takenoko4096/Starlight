@@ -1,9 +1,11 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
+import io.github.takenoko4096.starlight.StarlightModInitializer
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.properties.Property
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
@@ -53,7 +55,9 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
     @StarlightDSL
     class BlockModelConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
-        internal var model: BlockModel = SingleArgBlockModel(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_CUBE)
+        internal var model: BlockModel? = null
+
+        internal var variants: VariantsByProperties? = null
 
         private fun singleArg(textureMap: SingleArgBlockModel.SingleArgBlockTextureMap) {
             model = SingleArgBlockModel(textureMap)
@@ -95,16 +99,18 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.LANTERN)
         }
 
-        val models: Models = Models(TexturePath.defaultPath(configuration.resourceKey))
+        val models: Models = Models(configuration.registry.mod, TexturePath.defaultPath(configuration.resourceKey))
 
-        fun variantByBlockStates() {
-
+        fun <T : Comparable<T>> propertyVariants(property: Property<T>, callback: VariantsByProperties1<T>.() -> Unit) {
+            val vp1 = VariantsByProperties1(property)
+            vp1.callback()
+            variants = vp1
         }
     }
 
     abstract class BlockModel internal constructor()
 
-    class TexturePath private constructor(val identifier: Identifier) {
+    open class TexturePath private constructor(val identifier: Identifier) {
         fun underScoredPrefix(prefix: String): TexturePath {
             return TexturePath(identifier.withPrefix("_$prefix"))
         }
@@ -116,27 +122,69 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         }
     }
 
-    class Models internal constructor(private val defaultTexturePath: TexturePath) {
-        fun cubeDirectional(callback: CubeDirectionalBlockModel.() -> Unit): BlockModel {
-            val model = CubeDirectionalBlockModel(defaultTexturePath)
-            model.callback()
-            model.run {
-                if (arrayOf(particle, north, south, east, west, up, down).any { it == null }) {
-                    throw IllegalStateException()
-                }
-            }
-            return model
+    class Models internal constructor(private val mod: StarlightModInitializer, val defaultTexturePath: TexturePath) {
+        fun cubeDirectional(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath): BlockModel {
+            return NonClientBlockModel(
+                mod,
+                listOf(),
+                "particle" to particle,
+                "north" to north,
+                "south" to south,
+                "east" to east,
+                "west" to west,
+                "up" to up,
+                "down" to down
+            )
         }
 
-        fun cubeAll(callback: CubeAllBlockModel.() -> Unit): BlockModel {
-            val model = CubeAllBlockModel(defaultTexturePath)
-            model.callback()
-            model.run {
-                if (all == null) {
-                    throw IllegalStateException()
-                }
-            }
-            return model
+        fun cubeAll(all: TexturePath): BlockModel {
+            return NonClientBlockModel(
+                mod,
+                listOf(),
+                "all" to all
+            )
+        }
+    }
+
+    class NonClientBlockModel(
+        val mod: StarlightModInitializer,
+        val mutators: List<NonClientVariantMutator>,
+        vararg paths: Pair<String, TexturePath>
+    ) : BlockModel() {
+        val mapping: Map<String, Identifier> = paths.associate { it.first to it.second.identifier }
+    }
+
+    enum class NonClientVariantMutator {
+        X_ROT_90,
+        X_ROT_180,
+        X_ROT_270,
+        Y_ROT_90,
+        Y_ROT_180,
+        Y_ROT_270,
+        UV_LOCK
+    }
+
+    abstract class VariantsByProperties {
+        //
+    }
+
+    abstract class NonClientSelect internal constructor(val model: NonClientBlockModel)
+
+    class NonClientSelect1<T : Comparable<T>> internal constructor(
+        val value1: T,
+        model: NonClientBlockModel
+    ) : NonClientSelect(model)
+
+    class VariantsByProperties1<T : Comparable<T>> internal constructor(val property: Property<T>) : VariantsByProperties() {
+        val selects: MutableSet<NonClientSelect1<T>> = mutableSetOf()
+
+        fun NonClientBlockModel.useWhen(value: T) {
+            selects.add(
+                NonClientSelect1(
+                    value,
+                    this
+                )
+            )
         }
     }
 
@@ -152,23 +200,5 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             DOOR,
             LANTERN
         }
-    }
-
-    abstract class DefaultTexturePathProviderBlockModel(val defaultTexturePath: TexturePath) : BlockModel() {
-
-    }
-
-    class CubeDirectionalBlockModel internal constructor(defaultTexturePath: TexturePath) : DefaultTexturePathProviderBlockModel(defaultTexturePath) {
-        var particle: TexturePath? = null
-        var north: TexturePath? = null
-        var south: TexturePath? = null
-        var east: TexturePath? = null
-        var west: TexturePath? = null
-        var up: TexturePath? = null
-        var down: TexturePath? = null
-    }
-
-    class CubeAllBlockModel internal constructor(defaultTexturePath: TexturePath) : DefaultTexturePathProviderBlockModel(defaultTexturePath) {
-        var all: TexturePath? = null
     }
 }

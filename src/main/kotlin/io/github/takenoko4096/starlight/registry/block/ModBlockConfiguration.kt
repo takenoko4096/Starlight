@@ -77,8 +77,12 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.renderingConfig.chunkSectionLayer
         }
 
-        fun blockModel(): BlockRenderingConfiguration.BlockModel {
+        fun blockModel(): BlockRenderingConfiguration.BlockModel? {
             return configuration.renderingConfig.blockModelConfig.model
+        }
+
+        fun blockModelVariants(): BlockRenderingConfiguration.VariantsByProperties? {
+            return configuration.renderingConfig.blockModelConfig.variants
         }
 
         fun translation(): TranslationConfiguration {
