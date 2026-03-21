@@ -6,17 +6,27 @@ import net.minecraft.client.data.models.MultiVariant
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator
 import net.minecraft.client.data.models.blockstates.PropertyDispatch
 import net.minecraft.client.renderer.block.model.VariantMutator
+import net.minecraft.resources.Identifier
 import net.minecraft.world.level.block.Block
 
 class BlockModelVariantsRegistrar internal constructor(
     internal val blockModelGenerators: BlockModelGenerators,
     internal val block: Block,
+    internal val defaultItemModel: BlockRenderingConfiguration.NonClientBlockModel?,
     internal val variants: BlockRenderingConfiguration.VariantsByProperties
 ) {
     private val empty = MultiVariantGenerator.dispatch(block)
 
-    private fun createModelVariant(nonClient: BlockRenderingConfiguration.NonClientBlockModel): MultiVariant {
-        return ClientBlockModel(this, nonClient).createModelVariant()
+    private val createdModels = mutableMapOf<BlockRenderingConfiguration.NonClientBlockModel, Identifier>()
+
+    private fun getOrCreateModel(nonClient: BlockRenderingConfiguration.NonClientBlockModel): Identifier {
+        if (createdModels.contains(nonClient)) {
+            return createdModels[nonClient]!!
+        }
+        else {
+            createdModels[nonClient] = ClientBlockModel(this, nonClient).identifier
+            return createdModels[nonClient]!!
+        }
     }
 
     private fun toClientMutator(nonClientMutator: BlockRenderingConfiguration.NonClientVariantMutator): VariantMutator {
@@ -35,14 +45,14 @@ class BlockModelVariantsRegistrar internal constructor(
         val dispatch = PropertyDispatch.initial(variants1.property)
 
         for (select in variants1.selects) {
-            var variant = createModelVariant(select.model)
-            for (mutator in select.model.mutators) {
-                variant = variant.with(toClientMutator(mutator))
+            var clientModel = BlockModelGenerators.plainVariant(getOrCreateModel(select.modelVariant.model))
+            for (mutator in select.modelVariant.mutators) {
+                clientModel = clientModel.with(toClientMutator(mutator))
             }
 
             dispatch.select(
                 select.value1,
-                variant
+                clientModel
             )
         }
 
@@ -57,5 +67,10 @@ class BlockModelVariantsRegistrar internal constructor(
 
         val generator = empty.with(dispatch)
         blockModelGenerators.blockStateOutput.accept(generator)
+
+        if (defaultItemModel != null && createdModels.contains(defaultItemModel)) {
+            val identifier = createdModels[defaultItemModel]!!
+            blockModelGenerators.registerSimpleItemModel(block, identifier)
+        }
     }
 }

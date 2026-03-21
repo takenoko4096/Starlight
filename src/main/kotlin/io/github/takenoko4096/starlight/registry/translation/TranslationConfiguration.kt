@@ -1,4 +1,4 @@
-package io.github.takenoko4096.starlight.registry.block
+package io.github.takenoko4096.starlight.registry.translation
 
 import io.github.takenoko4096.starlight.StarlightDSL
 

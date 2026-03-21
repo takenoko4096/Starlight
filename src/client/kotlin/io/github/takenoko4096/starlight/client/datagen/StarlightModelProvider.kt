@@ -2,7 +2,6 @@ package io.github.takenoko4096.starlight.client.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.client.datagen.model.BlockModelVariantsRegistrar
-import io.github.takenoko4096.starlight.client.datagen.model.ClientBlockModel
 import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
@@ -22,7 +21,7 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
             val block = blockRegistry.getBlock(configuration.resourceKey)
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
 
-            when (val model = accessor.blockModel()) {
+            when (val model = accessor.blockModelLegacy()) {
                 is BlockRenderingConfiguration.SingleArgBlockModel -> {
                     when (model.textureMap) {
                         SingleArgBlockTextureMap.TRIVIAL_CUBE -> {
@@ -59,7 +58,7 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
             val variants = accessor.blockModelVariants()
 
             if (variants != null) {
-                val registrar = BlockModelVariantsRegistrar(blockModelGenerators, block, variants)
+                val registrar = BlockModelVariantsRegistrar(blockModelGenerators, block, accessor.blockDefaultItemModel(), variants)
                 registrar.register()
             }
         }

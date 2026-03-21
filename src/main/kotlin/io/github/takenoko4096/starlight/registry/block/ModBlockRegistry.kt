@@ -15,11 +15,12 @@ class ModBlockRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
         o.configuration()
         val block = o.register()
         configurations.add(o)
+        blocks[o.resourceKey] = block
         return block
     }
 
     fun getBlock(resourceKey: ResourceKey<Block>): Block {
-        return blocks[resourceKey] ?: throw IllegalStateException()
+        return blocks[resourceKey] ?: throw IllegalArgumentException("ブロック '${resourceKey.identifier()}' が Modブロックレジストリに見つかりませんでした: ${blocks.keys.map { it.identifier() }}")
     }
 
     fun getConfigurations(): Set<ModBlockConfiguration> {

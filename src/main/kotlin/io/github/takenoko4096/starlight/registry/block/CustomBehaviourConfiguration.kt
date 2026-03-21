@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 
 @StarlightDSL
 class CustomBehaviourConfiguration {
-    internal var propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>>? = null
+    internal var propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>> = setOf()
 
     private var eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher = BlockEventsConfiguration.BlockEventDispatcher(setOf())
 
@@ -13,12 +13,7 @@ class CustomBehaviourConfiguration {
         val bsc = BlockStatesConfiguration()
         bsc.callback()
         propertyDefinitions = bsc.build()
-
-        if (propertyDefinitions == null) {
-            throw IllegalStateException("propertyDefinitions is null; cannot prepare properties info")
-        }
-
-        return Properties(propertyDefinitions!!.toSet())
+        return Properties(propertyDefinitions.toSet())
     }
 
     fun events(callback: BlockEventsConfiguration.() -> Unit) {
@@ -28,12 +23,10 @@ class CustomBehaviourConfiguration {
     }
 
     internal fun build(): (BlockBehaviour.Properties) -> CustomBlock {
-        if (propertyDefinitions == null) {
-            throw IllegalStateException("propertyDefinitions is unset")
-        }
-
+        val defs = propertyDefinitions.toSet()
+        val evs = eventDispatcher
         return {
-            CustomBlock(it, propertyDefinitions!!, eventDispatcher)
+            CustomBlock(it, defs, evs)
         }
     }
 }

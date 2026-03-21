@@ -10,14 +10,42 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
+import org.jetbrains.annotations.ApiStatus
 import java.util.function.BiConsumer
 
+@ApiStatus.Experimental
 open class CustomBlock internal constructor(
     properties: BlockBehaviour.Properties,
     private val propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>>,
     private val eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher
 ) : Block(properties) {
+    /**
+     * 呼び出し順は
+     * Block(properties)
+     *      の中の createBlockStateDefinition()
+     *          の中の this.propertyDefinitions
+     * ↓
+     * private val propertyDefinitions (プロパティ初期化)
+     *
+     * propertyDefinitions の初期化や init {} の前に呼ばれるのが createBlockStateDefinition()
+     */
+
     init {
+        val builder = StateDefinition.Builder<Block, BlockState>(this)
+        for (definition in propertyDefinitions) {
+            builder.add(definition.property)
+        }
+
+        val stateDefinition = builder.create(
+            { it.defaultBlockState() },
+            { a, b, c -> BlockState(a, b, c) }
+        )
+
+        val field = Block::class.java.getDeclaredField("stateDefinition")
+        field.trySetAccessible()
+        field.set(this, stateDefinition)
+        registerDefaultState(stateDefinition.any())
+
         val defaultState = defaultBlockState()
 
         for (definition in propertyDefinitions) {
@@ -25,12 +53,6 @@ open class CustomBlock internal constructor(
         }
 
         registerDefaultState(defaultState)
-    }
-
-    override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
-        for (definition in propertyDefinitions) { // null????????????????????????????
-            builder.add(definition.property)
-        }
     }
 
     override fun stepOn(level: Level, blockPos: BlockPos, blockState: BlockState, entity: Entity) {

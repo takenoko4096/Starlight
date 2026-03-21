@@ -1,6 +1,7 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
+import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -77,12 +78,16 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.renderingConfig.chunkSectionLayer
         }
 
-        fun blockModel(): BlockRenderingConfiguration.BlockModel? {
+        fun blockModelLegacy(): BlockRenderingConfiguration.BlockModel? {
             return configuration.renderingConfig.blockModelConfig.model
         }
 
         fun blockModelVariants(): BlockRenderingConfiguration.VariantsByProperties? {
             return configuration.renderingConfig.blockModelConfig.variants
+        }
+
+        fun blockDefaultItemModel(): BlockRenderingConfiguration.NonClientBlockModel? {
+            return configuration.renderingConfig.blockModelConfig.itemModel
         }
 
         fun translation(): TranslationConfiguration {
