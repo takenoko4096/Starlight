@@ -28,7 +28,7 @@ open class CustomBlock internal constructor(
     }
 
     override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
-        for (definition in propertyDefinitions) {
+        for (definition in propertyDefinitions) { // null????????????????????????????
             builder.add(definition.property)
         }
     }
