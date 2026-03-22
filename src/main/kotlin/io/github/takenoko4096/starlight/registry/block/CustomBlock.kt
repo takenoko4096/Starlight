@@ -37,43 +37,33 @@ open class CustomBlock internal constructor(
             builder.add(definition.property)
         }
 
+        setField(
+            "properties",
+            "field_23155",
+            "O",
+            this,
+            properties
+        )
+
         val stateDefinition = builder.create(
             { it.defaultBlockState() },
             { a, b, c -> BlockState(a, b, c) }
         )
 
-        val clazz = Block::class.java
-        val field: Field = try {
-            clazz.getDeclaredField("stateDefinition")
-        }
-        catch (e: NoSuchFieldException) {
-            e.printStackTrace()
+        setField(
+            "stateDefinition",
+            "field_10647",
+            "C",
+            this,
+            stateDefinition
+        )
 
-            try {
-                clazz.getDeclaredField("field_10647")
-            }
-            catch (f: NoSuchFieldException) {
-                f.printStackTrace()
-
-                try {
-                    clazz.getDeclaredField("C")
-                }
-                catch (g: NoSuchFieldException) {
-                    g.printStackTrace()
-
-                    throw RuntimeException("Could not find field 'stateDefinition' (Mojang), 'field_10647' (Intermediary), 'C' (Obfuscated) in class '${clazz.name}'.")
-                }
-            }
-        }
-
-        field.trySetAccessible()
-        field.set(this, stateDefinition)
         registerDefaultState(stateDefinition.any())
 
-        val defaultState = defaultBlockState()
+        var defaultState = defaultBlockState()
 
         for (definition in propertyDefinitions) {
-            definition.setDefaultValueTo(defaultState)
+            defaultState = definition.setDefaultValueTo(defaultState)
         }
 
         registerDefaultState(defaultState)
@@ -102,6 +92,36 @@ open class CustomBlock internal constructor(
             super.onExplosionHit(blockState, serverLevel, blockPos, explosion) { itemStack, blockPos ->
                 event.dropHandle(BlockEventsConfiguration.ExplosionHitEvent.ExplosionDrop(itemStack, blockPos))
             }
+        }
+    }
+
+    companion object {
+        fun setField(mojang: String, intermediary: String, obfuscated: String, block: Block, value: Any) {
+            val clazz = Block::class.java
+            val field: Field = try {
+                clazz.getDeclaredField(mojang)
+            }
+            catch (e: NoSuchFieldException) {
+                e.printStackTrace()
+
+                try {
+                    clazz.getDeclaredField(intermediary)
+                }
+                catch (f: NoSuchFieldException) {
+                    f.printStackTrace()
+
+                    try {
+                        clazz.getDeclaredField(obfuscated)
+                    }
+                    catch (g: NoSuchFieldException) {
+                        g.printStackTrace()
+
+                        throw RuntimeException("Could not find field 'stateDefinition' (Mojang), 'field_10647' (Intermediary), 'C' (Obfuscated) in class '${clazz.name}'.")
+                    }
+                }
+            }
+            field.trySetAccessible()
+            field.set(block, value)
         }
     }
 }

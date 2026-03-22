@@ -101,8 +101,8 @@ class BlockStatesConfiguration internal constructor() {
         val property: Property<T>,
         val defaultValue: T
     ) {
-        internal fun setDefaultValueTo(blockState: BlockState) {
-            blockState.setValue(property, defaultValue)
+        internal fun setDefaultValueTo(blockState: BlockState): BlockState {
+            return blockState.setValue(property, defaultValue)
         }
     }
 }

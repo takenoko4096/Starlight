@@ -10,6 +10,7 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
+import java.lang.reflect.Field
 
 @StarlightDSL
 class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal val identifier: String) {
@@ -18,7 +19,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         Identifier.fromNamespaceAndPath(registry.mod.identifier, identifier)
     )
 
-    internal var blockProperties: BlockBehaviour.Properties? = null
+    internal var blockPropertiesConfiguration: BlockPropertiesConfiguration = BlockPropertiesConfiguration(this) {}
 
     internal var itemProperties: Item.Properties? = null
 
@@ -29,8 +30,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
     internal var translation = TranslationConfiguration()
 
     fun blockProperties(callback: BlockPropertiesConfiguration.() -> Unit) {
-        val bpc = BlockPropertiesConfiguration(this, callback)
-        blockProperties = bpc.build()
+        blockPropertiesConfiguration = BlockPropertiesConfiguration(this, callback)
     }
 
     fun itemProperties(callback: ItemPropertiesConfiguration.() -> Unit) {
@@ -58,19 +58,49 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
     }
 
     internal fun register(): Block {
-        if (blockProperties == null) throw IllegalStateException()
-
         val block = Blocks.register(
             resourceKey,
             customBehaviourCreator,
-            blockProperties!!
+            BlockBehaviour.Properties.of()
         )
+
+        val properties = blockPropertiesConfiguration.build(block.properties())
+        //block.forceCopyFieldFrom("friction", "", "", Block(properties))
 
         if (itemProperties != null) {
             Items.registerBlock(block, itemProperties!!)
         }
 
         return block
+    }
+
+    private fun BlockBehaviour.forceCopyFieldFrom(mojang: String, intermediary: String, obfuscated: String, from: BlockBehaviour) {
+        val clazz = Block::class.java
+        val field: Field = try {
+            clazz.getDeclaredField(mojang)
+        }
+        catch (e: NoSuchFieldException) {
+            e.printStackTrace()
+
+            try {
+                clazz.getDeclaredField(intermediary)
+            }
+            catch (f: NoSuchFieldException) {
+                f.printStackTrace()
+
+                try {
+                    clazz.getDeclaredField(obfuscated)
+                }
+                catch (g: NoSuchFieldException) {
+                    g.printStackTrace()
+
+                    throw RuntimeException("Could not find field '$mojang' (Mojang), '$intermediary' (Intermediary), '$obfuscated' (Obfuscated) in class '${clazz.name}'.")
+                }
+            }
+        }
+
+        field.trySetAccessible()
+        field.set(this, field.get(from))
     }
 
     class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {

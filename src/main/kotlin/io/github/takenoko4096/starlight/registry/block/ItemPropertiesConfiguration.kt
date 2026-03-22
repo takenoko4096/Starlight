@@ -5,11 +5,11 @@ import net.minecraft.world.item.Item
 
 @StarlightDSL
 class ItemPropertiesConfiguration internal constructor(private val configuration: ModBlockConfiguration, callback: ItemPropertiesConfiguration.() -> Unit) {
+    private var translationKey: String? = null
+
     init {
         callback()
     }
-
-    private var translationKey: String? = null
 
     fun translationKeyOf(value: String) {
         translationKey = "block.${configuration.registry.mod.identifier}.$value"

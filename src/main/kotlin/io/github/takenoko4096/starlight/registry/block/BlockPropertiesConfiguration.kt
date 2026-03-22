@@ -12,10 +12,6 @@ import java.util.Optional
 
 @StarlightDSL
 class BlockPropertiesConfiguration internal constructor(private val configuration: ModBlockConfiguration, callback: BlockPropertiesConfiguration.() -> Unit) {
-    init {
-        callback()
-    }
-
     var destroyTime: Float = 1f
 
     var sound: SoundType = SoundType.STONE
@@ -46,6 +42,10 @@ class BlockPropertiesConfiguration internal constructor(private val configuratio
 
     private var lightLevelProvider: (BlockState) -> Int = { 0 }
 
+    init {
+        callback()
+    }
+
     fun mapColor(callback: (BlockState) -> MapColor) {
         mapColorProvider = callback
     }
@@ -54,8 +54,7 @@ class BlockPropertiesConfiguration internal constructor(private val configuratio
         lightLevelProvider = callback
     }
 
-    internal fun build(): BlockBehaviour.Properties {
-        val properties = BlockBehaviour.Properties.of()
+    internal fun build(properties: BlockBehaviour.Properties): BlockBehaviour.Properties {
         properties.destroyTime(destroyTime)
         properties.sound(sound)
         if (!occlusion) properties.noOcclusion()
@@ -71,6 +70,7 @@ class BlockPropertiesConfiguration internal constructor(private val configuratio
         properties.pushReaction(pushReaction)
         properties.mapColor(mapColorProvider)
         properties.lightLevel(lightLevelProvider)
+
         return properties
     }
 }
