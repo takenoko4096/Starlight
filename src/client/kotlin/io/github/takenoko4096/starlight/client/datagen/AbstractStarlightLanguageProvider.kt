@@ -19,7 +19,6 @@ abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModIn
             val translation = accessor.translation()
 
             getTranslation(translation)?.let {
-                println(it)
                 translationBuilder.add(block.descriptionId, it)
             }
         }

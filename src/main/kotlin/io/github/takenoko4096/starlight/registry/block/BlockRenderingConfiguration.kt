@@ -6,6 +6,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.Property
+import kotlin.collections.associate
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
@@ -145,6 +146,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
                 mod,
                 config,
                 ModelOptionProvider(callback),
+                BuiltinNonClientModelTemplate.CUBE_DIRECTIONAL,
                 "particle" to particle,
                 "north" to north,
                 "south" to south,
@@ -160,10 +162,39 @@ class BlockRenderingConfiguration internal constructor(private val configuration
                 mod,
                 config,
                 ModelOptionProvider(callback),
+                BuiltinNonClientModelTemplate.CUBE_ALL,
                 "all" to all
             )
         }
     }
+
+    abstract class NonClientModelTemplate
+
+    class BuiltinNonClientModelTemplate private constructor() : NonClientModelTemplate() {
+        private val id = maxId++
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (other !is BuiltinNonClientModelTemplate) return false
+
+            if (id != other.id) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return id
+        }
+
+        companion object {
+            private var maxId = 0
+
+            val CUBE_DIRECTIONAL = BuiltinNonClientModelTemplate()
+            val CUBE_ALL = BuiltinNonClientModelTemplate()
+        }
+    }
+
+    class CustomNonClientModelTemplate(val identifier: Identifier) : NonClientModelTemplate()
 
     @StarlightDSL
     class ModelOptionProvider internal constructor(callback: ModelOptionProvider.() -> Unit) {
@@ -178,9 +209,10 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         val mod: StarlightModInitializer,
         val blockModelConfiguration: BlockModelConfiguration,
         private val options: ModelOptionProvider,
+        val parent: NonClientModelTemplate,
         vararg paths: Pair<String, TexturePath>
     ) : BlockModel() {
-        val mapping: Map<String, Identifier> = paths.associate { it.first to it.second.identifier }
+        val mapping = paths.associate { it.first to it.second.identifier }
 
         fun toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
             return NonClientBlockModelVariant(this, mutators.toList())

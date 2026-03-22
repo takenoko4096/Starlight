@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
 import org.jetbrains.annotations.ApiStatus
+import java.lang.reflect.Field
 import java.util.function.BiConsumer
 
 @ApiStatus.Experimental
@@ -41,7 +42,30 @@ open class CustomBlock internal constructor(
             { a, b, c -> BlockState(a, b, c) }
         )
 
-        val field = Block::class.java.getDeclaredField("stateDefinition")
+        val clazz = Block::class.java
+        val field: Field = try {
+            clazz.getDeclaredField("stateDefinition")
+        }
+        catch (e: NoSuchFieldException) {
+            e.printStackTrace()
+
+            try {
+                clazz.getDeclaredField("field_10647")
+            }
+            catch (f: NoSuchFieldException) {
+                f.printStackTrace()
+
+                try {
+                    clazz.getDeclaredField("C")
+                }
+                catch (g: NoSuchFieldException) {
+                    g.printStackTrace()
+
+                    throw RuntimeException("Could not find field 'stateDefinition' (Mojang), 'field_10647' (Intermediary), 'C' (Obfuscated) in class '${clazz.name}'.")
+                }
+            }
+        }
+
         field.trySetAccessible()
         field.set(this, stateDefinition)
         registerDefaultState(stateDefinition.any())
