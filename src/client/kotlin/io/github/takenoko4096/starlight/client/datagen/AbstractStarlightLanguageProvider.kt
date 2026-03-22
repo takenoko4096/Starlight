@@ -19,6 +19,7 @@ abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModIn
             val translation = accessor.translation()
 
             getTranslation(translation)?.let {
+                println(it)
                 translationBuilder.add(block.descriptionId, it)
             }
         }
@@ -43,7 +44,6 @@ abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModIn
 
     class JaJp(mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : AbstractStarlightLanguageProvider(mod, output, registryLookup, "ja_jp") {
         override fun getTranslation(translationConfiguration: TranslationConfiguration): String? {
-            println("translation jp: "+translationConfiguration.jaJp)
             return translationConfiguration.jaJp
         }
     }

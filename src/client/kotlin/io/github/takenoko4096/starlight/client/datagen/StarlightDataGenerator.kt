@@ -23,10 +23,10 @@ abstract class StarlightDataGenerator(private val mod: StarlightModInitializer) 
             AbstractStarlightLanguageProvider.JaJp(mod, output, registryLookup)
         }
 
-        onInitialize(fabricDataGenerator)
+        onInitialize(pack)
     }
 
-    open fun onInitialize(fabricDataGenerator: FabricDataGenerator) {
+    open fun onInitialize(pack: FabricDataGenerator.Pack) {
 
     }
 }
