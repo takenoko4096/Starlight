@@ -54,7 +54,8 @@ class BlockPropertiesConfiguration internal constructor(private val configuratio
         lightLevelProvider = callback
     }
 
-    internal fun build(properties: BlockBehaviour.Properties): BlockBehaviour.Properties {
+    internal fun build(): BlockBehaviour.Properties {
+        val properties = BlockBehaviour.Properties.of()
         properties.destroyTime(destroyTime)
         properties.sound(sound)
         if (!occlusion) properties.noOcclusion()

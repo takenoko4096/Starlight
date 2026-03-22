@@ -1,7 +1,10 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.StateDefinition
 
 @StarlightDSL
 class CustomBehaviourConfiguration {
@@ -25,8 +28,15 @@ class CustomBehaviourConfiguration {
     internal fun build(): (BlockBehaviour.Properties) -> CustomBlock {
         val defs = propertyDefinitions.toSet()
         val evs = eventDispatcher
+
         return {
-            CustomBlock(it, defs, evs)
+            object : CustomBlock(it, defs, evs) {
+                override fun createBlockStateDefinition(builder: StateDefinition.Builder<Block, BlockState>) {
+                    for (definition in defs) {
+                        builder.add(definition.property)
+                    }
+                }
+            }
         }
     }
 }

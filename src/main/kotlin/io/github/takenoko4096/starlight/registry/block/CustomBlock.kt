@@ -17,7 +17,7 @@ import java.util.function.BiConsumer
 @ApiStatus.Experimental
 open class CustomBlock internal constructor(
     properties: BlockBehaviour.Properties,
-    private val propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>>,
+    propertyDefinitions: Set<BlockStatesConfiguration.PropertyDefinition<*>>,
     private val eventDispatcher: BlockEventsConfiguration.BlockEventDispatcher
 ) : Block(properties) {
     /**
@@ -32,34 +32,6 @@ open class CustomBlock internal constructor(
      */
 
     init {
-        val builder = StateDefinition.Builder<Block, BlockState>(this)
-        for (definition in propertyDefinitions) {
-            builder.add(definition.property)
-        }
-
-        setField(
-            "properties",
-            "field_23155",
-            "O",
-            this,
-            properties
-        )
-
-        val stateDefinition = builder.create(
-            { it.defaultBlockState() },
-            { a, b, c -> BlockState(a, b, c) }
-        )
-
-        setField(
-            "stateDefinition",
-            "field_10647",
-            "C",
-            this,
-            stateDefinition
-        )
-
-        registerDefaultState(stateDefinition.any())
-
         var defaultState = defaultBlockState()
 
         for (definition in propertyDefinitions) {

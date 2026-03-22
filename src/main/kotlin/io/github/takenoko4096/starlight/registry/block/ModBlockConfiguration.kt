@@ -19,7 +19,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         Identifier.fromNamespaceAndPath(registry.mod.identifier, identifier)
     )
 
-    internal var blockPropertiesConfiguration: BlockPropertiesConfiguration = BlockPropertiesConfiguration(this) {}
+    internal var blockProperties: BlockBehaviour.Properties? = null
 
     internal var itemProperties: Item.Properties? = null
 
@@ -30,7 +30,8 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
     internal var translation = TranslationConfiguration()
 
     fun blockProperties(callback: BlockPropertiesConfiguration.() -> Unit) {
-        blockPropertiesConfiguration = BlockPropertiesConfiguration(this, callback)
+        val bpc = BlockPropertiesConfiguration(this, callback)
+        blockProperties = bpc.build()
     }
 
     fun itemProperties(callback: ItemPropertiesConfiguration.() -> Unit) {
@@ -58,14 +59,15 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
     }
 
     internal fun register(): Block {
+        if (blockProperties == null) {
+            throw IllegalStateException("'blockProperties' is unset!")
+        }
+
         val block = Blocks.register(
             resourceKey,
             customBehaviourCreator,
-            BlockBehaviour.Properties.of()
+            blockProperties!!
         )
-
-        val properties = blockPropertiesConfiguration.build(block.properties())
-        //block.forceCopyFieldFrom("friction", "", "", Block(properties))
 
         if (itemProperties != null) {
             Items.registerBlock(block, itemProperties!!)
