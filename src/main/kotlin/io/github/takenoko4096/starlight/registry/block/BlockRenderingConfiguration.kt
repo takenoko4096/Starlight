@@ -103,7 +103,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         val models: Models = Models(configuration.registry.mod, this)
 
-        fun <T : Comparable<T>> propertyVariants(property: Property<T>, callback: VariantsByProperties1<T>.() -> Unit) {
+        fun <T : Comparable<T>> variants(property: Property<T>, callback: VariantsByProperties1<T>.() -> Unit) {
             val vp1 = VariantsByProperties1(property)
             vp1.callback()
             variants = vp1
@@ -140,11 +140,11 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     class Models internal constructor(private val mod: StarlightModInitializer, private val config: BlockModelConfiguration) {
-        fun cubeDirectional(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath, callback: ModelSuffixProvider.() -> Unit = {}): NonClientBlockModel {
+        fun cubeDirectional(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath, callback: ModelOptionProvider.() -> Unit = {}): NonClientBlockModel {
             return NonClientBlockModel(
                 mod,
                 config,
-                ModelSuffixProvider(callback).suffix,
+                ModelOptionProvider(callback),
                 "particle" to particle,
                 "north" to north,
                 "south" to south,
@@ -155,17 +155,18 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             )
         }
 
-        fun cubeAll(all: TexturePath, callback: ModelSuffixProvider.() -> Unit = {}): NonClientBlockModel {
+        fun cubeAll(all: TexturePath, callback: ModelOptionProvider.() -> Unit = {}): NonClientBlockModel {
             return NonClientBlockModel(
                 mod,
                 config,
-                ModelSuffixProvider(callback).suffix,
+                ModelOptionProvider(callback),
                 "all" to all
             )
         }
     }
 
-    class ModelSuffixProvider internal constructor(callback: ModelSuffixProvider.() -> Unit) {
+    @StarlightDSL
+    class ModelOptionProvider internal constructor(callback: ModelOptionProvider.() -> Unit) {
         var suffix: String = ""
 
         init {
@@ -176,25 +177,21 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     class NonClientBlockModel(
         val mod: StarlightModInitializer,
         val blockModelConfiguration: BlockModelConfiguration,
-        private val suffix: String,
+        private val options: ModelOptionProvider,
         vararg paths: Pair<String, TexturePath>
     ) : BlockModel() {
         val mapping: Map<String, Identifier> = paths.associate { it.first to it.second.identifier }
 
-        fun mutate(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
+        fun toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
             return NonClientBlockModelVariant(this, mutators.toList())
         }
 
-        fun plain(): NonClientBlockModelVariant {
-            return NonClientBlockModelVariant(this, listOf())
-        }
-
-        fun setToDefaultItemModel() {
+        fun setAsItemModel() {
             blockModelConfiguration.itemModel = this
         }
 
         fun getSuffix(): String {
-            return if (suffix.isEmpty()) "" else "_$suffix"
+            return if (options.suffix.isEmpty()) "" else "_${options.suffix}"
         }
 
         override fun equals(other: Any?): Boolean {
@@ -229,6 +226,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         UV_LOCK
     }
 
+    @StarlightDSL
     abstract class VariantsByProperties {
         //
     }
