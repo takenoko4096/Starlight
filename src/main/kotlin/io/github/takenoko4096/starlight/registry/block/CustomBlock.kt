@@ -2,7 +2,10 @@ package io.github.takenoko4096.starlight.registry.block
 
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
@@ -10,6 +13,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
+import net.minecraft.world.phys.BlockHitResult
 import org.jetbrains.annotations.ApiStatus
 import java.lang.reflect.Field
 import java.util.function.BiConsumer
@@ -59,12 +63,29 @@ open class CustomBlock internal constructor(
         val event = BlockEventsConfiguration.ExplosionHitEvent(serverLevel, blockState, blockPos, explosion, false) {
             biConsumer.accept(it.itemStack, it.blockPos)
         }
+        eventDispatcher.dispatch(BlockEventsConfiguration.ExplosionHitEvent::class, event)
 
         if (!event.ignore) {
             super.onExplosionHit(blockState, serverLevel, blockPos, explosion) { itemStack, blockPos ->
                 event.dropHandle(BlockEventsConfiguration.ExplosionHitEvent.ExplosionDrop(itemStack, blockPos))
             }
         }
+    }
+
+    override fun useItemOn(itemStack: ItemStack, blockState: BlockState, level: Level, blockPos: BlockPos, player: Player, interactionHand: InteractionHand, blockHitResult: BlockHitResult): InteractionResult {
+        val event = BlockEventsConfiguration.InteractEvent(level, blockState, blockPos, player, blockHitResult, interactionHand, itemStack, InteractionResult.SUCCESS)
+
+        eventDispatcher.dispatch(BlockEventsConfiguration.InteractEvent::class, event)
+
+        return event.interactionResult
+    }
+
+    override fun useWithoutItem(blockState: BlockState, level: Level, blockPos: BlockPos, player: Player, blockHitResult: BlockHitResult): InteractionResult {
+        val event = BlockEventsConfiguration.InteractEvent(level, blockState, blockPos, player, blockHitResult, InteractionHand.MAIN_HAND, null, InteractionResult.SUCCESS)
+
+        eventDispatcher.dispatch(BlockEventsConfiguration.InteractEvent::class, event)
+
+        return event.interactionResult
     }
 
     companion object {

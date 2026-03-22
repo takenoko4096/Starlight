@@ -3,16 +3,20 @@ package io.github.takenoko4096.starlight.registry.block
 import io.github.takenoko4096.starlight.StarlightDSL
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.InteractionHand
+import net.minecraft.world.InteractionResult
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Explosion
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.phys.BlockHitResult
 import kotlin.reflect.KClass
 
 @StarlightDSL
 class BlockEventsConfiguration internal constructor() {
-    private val handlers = mutableSetOf<BlockEventHandler<*, *>>()
+    private val handlers = mutableSetOf<BlockEventHandler<*>>()
 
     fun onFallOn(callback: FallOnEvent.() -> Unit) {
         handlers.add(BlockEventHandler(
@@ -35,17 +39,24 @@ class BlockEventsConfiguration internal constructor() {
         ))
     }
 
-    abstract class BlockEvent<R> internal constructor() {}
+    fun onInteract(callback: InteractEvent.() -> Unit) {
+        handlers.add(BlockEventHandler(
+            InteractEvent::class,
+            callback
+        ))
+    }
 
-    class BlockEventHandler<T : BlockEvent<R>, R> internal constructor(
+    abstract class BlockEvent internal constructor() {}
+
+    class BlockEventHandler<T : BlockEvent> internal constructor(
         val clazz: KClass<T>,
-        val callback: T.() -> R
+        val callback: T.() -> Unit
     )
 
-    class BlockEventDispatcher internal constructor(private val set: Set<BlockEventHandler<*, *>>) {
-        internal fun <T : BlockEvent<R>, R> dispatch(clazz: KClass<T>, event: T) {
+    class BlockEventDispatcher internal constructor(private val set: Set<BlockEventHandler<*>>) {
+        internal fun <T : BlockEvent> dispatch(clazz: KClass<T>, event: T) {
             set.filter { it.clazz == clazz }
-                .forEach { (it.callback as T.() -> R)(event) }
+                .forEach { (it.callback as T.() -> Unit)(event) }
         }
     }
 
@@ -56,14 +67,14 @@ class BlockEventsConfiguration internal constructor() {
         val entity: Entity,
         var distance: Double,
         var causeDamage: Boolean = true
-    ) : BlockEvent<Unit>()
+    ) : BlockEvent()
 
     class StepOnEvent internal constructor(
         val level: Level,
         val blockState: BlockState,
         val blockPos: BlockPos,
         val entity: Entity
-    ) : BlockEvent<Unit>()
+    ) : BlockEvent()
 
     class ExplosionHitEvent internal constructor(
         val serverLevel: ServerLevel,
@@ -72,11 +83,24 @@ class BlockEventsConfiguration internal constructor() {
         val explosion: Explosion,
         var ignore: Boolean = false,
         var dropHandle: (ExplosionDrop) -> Unit
-    ) : BlockEvent<Unit>() {
+    ) : BlockEvent() {
         class ExplosionDrop internal constructor(
             val itemStack: ItemStack,
             val blockPos: BlockPos
         )
+    }
+
+    class InteractEvent internal constructor(
+        val level: Level,
+        val blockState: BlockState,
+        val blockPos: BlockPos,
+        val player: Player?,
+        val blockHitResult: BlockHitResult,
+        val interactionHand: InteractionHand,
+        val itemStack: ItemStack?,
+        internal var interactionResult: InteractionResult
+    ) : BlockEvent() {
+
     }
 
     internal fun build(): BlockEventDispatcher {
