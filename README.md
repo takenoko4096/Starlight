@@ -125,3 +125,6 @@ class TestMod : StarlightModInitializer() {
 - エンティティ追加
 
 など
+
+### 使用例
+[**TestMod**](https://github.com/takenoko4096/TestMod)
