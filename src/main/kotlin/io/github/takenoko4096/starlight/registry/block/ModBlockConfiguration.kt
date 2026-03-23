@@ -96,7 +96,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         }
 
         fun blockDefaultItemModel(): NonClientModel? {
-            return configuration.renderingConfig.modelConfig.itemModelConfig.item
+            return configuration.renderingConfig.modelConfig.itemModelConfig.model
         }
 
         fun translation(): TranslationConfiguration {

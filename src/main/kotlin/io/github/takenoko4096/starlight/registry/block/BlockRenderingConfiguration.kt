@@ -2,15 +2,11 @@ package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.render.TexturePath
-import io.github.takenoko4096.starlight.render.model.ModelOptions
 import io.github.takenoko4096.starlight.render.model.NonClientModel
-import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModelTemplate
+import io.github.takenoko4096.starlight.render.model.block.BlockModelProvider
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
-import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModel
-import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinTextureSlot
-import io.github.takenoko4096.starlight.render.model.custom.NonClientCustomModel
-import net.minecraft.resources.Identifier
+import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import net.minecraft.world.level.block.state.properties.Property
 
 @StarlightDSL
@@ -65,9 +61,13 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         internal var itemModelConfig = ItemModelConfiguration(configuration)
 
-        val defaultTexturePaths = DefaultTexturePathProvider(configuration)
+        val blockDefaultTexturePath = TexturePath.blockDefault(configuration.blockResourceKey)
 
-        val blockModels: BlockModelProvider = BlockModelProvider(configuration)
+        val itemDefaultTexturePath = TexturePath.itemDefault(configuration.itemResourceKey)
+
+        val blockModels = BlockModelProvider(configuration.blockResourceKey)
+
+        val itemModels = ItemModelProvider(configuration.itemResourceKey)
 
         fun block(callback: BlockModelConfiguration.() -> Unit) {
             val bmc = BlockModelConfiguration(configuration)
@@ -80,11 +80,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             imc.callback()
             itemModelConfig = imc
         }
-    }
-
-    class DefaultTexturePathProvider internal constructor(internal val configuration: ModBlockConfiguration) {
-        val block = TexturePath.blockDefault(configuration.blockResourceKey)
-        val item = TexturePath.itemDefault(configuration.itemResourceKey)
     }
 
     @StarlightDSL
@@ -141,49 +136,10 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     class ItemModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
-        internal var item: NonClientModel? = null
+        internal var model: NonClientModel? = null
 
         fun NonClientModel.useAsItemModel() {
-            item = this
-        }
-    }
-
-    class BlockModelProvider internal constructor(private val configuration: ModBlockConfiguration) {
-        fun cube(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
-            return NonClientBuiltinModel(
-                configuration.blockResourceKey,
-                NonClientBuiltinModelTemplate.CUBE,
-                mapOf(
-                    NonClientBuiltinTextureSlot.PARTICLE to particle,
-                    NonClientBuiltinTextureSlot.NORTH to north,
-                    NonClientBuiltinTextureSlot.SOUTH to south,
-                    NonClientBuiltinTextureSlot.EAST to east,
-                    NonClientBuiltinTextureSlot.WEST to west,
-                    NonClientBuiltinTextureSlot.UP to up,
-                    NonClientBuiltinTextureSlot.DOWN to down
-                ),
-                ModelOptions(callback)
-            )
-        }
-
-        fun cubeAll(all: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
-            return NonClientBuiltinModel(
-                configuration.blockResourceKey,
-                NonClientBuiltinModelTemplate.CUBE_ALL,
-                mapOf(
-                    NonClientBuiltinTextureSlot.ALL to all
-                ),
-                ModelOptions(callback)
-            )
-        }
-
-        fun custom(modelTemplate: Identifier, textureMapping: Map<String, TexturePath>, callback: ModelOptions.() -> Unit = {}): NonClientCustomModel {
-            return NonClientCustomModel(
-                configuration.blockResourceKey,
-                modelTemplate,
-                textureMapping,
-                ModelOptions(callback)
-            )
+            model = this
         }
     }
 
