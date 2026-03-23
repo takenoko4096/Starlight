@@ -12,8 +12,6 @@ import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfigurati
 
 class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
-        // ここでエラーが出るかどうか、すべてはrunDatagenの内部実装にかかっている
-        // 多分内部でminecraft mainを起動してるだけだからいけるとは思うんだけどね
         val blockRegistry = mod.blockRegistry
 
         for (configuration in blockRegistry.getConfigurations()) {

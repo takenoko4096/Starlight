@@ -4,14 +4,17 @@ import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
+import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.BlockAndTintGetter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.BlockState
 
 @StarlightDSL
 class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal val identifier: String) {
@@ -101,6 +104,14 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
 
         fun translation(): TranslationConfiguration {
             return configuration.translation
+        }
+
+        fun tintDefaultColor(): Int {
+            return configuration.renderingConfig.tintConfig.defaultColor
+        }
+
+        fun tintCallback(): (BlockPos, BlockState, BlockAndTintGetter) -> Int {
+            return configuration.renderingConfig.tintConfig.callback
         }
     }
 

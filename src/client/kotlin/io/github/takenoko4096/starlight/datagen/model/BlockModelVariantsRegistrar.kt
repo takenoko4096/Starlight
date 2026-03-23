@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Block
 class BlockModelVariantsRegistrar internal constructor(
     internal val blockModelGenerators: BlockModelGenerators,
     internal val block: Block,
-    internal val defaultItemModel: NonClientModel?,
+    internal val itemModel: NonClientModel?,
     internal val variants: PropertyVariants
 ) {
     private val empty = MultiVariantGenerator.dispatch(block)
@@ -59,11 +59,10 @@ class BlockModelVariantsRegistrar internal constructor(
         val generator = empty.with(dispatch)
         blockModelGenerators.blockStateOutput.accept(generator)
 
-        if (defaultItemModel != null) {
-
+        if (itemModel != null) {
             blockModelGenerators.registerSimpleItemModel(
                 block,
-                ClientModel.getOrCreate(block, defaultItemModel, blockModelGenerators).identifier
+                ClientModel.getOrCreate(block, itemModel, blockModelGenerators).identifier
             )
         }
     }

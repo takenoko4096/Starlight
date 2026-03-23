@@ -7,6 +7,9 @@ import io.github.takenoko4096.starlight.render.model.block.BlockModelProvider
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
+import net.minecraft.core.BlockPos
+import net.minecraft.world.level.BlockAndTintGetter
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 
 @StarlightDSL
@@ -14,6 +17,8 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     internal var chunkSectionLayer: NonClientChunkSectionLayer = NonClientChunkSectionLayer.SOLID
 
     internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
+
+    internal var tintConfig: TintConfiguration = TintConfiguration(configuration)
 
     fun layer(callback: LayerConfiguration.() -> Unit) {
         val lc = LayerConfiguration()
@@ -25,6 +30,12 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         val mc = ModelConfiguration(configuration)
         mc.callback()
         modelConfig = mc
+    }
+
+    fun tint(callback: TintConfiguration.() -> Unit) {
+        val tc = TintConfiguration(configuration)
+        tc.callback()
+        tintConfig = tc
     }
 
     @StarlightDSL
@@ -53,6 +64,17 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         CUTOUT,
         TRANSLUCENT,
         TRIPWIRE
+    }
+
+    @StarlightDSL
+    class TintConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
+        var defaultColor: Int = -1
+
+        internal var callback: (BlockPos, BlockState, BlockAndTintGetter) -> Int = { a, b, c -> -1 }
+
+        fun provide(callback: (BlockPos, BlockState, BlockAndTintGetter) -> Int) {
+            this.callback = callback
+        }
     }
 
     @StarlightDSL

@@ -13,15 +13,15 @@
 > - Starlight は MOD であり、 `mods` フォルダに配置する必要があります
 
 ```kotlin
-class TestMod : StarlightModInitializer() {
+object TestMod : StarlightModInitializer() {
     override val identifier = "testmod"
 
     override fun onInitialize() {}
 }
 
-class TestModClient : StarlightClient(TestMod)
+object TestModClient : StarlightClientModInitializer(TestMod)
 
-class TestModDataGenerator : StarlightDataGenerator(TestMod)
+object TestModDataGenerator : StarlightDataGenerator(TestMod)
 ```
 
 ### Register New Block
@@ -33,21 +33,21 @@ class TestModDataGenerator : StarlightDataGenerator(TestMod)
 > (↓の例の場合, `block/prismarine_lamp.png`, `block/prismarine_lamp_on.png` が必要)
 
 ```kotlin
-class TestMod : StarlightModInitializer() {
+object TestMod : StarlightModInitializer() {
     override val identifier = "testmod"
 
     override fun onInitialize() {
         val prismarineLamp = blockRegistry.register("prismarine_lamp") {
             val info = customBehaviour {
                 blockStates {
-                    booleanProperty("luminance") {
+                    booleanProperty("lit") {
                         defaultValue = false
                     }
                 }
 
                 events {
                     onInteract {
-                        val property = props.boolean("luminance")
+                        val property = props.boolean("lit")
                         val value = blockState.getValue(property)
                         level.setBlockAndUpdate(blockPos, blockState.setValue(property, !value))
                     }
@@ -73,21 +73,25 @@ class TestMod : StarlightModInitializer() {
             }
 
             rendering {
-                blockModel {
-                    val unlit = models.cubeAll(defaultTexturePath)
-                    val lit = models.cubeAll(defaultTexturePath.suffixed("on")) {
-                        suffix = "on"
+                val off = blockModels.cubeAll(blockDefaultTexturePath)
+                val lit = blockModels.cubeAll(blockDefaultTexturePath.suffixed("on")) {
+                    suffix = "on"
+                }
+                
+                models {
+                    block {
+                        variants(info.properties.boolean("luminance")) {
+                            off.toVariant().useWhen(false)
+                            on.toVariant().useWhen(true)
+                        }
                     }
 
-                    variants(info.properties.boolean("luminance")) {
-                        unlit.toVariant().useWhen(false)
-                        lit.toVariant().useWhen(true)
+                    item {
+                        unlit.setAsItemModel()
                     }
-
-                    unlit.setAsItemModel()
                 }
 
-                chunkSectionLayer {
+                layer {
                     solid()
                 }
             }
@@ -104,7 +108,7 @@ class TestMod : StarlightModInitializer() {
 > これを使用せずとも、ブロック等の翻訳名は定義可能
 
 ```kotlin
-class TestMod : StarlightModInitializer() {
+object TestMod : StarlightModInitializer() {
     override val identifier = "testmod"
 
     override fun onInitialize() {
