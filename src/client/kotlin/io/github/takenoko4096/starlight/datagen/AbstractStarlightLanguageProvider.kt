@@ -15,7 +15,7 @@ abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModIn
     override fun generateTranslations(holderLookupProvider: HolderLookup.Provider, translationBuilder: TranslationBuilder) {
         val blockRegistry = mod.blockRegistry
         for (configuration in blockRegistry.getConfigurations()) {
-            val block = blockRegistry.getBlock(configuration.resourceKey)
+            val block = blockRegistry.getBlock(configuration.blockResourceKey)
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
             val translation = accessor.translation()
 

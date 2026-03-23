@@ -2,6 +2,7 @@ package io.github.takenoko4096.starlight.render
 
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 
 open class TexturePath private constructor(val identifier: Identifier) {
@@ -25,6 +26,10 @@ open class TexturePath private constructor(val identifier: Identifier) {
     companion object {
         internal fun blockDefault(resourceKey: ResourceKey<Block>): TexturePath {
             return TexturePath(resourceKey.identifier().withPrefix("block/"))
+        }
+
+        internal fun itemDefault(resourceKey: ResourceKey<Item>): TexturePath {
+            return TexturePath(resourceKey.identifier().withPrefix("item/"))
         }
     }
 }

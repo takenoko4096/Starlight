@@ -14,7 +14,7 @@ abstract class StarlightClient(private val mod: StarlightModInitializer) : Clien
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
 
             BlockRenderLayerMap.putBlock(
-                blockRegistry.getBlock(configuration.resourceKey),
+                blockRegistry.getBlock(configuration.blockResourceKey),
                 when (accessor.chunkSectionLayer()) {
                     BlockRenderingConfiguration.NonClientChunkSectionLayer.SOLID -> ChunkSectionLayer.SOLID
                     BlockRenderingConfiguration.NonClientChunkSectionLayer.CUTOUT -> ChunkSectionLayer.CUTOUT

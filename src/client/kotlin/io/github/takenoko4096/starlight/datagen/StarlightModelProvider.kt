@@ -2,7 +2,6 @@ package io.github.takenoko4096.starlight.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.datagen.model.BlockModelVariantsRegistrar
-import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -18,7 +17,7 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
         val blockRegistry = mod.blockRegistry
 
         for (configuration in blockRegistry.getConfigurations()) {
-            val block = blockRegistry.getBlock(configuration.resourceKey)
+            val block = blockRegistry.getBlock(configuration.blockResourceKey)
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
 
             val model = accessor.blockModelLegacy()

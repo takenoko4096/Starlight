@@ -17,18 +17,18 @@ import net.minecraft.world.level.block.state.properties.Property
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
     internal var chunkSectionLayer: NonClientChunkSectionLayer = NonClientChunkSectionLayer.SOLID
 
-    internal var blockModelConfig = BlockModelConfiguration(configuration)
+    internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
 
-    fun chunkSectionLayer(callback: LayerConfiguration.() -> Unit) {
+    fun layer(callback: LayerConfiguration.() -> Unit) {
         val lc = LayerConfiguration()
         lc.callback()
         chunkSectionLayer = lc.layer
     }
 
-    fun blockModel(callback: BlockModelConfiguration.() -> Unit) {
-        val bmc = BlockModelConfiguration(configuration)
-        bmc.callback()
-        blockModelConfig = bmc
+    fun models(callback: ModelConfiguration.() -> Unit) {
+        val mc = ModelConfiguration(configuration)
+        mc.callback()
+        modelConfig = mc
     }
 
     @StarlightDSL
@@ -60,23 +60,41 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     @StarlightDSL
+    class ModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
+        internal var blockModelConfig = BlockModelConfiguration(configuration)
+
+        internal var itemModelConfig = ItemModelConfiguration(configuration)
+
+        val defaultTexturePaths = DefaultTexturePathProvider(configuration)
+
+        val blockModels: BlockModelProvider = BlockModelProvider(configuration)
+
+        fun block(callback: BlockModelConfiguration.() -> Unit) {
+            val bmc = BlockModelConfiguration(configuration)
+            bmc.callback()
+            blockModelConfig = bmc
+        }
+
+        fun item(callback: ItemModelConfiguration.() -> Unit) {
+            val imc = ItemModelConfiguration(configuration)
+            imc.callback()
+            itemModelConfig = imc
+        }
+    }
+
+    class DefaultTexturePathProvider internal constructor(internal val configuration: ModBlockConfiguration) {
+        val block = TexturePath.blockDefault(configuration.blockResourceKey)
+        val item = TexturePath.itemDefault(configuration.itemResourceKey)
+    }
+
+    @StarlightDSL
     class BlockModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
         internal var variants: PropertyVariants? = null
-
-        internal var item: NonClientModel? = null
-
-        val defaultTexturePath = TexturePath.blockDefault(configuration.resourceKey)
-
-        val models: BlockModelProvider = BlockModelProvider(this)
 
         fun <T : Comparable<T>> variants(property: Property<T>, callback: PropertyVariants1<T>.() -> Unit) {
             val vp1 = PropertyVariants1(property)
             vp1.callback()
             variants = vp1
-        }
-
-        fun NonClientModel.useAsItemModel() {
-            item = this
         }
 
         internal var model: SingleArgBlockModel? = null
@@ -122,10 +140,18 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         }
     }
 
-    class BlockModelProvider internal constructor(private val configuration: BlockModelConfiguration) {
+    class ItemModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
+        internal var item: NonClientModel? = null
+
+        fun NonClientModel.useAsItemModel() {
+            item = this
+        }
+    }
+
+    class BlockModelProvider internal constructor(private val configuration: ModBlockConfiguration) {
         fun cube(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
             return NonClientBuiltinModel(
-                configuration.configuration.resourceKey,
+                configuration.blockResourceKey,
                 NonClientBuiltinModelTemplate.CUBE,
                 mapOf(
                     NonClientBuiltinTextureSlot.PARTICLE to particle,
@@ -142,7 +168,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         fun cubeAll(all: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
             return NonClientBuiltinModel(
-                configuration.configuration.resourceKey,
+                configuration.blockResourceKey,
                 NonClientBuiltinModelTemplate.CUBE_ALL,
                 mapOf(
                     NonClientBuiltinTextureSlot.ALL to all
@@ -153,7 +179,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         fun custom(modelTemplate: Identifier, textureMapping: Map<String, TexturePath>, callback: ModelOptions.() -> Unit = {}): NonClientCustomModel {
             return NonClientCustomModel(
-                configuration.configuration.resourceKey,
+                configuration.blockResourceKey,
                 modelTemplate,
                 textureMapping,
                 ModelOptions(callback)

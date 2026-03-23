@@ -15,7 +15,7 @@ class ModBlockRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
         o.configuration()
         val block = o.register()
         configurations.add(o)
-        blocks[o.resourceKey] = block
+        blocks[o.blockResourceKey] = block
         return block
     }
 

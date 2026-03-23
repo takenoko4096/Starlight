@@ -15,8 +15,13 @@ import net.minecraft.world.level.block.state.BlockBehaviour
 
 @StarlightDSL
 class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal val identifier: String) {
-    val resourceKey: ResourceKey<Block> = ResourceKey.create(
+    val blockResourceKey: ResourceKey<Block> = ResourceKey.create(
         Registries.BLOCK,
+        Identifier.fromNamespaceAndPath(registry.mod.identifier, identifier)
+    )
+
+    val itemResourceKey: ResourceKey<Item> = ResourceKey.create(
+        Registries.ITEM,
         Identifier.fromNamespaceAndPath(registry.mod.identifier, identifier)
     )
 
@@ -65,7 +70,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         }
 
         val block = Blocks.register(
-            resourceKey,
+            blockResourceKey,
             customBehaviourCreator,
             blockProperties!!
         )
@@ -83,15 +88,15 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         }
 
         fun blockModelLegacy(): BlockRenderingConfiguration.SingleArgBlockModel? {
-            return configuration.renderingConfig.blockModelConfig.model
+            return configuration.renderingConfig.modelConfig.blockModelConfig.model
         }
 
         fun blockModelVariants(): PropertyVariants? {
-            return configuration.renderingConfig.blockModelConfig.variants
+            return configuration.renderingConfig.modelConfig.blockModelConfig.variants
         }
 
         fun blockDefaultItemModel(): NonClientModel? {
-            return configuration.renderingConfig.blockModelConfig.item
+            return configuration.renderingConfig.modelConfig.itemModelConfig.item
         }
 
         fun translation(): TranslationConfiguration {
