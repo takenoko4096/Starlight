@@ -106,10 +106,6 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.translation
         }
 
-        fun tintDefaultColor(): Int {
-            return configuration.renderingConfig.tintConfig.defaultColor
-        }
-
         fun tintCallback(): (BlockPos, BlockState, BlockAndTintGetter) -> Int {
             return configuration.renderingConfig.tintConfig.callback
         }

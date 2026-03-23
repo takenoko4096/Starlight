@@ -32,7 +32,7 @@ abstract class StarlightClientModInitializer(private val mod: StarlightModInitia
                     accessor.tintCallback()(blockPos, blockState, blockAndTintGetter)
                 }
 
-                return@register accessor.tintDefaultColor()
+                return@register -1
             },block)
         }
 

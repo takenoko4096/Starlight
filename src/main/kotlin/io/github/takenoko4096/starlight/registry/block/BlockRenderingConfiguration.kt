@@ -68,8 +68,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
     @StarlightDSL
     class TintConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
-        var defaultColor: Int = -1
-
         internal var callback: (BlockPos, BlockState, BlockAndTintGetter) -> Int = { a, b, c -> -1 }
 
         fun provide(callback: (BlockPos, BlockState, BlockAndTintGetter) -> Int) {
