@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block
 class ClientCustomBlockModel(block: Block, model: NonClientCustomModel, generators: BlockModelGenerators) : ClientCustomModel(model) {
     override val identifier: Identifier = template.createWithSuffix(
         block,
-        if (model.options.suffix == null) "" else model.options.suffix!!,
+        if (model.options.suffix == null) "" else '_' + model.options.suffix!!,
         mapping,
         generators.modelOutput
     )
