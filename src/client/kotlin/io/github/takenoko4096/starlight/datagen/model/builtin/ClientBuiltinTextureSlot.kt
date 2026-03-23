@@ -1,0 +1,28 @@
+package io.github.takenoko4096.starlight.datagen.model.builtin
+
+import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinTextureSlot
+import net.minecraft.client.data.models.model.TextureSlot
+
+enum class ClientBuiltinTextureSlot(
+    private val nonClient: NonClientBuiltinTextureSlot,
+    private val client: TextureSlot
+) {
+    ALL(NonClientBuiltinTextureSlot.ALL, TextureSlot.ALL),
+    PARTICLE(NonClientBuiltinTextureSlot.PARTICLE, TextureSlot.PARTICLE),
+    NORTH(NonClientBuiltinTextureSlot.NORTH, TextureSlot.NORTH),
+    SOUTH(NonClientBuiltinTextureSlot.SOUTH, TextureSlot.SOUTH),
+    EAST(NonClientBuiltinTextureSlot.EAST, TextureSlot.EAST),
+    WEST(NonClientBuiltinTextureSlot.WEST, TextureSlot.WEST),
+    UP(NonClientBuiltinTextureSlot.UP, TextureSlot.UP),
+    DOWN(NonClientBuiltinTextureSlot.DOWN, TextureSlot.DOWN);
+
+    companion object {
+        fun convert(nonClient: NonClientBuiltinTextureSlot): TextureSlot {
+            for (entry in entries) {
+                if (entry.nonClient == nonClient) return entry.client
+            }
+
+            throw IllegalStateException("Not implemented (client side)")
+        }
+    }
+}

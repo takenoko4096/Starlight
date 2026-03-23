@@ -1,12 +1,17 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.render.TexturePath
+import io.github.takenoko4096.starlight.render.model.ModelOptions
+import io.github.takenoko4096.starlight.render.model.NonClientModel
+import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModelTemplate
+import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
+import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
+import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModel
+import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinTextureSlot
+import io.github.takenoko4096.starlight.render.model.custom.NonClientCustomModel
 import net.minecraft.resources.Identifier
-import net.minecraft.resources.ResourceKey
-import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.Property
-import kotlin.collections.associate
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
@@ -55,10 +60,26 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     @StarlightDSL
-    class BlockModelConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
-        internal var model: BlockModel? = null
+    class BlockModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
+        internal var variants: PropertyVariants? = null
 
-        internal var variants: VariantsByProperties? = null
+        internal var item: NonClientModel? = null
+
+        val defaultTexturePath = TexturePath.blockDefault(configuration.resourceKey)
+
+        val models: BlockModelProvider = BlockModelProvider(this)
+
+        fun <T : Comparable<T>> variants(property: Property<T>, callback: PropertyVariants1<T>.() -> Unit) {
+            val vp1 = PropertyVariants1(property)
+            vp1.callback()
+            variants = vp1
+        }
+
+        fun NonClientModel.useAsItemModel() {
+            item = this
+        }
+
+        internal var model: SingleArgBlockModel? = null
 
         private fun singleArg(textureMap: SingleArgBlockModel.SingleArgBlockTextureMap) {
             model = SingleArgBlockModel(textureMap)
@@ -99,191 +120,48 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         fun lantern() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.LANTERN)
         }
-
-        val defaultTexturePath = TexturePath.defaultPath(configuration.resourceKey)
-
-        val models: Models = Models(configuration.registry.mod, this)
-
-        fun <T : Comparable<T>> variants(property: Property<T>, callback: VariantsByProperties1<T>.() -> Unit) {
-            val vp1 = VariantsByProperties1(property)
-            vp1.callback()
-            variants = vp1
-        }
-
-        internal var itemModel: NonClientBlockModel? = null
     }
 
-    abstract class BlockModel internal constructor()
-
-    open class TexturePath private constructor(val identifier: Identifier) {
-        fun suffixed(suffix: String): TexturePath {
-            return TexturePath(identifier.withSuffix("_$suffix"))
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is TexturePath) return false
-
-            if (identifier != other.identifier) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return identifier.hashCode()
-        }
-
-        companion object {
-            internal fun defaultPath(resourceKey: ResourceKey<Block>): TexturePath {
-                return TexturePath(resourceKey.identifier().withPrefix("block/"))
-            }
-        }
-    }
-
-    class Models internal constructor(private val mod: StarlightModInitializer, private val config: BlockModelConfiguration) {
-        fun cube(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath, callback: ModelOptionProvider.() -> Unit = {}): NonClientBlockModel {
-            return NonClientBlockModel(
-                mod,
-                config,
-                ModelOptionProvider(callback),
-                BuiltinNonClientModelTemplate.CUBE,
-                "particle" to particle,
-                "north" to north,
-                "south" to south,
-                "east" to east,
-                "west" to west,
-                "up" to up,
-                "down" to down
+    class BlockModelProvider internal constructor(private val configuration: BlockModelConfiguration) {
+        fun cube(particle: TexturePath, north: TexturePath, south: TexturePath, east: TexturePath, west: TexturePath, up: TexturePath, down: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
+            return NonClientBuiltinModel(
+                configuration.configuration.resourceKey,
+                NonClientBuiltinModelTemplate.CUBE,
+                mapOf(
+                    NonClientBuiltinTextureSlot.PARTICLE to particle,
+                    NonClientBuiltinTextureSlot.NORTH to north,
+                    NonClientBuiltinTextureSlot.SOUTH to south,
+                    NonClientBuiltinTextureSlot.EAST to east,
+                    NonClientBuiltinTextureSlot.WEST to west,
+                    NonClientBuiltinTextureSlot.UP to up,
+                    NonClientBuiltinTextureSlot.DOWN to down
+                ),
+                ModelOptions(callback)
             )
         }
 
-        fun cubeAll(all: TexturePath, callback: ModelOptionProvider.() -> Unit = {}): NonClientBlockModel {
-            return NonClientBlockModel(
-                mod,
-                config,
-                ModelOptionProvider(callback),
-                BuiltinNonClientModelTemplate.CUBE_ALL,
-                "all" to all
+        fun cubeAll(all: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
+            return NonClientBuiltinModel(
+                configuration.configuration.resourceKey,
+                NonClientBuiltinModelTemplate.CUBE_ALL,
+                mapOf(
+                    NonClientBuiltinTextureSlot.ALL to all
+                ),
+                ModelOptions(callback)
+            )
+        }
+
+        fun custom(modelTemplate: Identifier, textureMapping: Map<String, TexturePath>, callback: ModelOptions.() -> Unit = {}): NonClientCustomModel {
+            return NonClientCustomModel(
+                configuration.configuration.resourceKey,
+                modelTemplate,
+                textureMapping,
+                ModelOptions(callback)
             )
         }
     }
 
-    abstract class NonClientModelTemplate
-
-    class BuiltinNonClientModelTemplate private constructor() : NonClientModelTemplate() {
-        private val id = maxId++
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is BuiltinNonClientModelTemplate) return false
-
-            if (id != other.id) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            return id
-        }
-
-        companion object {
-            private var maxId = 0
-
-            val CUBE = BuiltinNonClientModelTemplate()
-            val CUBE_ALL = BuiltinNonClientModelTemplate()
-        }
-    }
-
-    class CustomNonClientModelTemplate(val identifier: Identifier) : NonClientModelTemplate()
-
-    @StarlightDSL
-    class ModelOptionProvider internal constructor(callback: ModelOptionProvider.() -> Unit) {
-        var suffix: String = ""
-
-        init {
-            callback()
-        }
-    }
-
-    class NonClientBlockModel(
-        val mod: StarlightModInitializer,
-        val blockModelConfiguration: BlockModelConfiguration,
-        private val options: ModelOptionProvider,
-        val parent: NonClientModelTemplate,
-        vararg paths: Pair<String, TexturePath>
-    ) : BlockModel() {
-        val mapping = paths.associate { it.first to it.second.identifier }
-
-        fun toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
-            return NonClientBlockModelVariant(this, mutators.toList())
-        }
-
-        fun setAsItemModel() {
-            blockModelConfiguration.itemModel = this
-        }
-
-        fun getSuffix(): String {
-            return if (options.suffix.isEmpty()) "" else "_${options.suffix}"
-        }
-
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (other !is NonClientBlockModel) return false
-
-            if (mod != other.mod) return false
-            if (mapping != other.mapping) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = mod.hashCode()
-            result = 31 * result + mapping.hashCode()
-            return result
-        }
-    }
-
-    class NonClientBlockModelVariant internal constructor(
-        val model: NonClientBlockModel,
-        val mutators: List<NonClientVariantMutator>
-    ) : BlockModel()
-
-    enum class NonClientVariantMutator {
-        X_ROT_90,
-        X_ROT_180,
-        X_ROT_270,
-        Y_ROT_90,
-        Y_ROT_180,
-        Y_ROT_270,
-        UV_LOCK
-    }
-
-    @StarlightDSL
-    abstract class VariantsByProperties {
-        //
-    }
-
-    abstract class NonClientSelect internal constructor(val modelVariant: NonClientBlockModelVariant)
-
-    class NonClientSelect1<T : Comparable<T>> internal constructor(
-        val value1: T,
-        model: NonClientBlockModelVariant
-    ) : NonClientSelect(model)
-
-    class VariantsByProperties1<T : Comparable<T>> internal constructor(val property: Property<T>) : VariantsByProperties() {
-        val selects: MutableSet<NonClientSelect1<T>> = mutableSetOf()
-
-        fun NonClientBlockModelVariant.useWhen(value1: T) {
-            selects.add(
-                NonClientSelect1(
-                    value1,
-                    this
-                )
-            )
-        }
-    }
-
-    class SingleArgBlockModel internal constructor(val textureMap: SingleArgBlockTextureMap) : BlockModel() {
+    class SingleArgBlockModel internal constructor(val textureMap: SingleArgBlockTextureMap) {
         enum class SingleArgBlockTextureMap {
             TRIVIAL_CUBE,
             TRIVIAL_COLUMN,

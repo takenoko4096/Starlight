@@ -2,6 +2,8 @@ package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.render.model.NonClientModel
+import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -10,7 +12,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
-import java.lang.reflect.Field
 
 @StarlightDSL
 class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal val identifier: String) {
@@ -76,50 +77,21 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         return block
     }
 
-    private fun BlockBehaviour.forceCopyFieldFrom(mojang: String, intermediary: String, obfuscated: String, from: BlockBehaviour) {
-        val clazz = Block::class.java
-        val field: Field = try {
-            clazz.getDeclaredField(mojang)
-        }
-        catch (e: NoSuchFieldException) {
-            e.printStackTrace()
-
-            try {
-                clazz.getDeclaredField(intermediary)
-            }
-            catch (f: NoSuchFieldException) {
-                f.printStackTrace()
-
-                try {
-                    clazz.getDeclaredField(obfuscated)
-                }
-                catch (g: NoSuchFieldException) {
-                    g.printStackTrace()
-
-                    throw RuntimeException("Could not find field '$mojang' (Mojang), '$intermediary' (Intermediary), '$obfuscated' (Obfuscated) in class '${clazz.name}'.")
-                }
-            }
-        }
-
-        field.trySetAccessible()
-        field.set(this, field.get(from))
-    }
-
     class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {
         fun chunkSectionLayer(): BlockRenderingConfiguration.NonClientChunkSectionLayer {
             return configuration.renderingConfig.chunkSectionLayer
         }
 
-        fun blockModelLegacy(): BlockRenderingConfiguration.BlockModel? {
+        fun blockModelLegacy(): BlockRenderingConfiguration.SingleArgBlockModel? {
             return configuration.renderingConfig.blockModelConfig.model
         }
 
-        fun blockModelVariants(): BlockRenderingConfiguration.VariantsByProperties? {
+        fun blockModelVariants(): PropertyVariants? {
             return configuration.renderingConfig.blockModelConfig.variants
         }
 
-        fun blockDefaultItemModel(): BlockRenderingConfiguration.NonClientBlockModel? {
-            return configuration.renderingConfig.blockModelConfig.itemModel
+        fun blockDefaultItemModel(): NonClientModel? {
+            return configuration.renderingConfig.blockModelConfig.item
         }
 
         fun translation(): TranslationConfiguration {

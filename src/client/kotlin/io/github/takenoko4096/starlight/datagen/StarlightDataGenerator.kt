@@ -1,4 +1,4 @@
-package io.github.takenoko4096.starlight.client.datagen
+package io.github.takenoko4096.starlight.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint

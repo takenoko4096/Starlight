@@ -1,4 +1,4 @@
-package io.github.takenoko4096.starlight.client.datagen
+package io.github.takenoko4096.starlight.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
+import kotlin.collections.iterator
 
 abstract class AbstractStarlightLanguageProvider(private val mod: StarlightModInitializer, output: FabricDataOutput, registryLookup: CompletableFuture<HolderLookup.Provider>, private val languageCode: String) : FabricLanguageProvider(output, languageCode, registryLookup) {
     protected abstract fun getTranslation(translationConfiguration: TranslationConfiguration): String?
