@@ -10,6 +10,10 @@ enum class NonClientBuiltinModelTemplate(vararg val textureSlots: NonClientBuilt
         NonClientBuiltinTextureSlot.UP,
         NonClientBuiltinTextureSlot.DOWN
     ),
+    CUBE_COLUMN(
+        NonClientBuiltinTextureSlot.SIDE,
+        NonClientBuiltinTextureSlot.END
+    ),
     CUBE_ALL(
         NonClientBuiltinTextureSlot.ALL
     ),

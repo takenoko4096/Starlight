@@ -21,7 +21,8 @@ enum class ClientBuiltinTextureSlot(
     SIDE(NonClientBuiltinTextureSlot.SIDE, TextureSlot.SIDE),
     LAYER0(NonClientBuiltinTextureSlot.LAYER0, TextureSlot.LAYER0),
     LAYER1(NonClientBuiltinTextureSlot.LAYER1, TextureSlot.LAYER1),
-    LAYER2(NonClientBuiltinTextureSlot.LAYER2, TextureSlot.LAYER2);
+    LAYER2(NonClientBuiltinTextureSlot.LAYER2, TextureSlot.LAYER2),
+    END(NonClientBuiltinTextureSlot.END, TextureSlot.END);
 
     companion object {
         fun convert(nonClient: NonClientBuiltinTextureSlot): TextureSlot {

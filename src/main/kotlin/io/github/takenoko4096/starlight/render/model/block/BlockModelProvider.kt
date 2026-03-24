@@ -29,6 +29,18 @@ class BlockModelProvider internal constructor(resourceKey: ResourceKey<Block>) :
         )
     }
 
+    fun cubeColumn(side: TexturePath, end: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
+        return NonClientBuiltinModel(
+            resourceKey,
+            NonClientBuiltinModelTemplate.CUBE_COLUMN,
+            mapOf(
+                NonClientBuiltinTextureSlot.SIDE to side,
+                NonClientBuiltinTextureSlot.END to end
+            ),
+            ModelOptions(callback)
+        )
+    }
+
     fun cubeAll(all: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
         return NonClientBuiltinModel(
             resourceKey,

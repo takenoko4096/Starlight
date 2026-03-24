@@ -15,5 +15,6 @@ enum class NonClientBuiltinTextureSlot {
     SIDE,
     LAYER0,
     LAYER1,
-    LAYER2
+    LAYER2,
+    END
 }

@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
+import org.jetbrains.annotations.ApiStatus
 
 @StarlightDSL
 class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal val identifier: String) {

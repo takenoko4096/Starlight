@@ -16,6 +16,7 @@ import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
+import org.jetbrains.annotations.ApiStatus
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
@@ -143,44 +144,56 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             variants = vp1
         }
 
+        /**
+         * ↓のコードは PropertyVariants 自動操作に置き替える？ それとも削除？
+         */
         internal var model: SingleArgBlockModel? = null
 
         private fun singleArg(textureMap: SingleArgBlockModel.SingleArgBlockTextureMap) {
             model = SingleArgBlockModel(textureMap)
         }
 
+        @ApiStatus.Obsolete
         fun trivialCube() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_CUBE)
         }
 
+        @ApiStatus.Obsolete
         fun trivialColumn() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN)
         }
 
+        @ApiStatus.Obsolete
         fun trivialColumnAlt() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN_ALT)
         }
 
+        @ApiStatus.Obsolete
         fun trivialColumnHorizontal() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL)
         }
 
+        @ApiStatus.Obsolete
         fun trivialColumnHorizontalAlt() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL_ALT)
         }
 
+        @ApiStatus.Obsolete
         fun genericCube() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.GENRIC_CUBE)
         }
 
+        @ApiStatus.Obsolete
         fun anvil() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.ANVIL)
         }
 
+        @ApiStatus.Obsolete
         fun door() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.DOOR)
         }
 
+        @ApiStatus.Obsolete
         fun lantern() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.LANTERN)
         }

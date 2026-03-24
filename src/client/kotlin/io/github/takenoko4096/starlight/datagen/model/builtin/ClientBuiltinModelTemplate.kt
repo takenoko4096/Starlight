@@ -7,6 +7,7 @@ import net.minecraft.client.data.models.model.TextureSlot
 
 enum class ClientBuiltinModelTemplate(private val nonClient: NonClientBuiltinModelTemplate, private val client: ModelTemplate) {
     CUBE(NonClientBuiltinModelTemplate.CUBE, ModelTemplates.CUBE),
+    CUBE_COLUMN(NonClientBuiltinModelTemplate.CUBE_COLUMN, ModelTemplates.CUBE_COLUMN),
     CUBE_ALL(NonClientBuiltinModelTemplate.CUBE_ALL, ModelTemplates.CUBE_ALL),
     CROP(NonClientBuiltinModelTemplate.CROP, ModelTemplates.CROP),
     SLAB_TOP(NonClientBuiltinModelTemplate.SLAB_TOP, ModelTemplates.SLAB_TOP),
