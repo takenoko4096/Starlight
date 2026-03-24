@@ -1,21 +1,24 @@
 package io.github.takenoko4096.starlight
 
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
-import io.github.takenoko4096.starlight.registry.translation.TranslationRegistry
+import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import net.fabricmc.api.ModInitializer
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.Objects
+import java.util.*
 
 abstract class StarlightModInitializer : ModInitializer {
     abstract val identifier: String
 
-    val logger = LoggerFactory.getLogger(identifier).apply {
-        info("$identifier is powered by Starlight")
-    }
+    val logger: Logger = LoggerFactory.getLogger(identifier)
 
     val blockRegistry: ModBlockRegistry = ModBlockRegistry(this)
 
-    val translationRegistry: TranslationRegistry = TranslationRegistry(this)
+    val translationRegistry: ModTranslationRegistry = ModTranslationRegistry(this)
+
+    init {
+        logger.info("$identifier is powered by Starlight")
+    }
 
     abstract override fun onInitialize()
 

@@ -5,6 +5,7 @@ import io.github.takenoko4096.starlight.registry.translation.TranslationConfigur
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -13,6 +14,8 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.BlockAndTintGetter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.level.block.entity.BlockEntity
+import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 
@@ -106,8 +109,14 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.translation
         }
 
-        fun tintCallback(): (BlockPos, BlockState, BlockAndTintGetter) -> Int {
-            return configuration.renderingConfig.tintConfig.callback
+        fun getTint(blockPos: BlockPos, blockState: BlockState, blockAndTintGetter: BlockAndTintGetter, i: Int): Int? {
+            return BlockRenderingConfiguration.TintConfiguration(
+                blockPos,
+                blockState,
+                blockAndTintGetter,
+                i,
+                configuration.renderingConfig.tintGetter
+            ).color
         }
     }
 

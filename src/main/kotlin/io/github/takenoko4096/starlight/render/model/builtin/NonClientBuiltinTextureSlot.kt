@@ -8,5 +8,12 @@ enum class NonClientBuiltinTextureSlot {
     EAST,
     WEST,
     UP,
-    DOWN
+    DOWN,
+    CROP,
+    TOP,
+    BOTTOM,
+    SIDE,
+    LAYER0,
+    LAYER1,
+    LAYER2
 }

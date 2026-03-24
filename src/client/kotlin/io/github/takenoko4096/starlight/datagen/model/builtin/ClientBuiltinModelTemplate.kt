@@ -7,7 +7,14 @@ import net.minecraft.client.data.models.model.TextureSlot
 
 enum class ClientBuiltinModelTemplate(private val nonClient: NonClientBuiltinModelTemplate, private val client: ModelTemplate) {
     CUBE(NonClientBuiltinModelTemplate.CUBE, ModelTemplates.CUBE),
-    CUBE_ALL(NonClientBuiltinModelTemplate.CUBE_ALL, ModelTemplates.CUBE_ALL);
+    CUBE_ALL(NonClientBuiltinModelTemplate.CUBE_ALL, ModelTemplates.CUBE_ALL),
+    CROP(NonClientBuiltinModelTemplate.CROP, ModelTemplates.CROP),
+    SLAB_TOP(NonClientBuiltinModelTemplate.SLAB_TOP, ModelTemplates.SLAB_TOP),
+    SLAB_BOTTOM(NonClientBuiltinModelTemplate.SLAB_BOTTOM, ModelTemplates.SLAB_BOTTOM),
+    FLAT_ITEM(NonClientBuiltinModelTemplate.FLAT_ITEM, ModelTemplates.FLAT_ITEM),
+    FLAT_HANDHELD_ITEM(NonClientBuiltinModelTemplate.FLAT_HANDHELD_ITEM, ModelTemplates.FLAT_HANDHELD_ITEM),
+    FLAT_HANDHELD_ROD_ITEM(NonClientBuiltinModelTemplate.FLAT_HANDHELD_ROD_ITEM, ModelTemplates.FLAT_HANDHELD_ROD_ITEM),
+    FLAT_HANDHELD_MACE_ITEM(NonClientBuiltinModelTemplate.FLAT_HANDHELD_MACE_ITEM, ModelTemplates.FLAT_HANDHELD_MACE_ITEM);
 
     companion object {
         fun convert(nonClient: NonClientBuiltinModelTemplate): ModelTemplate {

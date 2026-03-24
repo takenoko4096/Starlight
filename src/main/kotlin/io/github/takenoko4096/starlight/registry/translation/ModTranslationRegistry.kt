@@ -3,7 +3,7 @@ package io.github.takenoko4096.starlight.registry.translation
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.StarlightRegistry
 
-class TranslationRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
+class ModTranslationRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
     private val translations = mutableMapOf<String, TranslationConfiguration>()
 
     fun register(key: String, callback: TranslationConfiguration.() -> Unit) {

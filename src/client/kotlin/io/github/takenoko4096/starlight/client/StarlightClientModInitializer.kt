@@ -29,7 +29,8 @@ abstract class StarlightClientModInitializer(private val mod: StarlightModInitia
             // tint
             ColorProviderRegistry.BLOCK.register({ blockState, blockAndTintGetter, blockPos, i ->
                 if (blockAndTintGetter != null && blockPos != null) {
-                    accessor.tintCallback()(blockPos, blockState, blockAndTintGetter)
+                    return@register accessor.getTint(blockPos, blockState, blockAndTintGetter, i)
+                        ?: -1
                 }
 
                 return@register -1

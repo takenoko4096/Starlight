@@ -10,5 +10,32 @@ enum class NonClientBuiltinModelTemplate(vararg val textureSlots: NonClientBuilt
         NonClientBuiltinTextureSlot.UP,
         NonClientBuiltinTextureSlot.DOWN
     ),
-    CUBE_ALL(NonClientBuiltinTextureSlot.ALL);
+    CUBE_ALL(
+        NonClientBuiltinTextureSlot.ALL
+    ),
+    CROP(
+        NonClientBuiltinTextureSlot.CROP
+    ),
+    SLAB_TOP(
+        NonClientBuiltinTextureSlot.TOP,
+        NonClientBuiltinTextureSlot.BOTTOM,
+        NonClientBuiltinTextureSlot.SIDE
+    ),
+    SLAB_BOTTOM(
+        NonClientBuiltinTextureSlot.TOP,
+        NonClientBuiltinTextureSlot.BOTTOM,
+        NonClientBuiltinTextureSlot.SIDE
+    ),
+    FLAT_ITEM(
+        NonClientBuiltinTextureSlot.LAYER0
+    ),
+    FLAT_HANDHELD_ITEM(
+        NonClientBuiltinTextureSlot.LAYER0
+    ),
+    FLAT_HANDHELD_ROD_ITEM(
+        NonClientBuiltinTextureSlot.LAYER0
+    ),
+    FLAT_HANDHELD_MACE_ITEM(
+        NonClientBuiltinTextureSlot.LAYER0
+    );
 }

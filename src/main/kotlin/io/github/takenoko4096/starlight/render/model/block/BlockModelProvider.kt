@@ -40,6 +40,43 @@ class BlockModelProvider internal constructor(resourceKey: ResourceKey<Block>) :
         )
     }
 
+    fun crop(crop: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
+        return NonClientBuiltinModel(
+            resourceKey,
+            NonClientBuiltinModelTemplate.CROP,
+            mapOf(
+                NonClientBuiltinTextureSlot.CROP to crop
+            ),
+            ModelOptions(callback)
+        )
+    }
+
+    fun slabTop(top: TexturePath, side: TexturePath, bottom: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
+        return NonClientBuiltinModel(
+            resourceKey,
+            NonClientBuiltinModelTemplate.SLAB_TOP,
+            mapOf(
+                NonClientBuiltinTextureSlot.TOP to top,
+                NonClientBuiltinTextureSlot.SIDE to side,
+                NonClientBuiltinTextureSlot.BOTTOM to bottom
+            ),
+            ModelOptions(callback)
+        )
+    }
+
+    fun slabBottom(top: TexturePath, side: TexturePath, bottom: TexturePath, callback: ModelOptions.() -> Unit = {}): NonClientBuiltinModel {
+        return NonClientBuiltinModel(
+            resourceKey,
+            NonClientBuiltinModelTemplate.SLAB_BOTTOM,
+            mapOf(
+                NonClientBuiltinTextureSlot.TOP to top,
+                NonClientBuiltinTextureSlot.SIDE to side,
+                NonClientBuiltinTextureSlot.BOTTOM to bottom
+            ),
+            ModelOptions(callback)
+        )
+    }
+
     fun custom(modelTemplate: Identifier, textureMapping: Map<String, TexturePath>, callback: ModelOptions.() -> Unit = {}): NonClientCustomModel {
         return NonClientCustomModel(
             resourceKey,

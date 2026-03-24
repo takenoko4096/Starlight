@@ -8,7 +8,12 @@ import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import net.minecraft.core.BlockPos
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.BlockAndTintGetter
+import net.minecraft.world.level.ColorResolver
+import net.minecraft.world.level.biome.Biome
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 
@@ -18,12 +23,10 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
     internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
 
-    internal var tintConfig: TintConfiguration = TintConfiguration(configuration)
+    internal var tintGetter: TintConfiguration.() -> Unit = {}
 
     fun layer(callback: LayerConfiguration.() -> Unit) {
-        val lc = LayerConfiguration()
-        lc.callback()
-        chunkSectionLayer = lc.layer
+        chunkSectionLayer = LayerConfiguration(callback).layer
     }
 
     fun models(callback: ModelConfiguration.() -> Unit) {
@@ -33,14 +36,16 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     fun tint(callback: TintConfiguration.() -> Unit) {
-        val tc = TintConfiguration(configuration)
-        tc.callback()
-        tintConfig = tc
+        tintGetter = callback
     }
 
     @StarlightDSL
-    class LayerConfiguration internal constructor() {
+    class LayerConfiguration internal constructor(callback: LayerConfiguration.() -> Unit) {
         internal var layer: NonClientChunkSectionLayer = NonClientChunkSectionLayer.SOLID
+
+        init {
+            callback()
+        }
 
         fun solid() {
             layer = NonClientChunkSectionLayer.SOLID
@@ -67,11 +72,37 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     @StarlightDSL
-    class TintConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
-        internal var callback: (BlockPos, BlockState, BlockAndTintGetter) -> Int = { a, b, c -> -1 }
+    class TintConfiguration internal constructor(
+        val blockPos: BlockPos,
+        val blockState: BlockState,
+        val blockAndTintGetter: BlockAndTintGetter,
+        val i: Int,
+        callback: TintConfiguration.() -> Unit
+    ) {
+        var color: Int? = null
 
-        fun provide(callback: (BlockPos, BlockState, BlockAndTintGetter) -> Int) {
-            this.callback = callback
+        init {
+            callback()
+        }
+    }
+
+    class LocatedBlockRenderView internal constructor(
+        private val blockPos: BlockPos,
+        private val blockState: BlockState,
+        private val blockAndTintGetter: BlockAndTintGetter
+    ) {
+        fun getBiomeKey(): ResourceKey<Biome> {
+            if (blockAndTintGetter.hasBiomes()) {
+                val keyOptional = blockAndTintGetter.getBiomeFabric(blockPos).unwrapKey()
+                if (keyOptional.isPresent) {
+                    return keyOptional.get()
+                }
+                else {
+                    throw IllegalStateException()
+                }
+            }
+
+            throw IllegalStateException()
         }
     }
 

@@ -59,8 +59,12 @@ abstract class ClientModel {
             }
 
             val clientModel = when (model) {
-                is NonClientBuiltinModel -> ClientBuiltinBlockModel(block, model, generators)
-                is NonClientCustomModel -> ClientCustomBlockModel(block, model, generators)
+                is NonClientBuiltinModel -> {
+                    ClientBuiltinBlockModel(block, model, generators)
+                }
+                is NonClientCustomModel -> {
+                    ClientCustomBlockModel(block, model, generators)
+                }
                 else -> throw IllegalStateException("NEVER HAPPENS")
             }
 

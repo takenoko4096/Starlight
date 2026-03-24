@@ -77,7 +77,7 @@ object TestMod : StarlightModInitializer() {
                 val lit = blockModels.cubeAll(blockDefaultTexturePath.suffixed("on")) {
                     suffix = "on"
                 }
-                
+
                 models {
                     block {
                         variants(info.properties.boolean("luminance")) {
@@ -125,6 +125,8 @@ object TestMod : StarlightModInitializer() {
 まだ
 
 #### 実装予定
+- ブロックエンティティ化API
+- モデル生成APIの拡張
 - アイテム追加
 - エンティティ追加
 
