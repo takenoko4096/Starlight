@@ -1,8 +1,8 @@
 package io.github.takenoko4096.starlight.client
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
-import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
+import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry
@@ -19,10 +19,10 @@ abstract class StarlightClientModInitializer(private val mod: StarlightModInitia
             BlockRenderLayerMap.putBlock(
                 block,
                 when (accessor.chunkSectionLayer()) {
-                    BlockRenderingConfiguration.NonClientChunkSectionLayer.SOLID -> ChunkSectionLayer.SOLID
-                    BlockRenderingConfiguration.NonClientChunkSectionLayer.CUTOUT -> ChunkSectionLayer.CUTOUT
-                    BlockRenderingConfiguration.NonClientChunkSectionLayer.TRANSLUCENT -> ChunkSectionLayer.TRANSLUCENT
-                    BlockRenderingConfiguration.NonClientChunkSectionLayer.TRIPWIRE -> ChunkSectionLayer.TRIPWIRE
+                    NonClientChunkSectionLayer.SOLID -> ChunkSectionLayer.SOLID
+                    NonClientChunkSectionLayer.CUTOUT -> ChunkSectionLayer.CUTOUT
+                    NonClientChunkSectionLayer.TRANSLUCENT -> ChunkSectionLayer.TRANSLUCENT
+                    NonClientChunkSectionLayer.TRIPWIRE -> ChunkSectionLayer.TRIPWIRE
                 }
             )
 

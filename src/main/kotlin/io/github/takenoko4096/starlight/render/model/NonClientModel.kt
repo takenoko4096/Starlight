@@ -1,7 +1,5 @@
 package io.github.takenoko4096.starlight.render.model
 
-import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
-import io.github.takenoko4096.starlight.render.model.block.NonClientVariantMutator
 import net.minecraft.resources.ResourceKey
 
 abstract class NonClientModel(private val resourceKey: ResourceKey<*>, val options: ModelOptions) {
@@ -19,12 +17,5 @@ abstract class NonClientModel(private val resourceKey: ResourceKey<*>, val optio
         var result = resourceKey.hashCode()
         result = 31 * result + options.suffix.hashCode()
         return result
-    }
-
-    fun toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
-        return NonClientBlockModelVariant(
-            this,
-            mutators.toList()
-        )
     }
 }

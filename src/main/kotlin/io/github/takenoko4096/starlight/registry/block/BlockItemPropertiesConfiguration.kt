@@ -4,7 +4,7 @@ import io.github.takenoko4096.starlight.StarlightDSL
 import net.minecraft.world.item.Item
 
 @StarlightDSL
-class ItemPropertiesConfiguration internal constructor(private val configuration: ModBlockConfiguration, callback: ItemPropertiesConfiguration.() -> Unit) {
+class BlockItemPropertiesConfiguration internal constructor(private val configuration: ModBlockConfiguration, callback: BlockItemPropertiesConfiguration.() -> Unit) {
     private var translationKey: String? = null
 
     init {

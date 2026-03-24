@@ -1,33 +1,33 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
+import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.BlockModelProvider
+import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
+import io.github.takenoko4096.starlight.render.model.block.NonClientVariantMutator
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
+import io.github.takenoko4096.starlight.render.model.block.PropertyVariants0
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
+import io.github.takenoko4096.starlight.render.model.block.PropertyVariants2
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import net.minecraft.core.BlockPos
-import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.BlockAndTintGetter
-import net.minecraft.world.level.ColorResolver
-import net.minecraft.world.level.biome.Biome
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import org.jetbrains.annotations.ApiStatus
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
-    internal var chunkSectionLayer: NonClientChunkSectionLayer = NonClientChunkSectionLayer.SOLID
+    internal var layerConfig = LayerConfiguration {}
 
     internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
 
     internal var tintGetter: TintConfiguration.() -> Unit = {}
 
     fun layer(callback: LayerConfiguration.() -> Unit) {
-        chunkSectionLayer = LayerConfiguration(callback).layer
+        layerConfig = LayerConfiguration(callback)
     }
 
     fun models(callback: ModelConfiguration.() -> Unit) {
@@ -65,13 +65,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         }
     }
 
-    enum class NonClientChunkSectionLayer {
-        SOLID,
-        CUTOUT,
-        TRANSLUCENT,
-        TRIPWIRE
-    }
-
     @StarlightDSL
     class TintConfiguration internal constructor(
         val blockPos: BlockPos,
@@ -84,26 +77,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         init {
             callback()
-        }
-    }
-
-    class LocatedBlockRenderView internal constructor(
-        private val blockPos: BlockPos,
-        private val blockState: BlockState,
-        private val blockAndTintGetter: BlockAndTintGetter
-    ) {
-        fun getBiomeKey(): ResourceKey<Biome> {
-            if (blockAndTintGetter.hasBiomes()) {
-                val keyOptional = blockAndTintGetter.getBiomeFabric(blockPos).unwrapKey()
-                if (keyOptional.isPresent) {
-                    return keyOptional.get()
-                }
-                else {
-                    throw IllegalStateException()
-                }
-            }
-
-            throw IllegalStateException()
         }
     }
 
@@ -138,10 +111,34 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     class BlockModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
         internal var variants: PropertyVariants? = null
 
+        fun NonClientModel.toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
+            return NonClientBlockModelVariant(
+                this,
+                mutators.toList()
+            )
+        }
+
+        fun variants(callback: PropertyVariants0.() -> Unit) {
+            val vp0 = PropertyVariants0()
+            vp0.callback()
+
+            if (vp0.variant == null) {
+                throw IllegalStateException("Please use 'useAsBlockModel()' in variants")
+            }
+
+            variants = vp0
+        }
+
         fun <T : Comparable<T>> variants(property: Property<T>, callback: PropertyVariants1<T>.() -> Unit) {
             val vp1 = PropertyVariants1(property)
             vp1.callback()
             variants = vp1
+        }
+
+        fun <T: Comparable<T>, U : Comparable<U>> variants(property1: Property<T>, property2: Property<U>, callback: PropertyVariants2<T, U>.() -> Unit) {
+            val vp2 = PropertyVariants2(property1, property2)
+            vp2.callback()
+            variants = vp2
         }
 
         /**

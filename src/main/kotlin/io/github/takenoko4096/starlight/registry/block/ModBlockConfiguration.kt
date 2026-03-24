@@ -2,10 +2,10 @@ package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -14,11 +14,8 @@ import net.minecraft.world.item.Items
 import net.minecraft.world.level.BlockAndTintGetter
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
-import net.minecraft.world.level.block.entity.BlockEntity
-import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
-import org.jetbrains.annotations.ApiStatus
 
 @StarlightDSL
 class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal val identifier: String) {
@@ -47,8 +44,8 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         blockProperties = bpc.build()
     }
 
-    fun itemProperties(callback: ItemPropertiesConfiguration.() -> Unit) {
-        val ipc = ItemPropertiesConfiguration(this, callback)
+    fun itemProperties(callback: BlockItemPropertiesConfiguration.() -> Unit) {
+        val ipc = BlockItemPropertiesConfiguration(this, callback)
         itemProperties = ipc.build()
     }
 
@@ -90,8 +87,8 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
     }
 
     class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {
-        fun chunkSectionLayer(): BlockRenderingConfiguration.NonClientChunkSectionLayer {
-            return configuration.renderingConfig.chunkSectionLayer
+        fun chunkSectionLayer(): NonClientChunkSectionLayer {
+            return configuration.renderingConfig.layerConfig.layer
         }
 
         fun blockModelLegacy(): BlockRenderingConfiguration.SingleArgBlockModel? {

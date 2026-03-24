@@ -6,6 +6,8 @@ import io.github.takenoko4096.starlight.render.model.ModelProvider
 import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModel
 import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModelTemplate
 import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinTextureSlot
+import io.github.takenoko4096.starlight.render.model.custom.NonClientCustomModel
+import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.Item
 
@@ -50,6 +52,15 @@ class ItemModelProvider internal constructor(resourceKey: ResourceKey<Item>) : M
             mapOf(
                 NonClientBuiltinTextureSlot.LAYER0 to layer0
             ),
+            ModelOptions(callback)
+        )
+    }
+
+    fun custom(modelTemplate: Identifier, textureMapping: Map<String, TexturePath>, callback: ModelOptions.() -> Unit = {}): NonClientCustomModel {
+        return NonClientCustomModel(
+            resourceKey,
+            modelTemplate,
+            textureMapping,
             ModelOptions(callback)
         )
     }
