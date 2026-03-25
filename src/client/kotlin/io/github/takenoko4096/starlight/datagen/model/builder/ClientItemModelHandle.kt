@@ -37,7 +37,7 @@ abstract class ClientItemModelHandle internal constructor(
     }
 
     abstract class ClientSelect<T : Select<C>, C> protected constructor(itemModelGenerators: ItemModelGenerators, item: Item, override val select: T) : ClientItemModelHandle(itemModelGenerators, item, select) {
-        protected fun <T> getCases(mapper: (C) -> T): List<SelectItemModel.SwitchCase<T>> {
+        protected fun <T : Any> getCases(mapper: (C) -> T): List<SelectItemModel.SwitchCase<T>> {
             return ItemModelBuilder.AccessForClient.getSelectCases(select).map {
                 ItemModelUtils.`when`(
                     it.`when`.map(mapper).toList(),
@@ -75,7 +75,7 @@ abstract class ClientItemModelHandle internal constructor(
         }
     }
 
-    class ClientComponentSelect<C>(itemModelGenerators: ItemModelGenerators, item: Item, select: ComponentSelect<C>) : ClientSelect<ComponentSelect<C>, C>(itemModelGenerators, item, select) {
+    class ClientComponentSelect<C : Any>(itemModelGenerators: ItemModelGenerators, item: Item, select: ComponentSelect<C>) : ClientSelect<ComponentSelect<C>, C>(itemModelGenerators, item, select) {
         override fun convert(): ItemModel.Unbaked {
             return ItemModelUtils.select(
                 ComponentContents(select.componentType),

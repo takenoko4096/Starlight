@@ -44,7 +44,7 @@ abstract class Select<C> : ItemModelHandle() {
             return ChargeTypeSelect()
         }
 
-        fun <T> component(componentType: DataComponentType<T>): ComponentSelect<T> {
+        fun <T : Any> component(componentType: DataComponentType<T>): ComponentSelect<T> {
             return ComponentSelect(componentType)
         }
 

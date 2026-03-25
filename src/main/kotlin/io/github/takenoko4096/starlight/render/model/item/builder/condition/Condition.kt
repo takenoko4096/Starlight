@@ -26,7 +26,7 @@ abstract class Condition<C> : ItemModelHandle() {
             return CarriedCondition()
         }
 
-        fun <C> component(type: DataComponentType<C>, value: C): ComponentCondition<C> {
+        fun <C : Any> component(type: DataComponentType<C>, value: C): ComponentCondition<C> {
             return ComponentCondition(type, value)
         }
 
