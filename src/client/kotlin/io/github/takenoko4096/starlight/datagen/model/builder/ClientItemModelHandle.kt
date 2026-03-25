@@ -22,16 +22,12 @@ import net.minecraft.world.item.CrossbowItem
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.Level
 
-abstract class ClientItemModelHandle protected constructor(
+abstract class ClientItemModelHandle internal constructor(
     protected val itemModelGenerators: ItemModelGenerators,
     protected val item: Item,
     protected open val select: ItemModelHandle
 ) {
     abstract fun convert(): ItemModel.Unbaked
-
-    fun register() {
-        return itemModelGenerators.itemModelOutput.accept(item, convert())
-    }
 
     class ClientEnd(itemModelGenerators: ItemModelGenerators, item: Item, private val end: End) : ClientItemModelHandle(itemModelGenerators, item, end) {
         override fun convert(): ItemModel.Unbaked {
@@ -107,6 +103,10 @@ abstract class ClientItemModelHandle protected constructor(
             is ComponentSelect<*> -> ClientComponentSelect(itemModelGenerators, item, handle)
             is ContextDimensionSelect -> ClientContextDimensionSelect(itemModelGenerators, item, handle)
             else -> throw IllegalStateException()
+        }
+
+        fun registerModel(itemModelGenerators: ItemModelGenerators, item: Item, handle: ItemModelHandle) {
+            itemModelGenerators.itemModelOutput.accept(item, toClient(itemModelGenerators, item, handle).convert())
         }
     }
 }

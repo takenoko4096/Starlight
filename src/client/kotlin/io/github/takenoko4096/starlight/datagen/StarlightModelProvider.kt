@@ -2,6 +2,7 @@ package io.github.takenoko4096.starlight.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.datagen.model.BlockModelVariantsRegistrar
+import io.github.takenoko4096.starlight.datagen.model.builder.ClientItemModelHandle
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
@@ -9,6 +10,8 @@ import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.model.TexturedModel
 import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
+import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
+import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 
 class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricDataOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
@@ -65,7 +68,14 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
     }
 
     override fun generateItemModels(itemModelGenerators: ItemModelGenerators) {
+        val itemRegistry: ModItemRegistry = mod.itemRegistry
 
+        for (configuration in itemRegistry.getConfigurations()) {
+            val item = itemRegistry.getItem(configuration.itemResourceKey)
+            val accessor = ModItemConfiguration.getAccessor(configuration)
+
+            ClientItemModelHandle.registerModel(itemModelGenerators, item, accessor.getModelHandle())
+        }
     }
 
     override fun getName(): String = "StarlightModelProvider"

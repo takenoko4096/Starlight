@@ -1,7 +1,9 @@
 package io.github.takenoko4096.starlight
 
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
+import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
+import io.github.takenoko4096.starlight.render.model.item.builder.select.Select
 import net.fabricmc.api.ModInitializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -11,6 +13,8 @@ abstract class StarlightModInitializer : ModInitializer {
     abstract val identifier: String
 
     val logger: Logger = LoggerFactory.getLogger(identifier)
+
+    val itemRegistry: ModItemRegistry = ModItemRegistry(this)
 
     val blockRegistry: ModBlockRegistry = ModBlockRegistry(this)
 

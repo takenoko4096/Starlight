@@ -2,6 +2,8 @@ package io.github.takenoko4096.starlight.registry.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.render.TexturePath
+import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelBuilder
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelHandle
 import net.minecraft.core.registries.Registries
@@ -64,12 +66,34 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
 
     @StarlightDSL
     class ItemModelConfiguration(private val configuration: ModItemConfiguration, callback: ItemModelConfiguration.() -> Unit) {
+        internal var handle: ItemModelHandle? = null
+
+        val itemDefaultTexturePath = TexturePath.itemDefault(configuration.itemResourceKey)
+
+        val itemModels = ItemModelProvider(configuration.itemResourceKey)
+
         init {
             callback()
+
+            if (handle == null) {
+                throw IllegalStateException("please use 'use()' to specify model handler")
+            }
         }
 
-        fun modelHandle(callback: ItemModelBuilder.() -> Unit): ItemModelHandle {
-            return ItemModelBuilder(callback).build()
+        fun use(callback: ItemModelBuilder.() -> Unit) {
+            handle = ItemModelBuilder(callback).build()
+        }
+    }
+
+    class AccessorForClient internal constructor(private val configuration: ModItemConfiguration) {
+        fun getModelHandle(): ItemModelHandle {
+            return configuration.renderingConfig.modelConfig.handle ?: throw IllegalStateException()
+        }
+    }
+
+    companion object {
+        fun getAccessor(configuration: ModItemConfiguration): AccessorForClient {
+            return AccessorForClient(configuration)
         }
     }
 }
