@@ -2,6 +2,8 @@ package io.github.takenoko4096.starlight.registry.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelBuilder
+import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelHandle
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -66,6 +68,8 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
             callback()
         }
 
-
+        fun modelHandle(callback: ItemModelBuilder.() -> Unit): ItemModelHandle {
+            return ItemModelBuilder(callback).build()
+        }
     }
 }

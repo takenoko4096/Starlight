@@ -111,13 +111,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     class BlockModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
         internal var variants: PropertyVariants? = null
 
-        fun NonClientModel.toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
-            return NonClientBlockModelVariant(
-                this,
-                mutators.toList()
-            )
-        }
-
         fun variants(callback: PropertyVariants0.() -> Unit) {
             val vp0 = PropertyVariants0()
             vp0.callback()

@@ -53,10 +53,6 @@ abstract class ClientModel {
             if (CREATED_MODELS.contains(model)) {
                 return CREATED_MODELS[model]!!
             }
-            else {
-                println(model.hashCode())
-                println(CREATED_MODELS.mapKeys { it.hashCode() })
-            }
 
             val clientModel = when (model) {
                 is NonClientBuiltinModel -> {

@@ -4,7 +4,9 @@ import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
 import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.model.NonClientModel
+import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
+import io.github.takenoko4096.starlight.render.model.block.PropertyVariants0
 import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier

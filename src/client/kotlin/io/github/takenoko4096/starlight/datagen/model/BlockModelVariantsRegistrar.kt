@@ -42,7 +42,10 @@ class BlockModelVariantsRegistrar internal constructor(
     }
 
     private fun variants0(variants0: PropertyVariants0): MultiVariantGenerator {
-        return MultiVariantGenerator.dispatch(block, toClient(variants0.variant!!))
+        return MultiVariantGenerator.dispatch(
+            block,
+            toClient(PropertyVariants0.getVariant(variants0))
+        )
     }
 
     private fun <T : Comparable<T>> variants1(variants1: PropertyVariants1<T>): MultiVariantGenerator {
