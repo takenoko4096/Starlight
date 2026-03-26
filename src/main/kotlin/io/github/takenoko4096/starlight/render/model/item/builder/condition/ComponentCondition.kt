@@ -1,5 +1,5 @@
 package io.github.takenoko4096.starlight.render.model.item.builder.condition
 
-import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.component.predicates.DataComponentPredicate
 
-class ComponentCondition<C : Any>(val type: DataComponentType<C>, val value: C) : Condition<C>()
+class ComponentCondition<C : DataComponentPredicate>(val type: DataComponentPredicate.Type<C>, val value: C) : Condition<C>()

@@ -71,5 +71,9 @@ abstract class Select<C> : ItemModelHandle() {
         fun mainHand(): MainHandSelect {
             return MainHandSelect()
         }
+
+        fun trimMaterial(): TrimMaterialSelect {
+            return TrimMaterialSelect()
+        }
     }
 }

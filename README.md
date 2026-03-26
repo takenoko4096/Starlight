@@ -125,10 +125,12 @@ object TestMod : StarlightModInitializer() {
 まだ
 
 #### 実装予定
-- ブロックエンティティ化API
-- モデル生成APIの拡張
+- `BlockEntity` 追加
+- モデル生成API拡張
 - アイテム追加
 - エンティティ追加
+- アイテムコンポーネントビルダー
+- メッセージコンポーネントビルダー
 
 など
 

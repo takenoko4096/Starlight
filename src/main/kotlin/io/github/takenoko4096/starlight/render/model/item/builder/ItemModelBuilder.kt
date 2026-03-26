@@ -3,6 +3,8 @@ package io.github.takenoko4096.starlight.render.model.item.builder
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.item.builder.condition.Condition
+import io.github.takenoko4096.starlight.render.model.item.builder.rangedispatch.RangeDispatch
+import io.github.takenoko4096.starlight.render.model.item.builder.rangedispatch.RangeDispatchEntry
 import io.github.takenoko4096.starlight.render.model.item.builder.select.Select
 import io.github.takenoko4096.starlight.render.model.item.builder.select.SelectCase
 
@@ -24,7 +26,12 @@ class ItemModelBuilder internal constructor(callback: ItemModelBuilder.() -> Uni
         handle = condition
     }
 
-    fun model(model: NonClientModel) {
+    fun <T : RangeDispatch<C>, C> rangeDispatch(rangeDispatch: T, callback: T.() -> Unit) {
+        rangeDispatch.callback()
+        handle = rangeDispatch
+    }
+
+    fun use(model: NonClientModel) {
         handle = End(model)
     }
 
@@ -39,6 +46,22 @@ class ItemModelBuilder internal constructor(callback: ItemModelBuilder.() -> Uni
 
         fun <C> getSelectFallback(select: Select<C>): ItemModelHandle {
             return select.fallback.build()
+        }
+
+        fun <C> getConditionOnTrue(condition: Condition<C>): ItemModelHandle {
+            return condition.onTrueModel.build()
+        }
+
+        fun <C> getConditionOnFalse(condition: Condition<C>): ItemModelHandle {
+            return condition.onFalseModel.build()
+        }
+
+        fun <C> getRangeDispatchEntries(rangeDispatch: RangeDispatch<C>): List<RangeDispatchEntry<C>> {
+            return rangeDispatch.entries.entries.toList()
+        }
+
+        fun <C> getRangeDispatchFallback(rangeDispatch: RangeDispatch<C>): ItemModelHandle {
+            return rangeDispatch.fallback.build()
         }
     }
 }

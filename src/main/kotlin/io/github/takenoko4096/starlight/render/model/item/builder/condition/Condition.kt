@@ -3,6 +3,7 @@ package io.github.takenoko4096.starlight.render.model.item.builder.condition
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelHandle
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelBuilder
 import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.component.predicates.DataComponentPredicate
 
 abstract class Condition<C> : ItemModelHandle() {
     internal var onTrueModel: ItemModelBuilder = ItemModelBuilder {}
@@ -26,7 +27,7 @@ abstract class Condition<C> : ItemModelHandle() {
             return CarriedCondition()
         }
 
-        fun <C : Any> component(type: DataComponentType<C>, value: C): ComponentCondition<C> {
+        fun <C : DataComponentPredicate> component(type: DataComponentPredicate.Type<C>, value: C): ComponentCondition<C> {
             return ComponentCondition(type, value)
         }
 
@@ -38,12 +39,24 @@ abstract class Condition<C> : ItemModelHandle() {
             return DamagedCondition()
         }
 
+        fun extendedView(): ExtendedViewCondition {
+            return ExtendedViewCondition()
+        }
+
+        fun <C : Any> hasComponent(type: DataComponentType<C>, ignoreDefault: Boolean): HasComponentCondition<C> {
+            return HasComponentCondition(type, ignoreDefault)
+        }
+
         fun usingItem(): UsingItemCondition {
             return UsingItemCondition()
         }
 
         fun selectedCondition(): SelectedCondition {
             return SelectedCondition()
+        }
+
+        fun viewEntity(): ViewEntityCondition {
+            return ViewEntityCondition()
         }
     }
 }

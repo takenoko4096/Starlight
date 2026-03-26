@@ -80,7 +80,7 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
             }
         }
 
-        fun use(callback: ItemModelBuilder.() -> Unit) {
+        fun handling(callback: ItemModelBuilder.() -> Unit) {
             handle = ItemModelBuilder(callback).build()
         }
     }

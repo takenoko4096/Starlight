@@ -3,8 +3,8 @@ package io.github.takenoko4096.starlight
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
-import io.github.takenoko4096.starlight.render.model.item.builder.select.Select
 import net.fabricmc.api.ModInitializer
+import net.minecraft.resources.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -32,5 +32,9 @@ abstract class StarlightModInitializer : ModInitializer {
 
     override fun equals(other: Any?): Boolean {
         return if (other is StarlightModInitializer) identifier == other.identifier else false
+    }
+
+    fun namespaced(value: String): Identifier {
+        return Identifier.fromNamespaceAndPath(identifier, value)
     }
 }
