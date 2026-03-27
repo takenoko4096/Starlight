@@ -21,6 +21,10 @@ abstract class StarlightModInitializer : ModInitializer {
 
     val translationRegistry: ModTranslationRegistry = ModTranslationRegistry(this)
 
+    init {
+        logger.info("$identifier is powered by Starlight")
+    }
+
     abstract override fun onInitialize()
 
     override fun hashCode(): Int {
