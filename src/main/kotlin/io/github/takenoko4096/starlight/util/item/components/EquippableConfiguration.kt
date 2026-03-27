@@ -17,6 +17,7 @@ import net.minecraft.world.item.equipment.EquipmentAsset
 import net.minecraft.world.item.equipment.Equippable
 import java.util.Optional
 
+@StarlightDSL
 class EquippableConfiguration(mod: StarlightModInitializer, callback: EquippableConfiguration.() -> Unit) : AbstractComponentConfiguration<Equippable>(mod, DataComponents.EQUIPPABLE) {
     private var sounds = SoundEventConfiguration {}
 

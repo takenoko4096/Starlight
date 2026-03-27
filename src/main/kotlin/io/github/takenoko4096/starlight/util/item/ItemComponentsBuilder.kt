@@ -11,6 +11,8 @@ import io.github.takenoko4096.starlight.util.item.components.FoodConfiguration
 import io.github.takenoko4096.starlight.util.item.components.LoreConfiguration
 import io.github.takenoko4096.starlight.util.item.components.RarityConfiguration
 import io.github.takenoko4096.starlight.util.item.components.RepairableConfiguration
+import io.github.takenoko4096.starlight.util.item.components.SwingAnimationConfiguration
+import io.github.takenoko4096.starlight.util.item.components.ToolConfiguration
 import io.github.takenoko4096.starlight.util.item.components.WeaponConfiguration
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.component.DataComponents
@@ -108,6 +110,14 @@ open class ItemComponentsBuilder(private val mod: StarlightModInitializer, priva
 
     fun repairable(callback: RepairableConfiguration.() -> Unit) {
         components.add(RepairableConfiguration(mod, callback).toComponent())
+    }
+
+    fun swingAnimation(callback: SwingAnimationConfiguration.() -> Unit) {
+        components.add(SwingAnimationConfiguration(mod, callback).toComponent())
+    }
+
+    fun tool(callback: ToolConfiguration.() -> Unit) {
+        components.add(ToolConfiguration(mod, callback).toComponent())
     }
 
     fun unbreakable() {
