@@ -1,4 +1,4 @@
-package io.github.takenoko4096.starlight.util.item
+package io.github.takenoko4096.starlight.util.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.item.component.ItemAttributeModifiers
 
 @StarlightDSL
-class AttributeModifiersConfiguration internal constructor(mod: StarlightModInitializer, callback: AttributeModifiersConfiguration.() -> Unit) : ComponentConfiguration<ItemAttributeModifiers>(mod, DataComponents.ATTRIBUTE_MODIFIERS) {
+class AttributeModifiersConfiguration internal constructor(mod: StarlightModInitializer, callback: AttributeModifiersConfiguration.() -> Unit) : AbstractComponentConfiguration<ItemAttributeModifiers>(mod, DataComponents.ATTRIBUTE_MODIFIERS) {
     private val entries = mutableListOf<ItemAttributeModifiers.Entry>()
 
     private var id: Int = 0
@@ -36,14 +36,16 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
     }
 
     override fun build(): ItemAttributeModifiers {
-        return ItemAttributeModifiers(listOf(
+        return ItemAttributeModifiers(
+            listOf(
 
-        ))
+            )
+        )
     }
 
     @StarlightDSL
     class ModifierEntryConfiguration(private val attribute: Holder<Attribute>, private val parent: AttributeModifiersConfiguration, callback: ModifierEntryConfiguration.() -> Unit) {
-        private var identifier: Identifier = parent.mod.namespaced((parent.id++).toString())
+        private var identifier: Identifier = parent.mod.identifierOf((parent.id++).toString())
 
         private var operation: AttributeModifier.Operation = AttributeModifier.Operation.ADD_VALUE
 
@@ -52,7 +54,7 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
         var id: String
             get() = identifier.path
             set(value) {
-                identifier = parent.mod.namespaced(value)
+                identifier = parent.mod.identifierOf(value)
             }
 
         var value: Double? = null

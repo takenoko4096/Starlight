@@ -1,4 +1,4 @@
-package io.github.takenoko4096.starlight.util.item
+package io.github.takenoko4096.starlight.util.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.item.component.ItemLore
 
 @StarlightDSL
-class LoreConfiguration(mod: StarlightModInitializer, callback: LoreConfiguration.() -> Unit) : ComponentConfiguration<ItemLore>(mod, DataComponents.LORE) {
+class LoreConfiguration(mod: StarlightModInitializer, callback: LoreConfiguration.() -> Unit) : AbstractComponentConfiguration<ItemLore>(mod, DataComponents.LORE) {
     private val lines = mutableListOf<Component>()
 
     init {

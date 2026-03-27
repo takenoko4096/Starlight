@@ -3,6 +3,7 @@ package io.github.takenoko4096.starlight
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
+import io.github.takenoko4096.starlight.render.TexturePath
 import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
@@ -34,7 +35,11 @@ abstract class StarlightModInitializer : ModInitializer {
         return if (other is StarlightModInitializer) identifier == other.identifier else false
     }
 
-    fun namespaced(value: String): Identifier {
+    fun identifierOf(value: String): Identifier {
         return Identifier.fromNamespaceAndPath(identifier, value)
+    }
+
+    fun texturePathOf(value: String): TexturePath {
+        return TexturePath(Identifier.fromNamespaceAndPath(identifier, value))
     }
 }
