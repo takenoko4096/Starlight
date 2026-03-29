@@ -8,10 +8,12 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.CommonComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
+import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.Attributes
+import net.minecraft.world.entity.ai.attributes.DefaultAttributes
 import net.minecraft.world.item.component.ItemAttributeModifiers
 
 @StarlightDSL
@@ -188,7 +190,7 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
                 identifier = parent.mod.identifierOf(value)
             }
 
-        var value: Double? = null
+        var value: Double = attribute.value().defaultValue
 
         init {
             callback()
@@ -203,19 +205,15 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
         }
 
         fun display(callback: DisplayConfiguration.() -> Unit) {
-            display = DisplayConfiguration(callback).display
+            display = DisplayConfiguration(attribute.value(), operation, value, callback).display
         }
 
         fun build(): ItemAttributeModifiers.Entry {
-            if (value == null) {
-                throw IllegalStateException("Unset property 'value' in attribute modifier")
-            }
-
             return ItemAttributeModifiers.Entry(
                 attribute,
                 AttributeModifier(
                     identifier,
-                    value!!,
+                    value,
                     operation
                 ),
                 group,
@@ -226,6 +224,10 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
         @StarlightDSL
         class OperationConfiguration internal constructor(callback: OperationConfiguration.() -> Unit) {
             internal var operation = AttributeModifier.Operation.ADD_VALUE
+
+            init {
+                callback()
+            }
 
             fun addValue() {
                 operation = AttributeModifier.Operation.ADD_VALUE
@@ -314,17 +316,30 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
             }
 
             fun builtin() {
-                val e: Double = 1.0
+                val defaults = DefaultAttributes.getSupplier(EntityType.PLAYER)
+                var output = value
+
+                if (attribute == Attributes.ATTACK_DAMAGE) {
+                    output += defaults.getBaseValue(Attributes.ATTACK_DAMAGE)
+                }
+                else if (attribute == Attributes.ATTACK_SPEED) {
+                    output += defaults.getBaseValue(Attributes.ATTACK_SPEED)
+                }
+
+                if (operation == AttributeModifier.Operation.ADD_MULTIPLIED_BASE || operation == AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
+                    output *= 100.0
+                }
+                else if (attribute == Attributes.KNOCKBACK_RESISTANCE) {
+                    output *= 10.0
+                }
 
                 override(
                     CommonComponents.space()
                         .append(
                             Component.translatable(
-                                "attribute.modifier.equals." + operation.id(),
-                                *arrayOf<Any>(
-                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(e),
-                                    Component.translatable(attribute.descriptionId)
-                                )
+                                "attribute.modifier.equals.${operation.id()}",
+                                Component.literal(ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(output)),
+                                Component.translatable(attribute.descriptionId)
                             )
                         )
                         .withStyle(ChatFormatting.DARK_GREEN)
