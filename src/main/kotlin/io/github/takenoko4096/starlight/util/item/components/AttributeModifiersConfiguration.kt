@@ -14,6 +14,8 @@ import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.ToolMaterial
 import net.minecraft.world.item.component.ItemAttributeModifiers
 
 @StarlightDSL
@@ -321,9 +323,11 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
                 var output = value
 
                 if (attribute == Attributes.ATTACK_DAMAGE) {
+                    // TODO なぜか加算されない
                     output += defaults.getBaseValue(Attributes.ATTACK_DAMAGE)
                 }
                 else if (attribute == Attributes.ATTACK_SPEED) {
+                    // TODO なぜか加算されない
                     output += defaults.getBaseValue(Attributes.ATTACK_SPEED)
                 }
 
