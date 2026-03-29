@@ -61,23 +61,23 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
 
         fun model(callback: ItemModelConfiguration.() -> Unit) {
             modelConfig = ItemModelConfiguration(configuration, callback)
+            if (modelConfig.handle == null) {
+                throw IllegalStateException("please use 'use()' to specify model handler")
+            }
         }
     }
 
     @StarlightDSL
     class ItemModelConfiguration(private val configuration: ModItemConfiguration, callback: ItemModelConfiguration.() -> Unit) {
-        internal var handle: ItemModelHandle? = null
+        internal var handle: ItemModelHandle?
 
         val itemDefaultTexturePath = TexturePath.itemDefault(configuration.itemResourceKey)
 
         val itemModels = ItemModelProvider(configuration.itemResourceKey)
 
         init {
+            handle = null
             callback()
-
-            if (handle == null) {
-                throw IllegalStateException("please use 'use()' to specify model handler")
-            }
         }
 
         fun handling(callback: ItemModelBuilder.() -> Unit) {

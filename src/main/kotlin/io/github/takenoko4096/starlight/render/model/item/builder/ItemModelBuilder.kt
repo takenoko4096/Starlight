@@ -36,7 +36,7 @@ class ItemModelBuilder internal constructor(callback: ItemModelBuilder.() -> Uni
     }
 
     fun build(): ItemModelHandle {
-        return handle ?: throw IllegalStateException()
+        return handle ?: throw IllegalStateException("empty item model handle")
     }
 
     object AccessForClient {
