@@ -89,6 +89,10 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
         fun getModelHandle(): ItemModelHandle {
             return configuration.renderingConfig.modelConfig.handle ?: throw IllegalStateException()
         }
+
+        fun translation(): TranslationConfiguration {
+            return configuration.translation
+        }
     }
 
     companion object {

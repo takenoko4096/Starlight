@@ -30,6 +30,10 @@ import net.minecraft.world.item.enchantment.Enchantable
 open class ItemComponentsBuilder(private val mod: StarlightModInitializer, private val dataSource: RegistryAccess?, callback: ItemComponentsBuilder.() -> Unit) {
     private val components = mutableSetOf<ItemComponent<*>>()
 
+    init {
+        callback()
+    }
+
     fun build(target: Item.Properties) {
         components.forEach {
             it.set(target)

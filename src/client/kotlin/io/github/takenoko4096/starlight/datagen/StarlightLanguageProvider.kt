@@ -2,6 +2,7 @@ package io.github.takenoko4096.starlight.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
+import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
@@ -21,6 +22,17 @@ abstract class StarlightLanguageProvider(private val mod: StarlightModInitialize
 
             getTranslation(translation)?.let {
                 translationBuilder.add(block.descriptionId, it)
+            }
+        }
+
+        val itemRegistry = mod.itemRegistry
+        for (configuration in itemRegistry.getConfigurations()) {
+            val item = itemRegistry.getItem(configuration.itemResourceKey)
+            val accessor = ModItemConfiguration.getAccessor(configuration)
+            val translation = accessor.translation()
+
+            getTranslation(translation)?.let {
+                translationBuilder.add(item.descriptionId, it)
             }
         }
 
