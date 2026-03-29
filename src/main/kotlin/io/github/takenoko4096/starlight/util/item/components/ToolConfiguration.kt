@@ -5,7 +5,6 @@ import io.github.takenoko4096.starlight.StarlightModInitializer
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.component.Tool
 import net.minecraft.world.level.block.Block
@@ -23,6 +22,10 @@ class ToolConfiguration(mod: StarlightModInitializer, callback: ToolConfiguratio
 
     init {
         callback()
+    }
+
+    fun rules(callback: RulesConfiguration.() -> Unit) {
+        rules = RulesConfiguration(callback)
     }
 
     override fun build(): Tool {
@@ -55,8 +58,15 @@ class ToolConfiguration(mod: StarlightModInitializer, callback: ToolConfiguratio
             rule(BuiltInRegistries.BLOCK.getOrThrow(tag), callback)
         }
 
-        fun identifiers(vararg ids: ResourceKey<Block>, callback: RuleConfiguration.() -> Unit) {
-            val set  =HolderSet.direct(ids.map { BuiltInRegistries.BLOCK.getOrThrow(it) })
+        fun blocks(vararg blocks: Block, callback: RuleConfiguration.() -> Unit) {
+            val registry = BuiltInRegistries.BLOCK
+
+            val holders = blocks.map {
+                val key = registry.getResourceKey(it)
+                if (!key.isPresent) throw IllegalStateException("Unknown block for tool rule: ${it.name}")
+                registry.getOrThrow(key.get())
+            }
+            val set = HolderSet.direct(*holders.toTypedArray())
             rule(set, callback)
         }
 

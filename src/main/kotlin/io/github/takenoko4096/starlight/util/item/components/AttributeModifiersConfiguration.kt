@@ -208,7 +208,7 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
             display = DisplayConfiguration(attribute.value(), operation, value, callback).display
         }
 
-        fun build(): ItemAttributeModifiers.Entry {
+        internal fun build(): ItemAttributeModifiers.Entry {
             return ItemAttributeModifiers.Entry(
                 attribute,
                 AttributeModifier(
@@ -303,6 +303,7 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
             }
         }
 
+        @StarlightDSL
         class DisplayConfiguration internal constructor(
             private val attribute: Attribute,
             private val operation: AttributeModifier.Operation,

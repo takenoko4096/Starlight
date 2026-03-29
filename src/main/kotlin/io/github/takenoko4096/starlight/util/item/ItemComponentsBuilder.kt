@@ -2,33 +2,22 @@ package io.github.takenoko4096.starlight.util.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
-import io.github.takenoko4096.starlight.util.item.ItemComponent
-import io.github.takenoko4096.starlight.util.item.components.AttributeModifiersConfiguration
-import io.github.takenoko4096.starlight.util.item.components.EnchantableConfiguration
-import io.github.takenoko4096.starlight.util.item.components.EnchantmentsConfiguration
-import io.github.takenoko4096.starlight.util.item.components.EquippableConfiguration
-import io.github.takenoko4096.starlight.util.item.components.FoodConfiguration
-import io.github.takenoko4096.starlight.util.item.components.LoreConfiguration
-import io.github.takenoko4096.starlight.util.item.components.RarityConfiguration
-import io.github.takenoko4096.starlight.util.item.components.RepairableConfiguration
-import io.github.takenoko4096.starlight.util.item.components.SwingAnimationConfiguration
-import io.github.takenoko4096.starlight.util.item.components.ToolConfiguration
-import io.github.takenoko4096.starlight.util.item.components.WeaponConfiguration
+import io.github.takenoko4096.starlight.util.item.components.*
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.component.DataComponents
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.world.damagesource.DamageType
-import net.minecraft.world.damagesource.DamageTypes
+import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.crafting.Recipe
-import net.minecraft.world.item.enchantment.Enchantable
+import net.minecraft.world.level.block.Blocks
 
 @StarlightDSL
 open class ItemComponentsBuilder(private val mod: StarlightModInitializer, private val dataSource: RegistryAccess?, callback: ItemComponentsBuilder.() -> Unit) {
-    private val components = mutableSetOf<ItemComponent<*>>()
+    private val components = mutableListOf<ItemComponent<*>>()
+
+    val templates = Templates()
 
     init {
         callback()
@@ -130,5 +119,69 @@ open class ItemComponentsBuilder(private val mod: StarlightModInitializer, priva
 
     fun weapon(callback: WeaponConfiguration.() -> Unit) {
         components.add(WeaponConfiguration(mod, callback).toComponent())
+    }
+
+    fun by(template: Template) {
+        template.apply(this)
+    }
+
+    class Template internal constructor(private val callback: ItemComponentsBuilder.() -> Unit) {
+        internal fun apply(builder: ItemComponentsBuilder) {
+            callback(builder)
+        }
+    }
+
+    class Templates internal constructor() {
+        fun sword(durability: Int, attackDamage: Double) = Template {
+            maxStackSize(1)
+            maxDamage(durability)
+            damage(0)
+            weapon {
+                itemDamagePerAttack = 1
+            }
+            attributeModifiers {
+                attackDamage {
+                    slot {
+                        weapon.mainhand()
+                    }
+                    operation {
+                        addValue()
+                    }
+                    value = attackDamage
+                    display {
+                        builtin()
+                    }
+                }
+                attackSpeed {
+                    slot {
+                        weapon.mainhand()
+                    }
+                    operation {
+                        addValue()
+                    }
+                    value = -2.4
+                    display {
+                        builtin()
+                    }
+                }
+            }
+            tool {
+                damagePerBlock = 2
+                defaultMiningSpeed = 1.0f
+                canDestroyBlocksInCreative = false
+
+                rules {
+                    tag(BlockTags.SWORD_INSTANTLY_MINES) {
+                        speed = Float.MAX_VALUE
+                    }
+                    tag(BlockTags.SWORD_EFFICIENT) {
+                        speed = 1.5f
+                    }
+                    blocks(Blocks.COBWEB) {
+                        speed = 15.0f
+                    }
+                }
+            }
+        }
     }
 }
