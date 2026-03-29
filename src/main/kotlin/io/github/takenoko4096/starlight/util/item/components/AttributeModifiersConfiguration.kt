@@ -2,8 +2,11 @@ package io.github.takenoko4096.starlight.util.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
+import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
+import net.minecraft.network.chat.CommonComponents
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.entity.EquipmentSlotGroup
 import net.minecraft.world.entity.ai.attributes.Attribute
@@ -177,6 +180,8 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
 
         private var group = EquipmentSlotGroup.ANY
 
+        private var display: ItemAttributeModifiers.Display = ItemAttributeModifiers.Display.attributeModifiers()
+
         var id: String
             get() = identifier.path
             set(value) {
@@ -197,6 +202,10 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
             group = EquipmentSlotGroupConfiguration(callback).group
         }
 
+        fun display(callback: DisplayConfiguration.() -> Unit) {
+            display = DisplayConfiguration(callback).display
+        }
+
         fun build(): ItemAttributeModifiers.Entry {
             if (value == null) {
                 throw IllegalStateException("Unset property 'value' in attribute modifier")
@@ -209,7 +218,8 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
                     value!!,
                     operation
                 ),
-                group
+                group,
+                display
             )
         }
 
@@ -288,6 +298,45 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
                 fun offhand() {
                     parent.group = EquipmentSlotGroup.OFFHAND
                 }
+            }
+        }
+
+        class DisplayConfiguration internal constructor(
+            private val attribute: Attribute,
+            private val operation: AttributeModifier.Operation,
+            private val value: Double,
+            callback: DisplayConfiguration.() -> Unit
+        ) {
+            internal var display: ItemAttributeModifiers.Display = ItemAttributeModifiers.Display.attributeModifiers()
+
+            init {
+                callback()
+            }
+
+            fun builtin() {
+                val e: Double = 1.0
+
+                override(
+                    CommonComponents.space()
+                        .append(
+                            Component.translatable(
+                                "attribute.modifier.equals." + operation.id(),
+                                *arrayOf<Any>(
+                                    ItemAttributeModifiers.ATTRIBUTE_MODIFIER_FORMAT.format(e),
+                                    Component.translatable(attribute.descriptionId)
+                                )
+                            )
+                        )
+                        .withStyle(ChatFormatting.DARK_GREEN)
+                )
+            }
+
+            fun override(component: Component) {
+                display = ItemAttributeModifiers.Display.override(component)
+            }
+
+            fun hidden() {
+                display = ItemAttributeModifiers.Display.hidden()
             }
         }
     }
