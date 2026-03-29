@@ -2,13 +2,16 @@ package io.github.takenoko4096.starlight.util.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
+import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.TagKey
+import net.minecraft.world.item.ToolMaterial
 import net.minecraft.world.item.component.Tool
 import net.minecraft.world.level.block.Block
-import java.util.Optional
+import net.minecraft.world.level.block.Blocks
+import java.util.*
 
 @StarlightDSL
 class ToolConfiguration(mod: StarlightModInitializer, callback: ToolConfiguration.() -> Unit) : AbstractComponentConfiguration<Tool>(mod, DataComponents.TOOL) {
@@ -55,18 +58,12 @@ class ToolConfiguration(mod: StarlightModInitializer, callback: ToolConfiguratio
         }
 
         fun tag(tag: TagKey<Block>, callback: RuleConfiguration.() -> Unit) {
-            rule(BuiltInRegistries.BLOCK.getOrThrow(tag), callback)
+            val holderGetter = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK)
+            rule(holderGetter.getOrThrow(tag), callback)
         }
 
         fun blocks(vararg blocks: Block, callback: RuleConfiguration.() -> Unit) {
-            val registry = BuiltInRegistries.BLOCK
-
-            val holders = blocks.map {
-                val key = registry.getResourceKey(it)
-                if (!key.isPresent) throw IllegalStateException("Unknown block for tool rule: ${it.name}")
-                registry.getOrThrow(key.get())
-            }
-            val set = HolderSet.direct(*holders.toTypedArray())
+            val set = HolderSet.direct(blocks.map { it.builtInRegistryHolder() })
             rule(set, callback)
         }
 
