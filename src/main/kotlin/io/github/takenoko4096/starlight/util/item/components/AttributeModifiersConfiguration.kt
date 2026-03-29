@@ -22,9 +22,7 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
     }
 
     private fun modifier(attribute: Holder<Attribute>, callback: ModifierEntryConfiguration.() -> Unit) {
-        entries.add(
-            ModifierEntryConfiguration(attribute, this, callback).build()
-        )
+        entries.add(ModifierEntryConfiguration(attribute, this, callback).build())
     }
 
     fun armor(callback: ModifierEntryConfiguration.() -> Unit) {
@@ -168,11 +166,7 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
     }
 
     override fun build(): ItemAttributeModifiers {
-        return ItemAttributeModifiers(
-            listOf(
-
-            )
-        )
+        return ItemAttributeModifiers(entries.toList())
     }
 
     @StarlightDSL
