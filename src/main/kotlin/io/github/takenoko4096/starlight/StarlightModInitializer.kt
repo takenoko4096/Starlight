@@ -10,9 +10,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
 
-abstract class StarlightModInitializer : ModInitializer {
-    abstract val identifier: String
-
+abstract class StarlightModInitializer(val identifier: String) : ModInitializer {
     val logger: Logger = LoggerFactory.getLogger(identifier)
 
     val itemRegistry: ModItemRegistry = ModItemRegistry(this)
@@ -40,6 +38,6 @@ abstract class StarlightModInitializer : ModInitializer {
     }
 
     fun texturePathOf(value: String): TexturePath {
-        return TexturePath(Identifier.fromNamespaceAndPath(identifier, value))
+        return TexturePath(identifierOf(value))
     }
 }

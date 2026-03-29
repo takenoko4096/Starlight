@@ -6,7 +6,7 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 
 open class TexturePath internal constructor(val identifier: Identifier) {
-    fun suffixed(suffix: String): TexturePath {
+    infix fun underscore(suffix: String): TexturePath {
         return TexturePath(identifier.withSuffix("_$suffix"))
     }
 
