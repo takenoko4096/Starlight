@@ -20,7 +20,7 @@ class BlockItemPropertiesConfiguration internal constructor(private val configur
     }
 
     internal fun build(): Item.Properties {
-        val properties = Item.Properties()
+        val properties = Item.Properties().setId(configuration.itemResourceKey)
         if (translationKey == null) throw IllegalStateException()
         else properties.overrideDescription(translationKey!!)
         return properties

@@ -2,20 +2,18 @@ package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
-import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.model.NonClientModel
-import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
-import io.github.takenoko4096.starlight.render.model.block.PropertyVariants0
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
+import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.Items
-import net.minecraft.world.level.BlockAndTintGetter
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 
@@ -75,24 +73,18 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             throw IllegalStateException("'blockProperties' is unset!")
         }
 
-        val block = Blocks.register(
-            blockResourceKey,
-            customBehaviourCreator,
-            blockProperties!!
-        )
+        val block = customBehaviourCreator(blockProperties!!)
+        Registry.register(BuiltInRegistries.BLOCK, blockResourceKey, block)
 
         if (itemProperties != null) {
-            Items.registerBlock(block, itemProperties!!)
+            val item = BlockItem(block, itemProperties!!)
+            Registry.register(BuiltInRegistries.ITEM, itemResourceKey, item)
         }
 
         return block
     }
 
     class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {
-        fun chunkSectionLayer(): NonClientChunkSectionLayer {
-            return configuration.renderingConfig.layerConfig.layer
-        }
-
         fun blockModelLegacy(): BlockRenderingConfiguration.SingleArgBlockModel? {
             return configuration.renderingConfig.modelConfig.blockModelConfig.model
         }
@@ -109,14 +101,16 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.translation
         }
 
-        fun getTint(blockPos: BlockPos, blockState: BlockState, blockAndTintGetter: BlockAndTintGetter, i: Int): Int? {
-            return BlockRenderingConfiguration.TintConfiguration(
-                blockPos,
-                blockState,
-                blockAndTintGetter,
-                i,
-                configuration.renderingConfig.tintGetter
-            ).color
+        fun defaultTint(): (BlockState) -> Int {
+            return configuration.renderingConfig.tintConfig.defaultColorGetter
+        }
+
+        fun inWorldTint(): (BlockState, BlockPos, Level) -> Int {
+            return configuration.renderingConfig.tintConfig.colorGetter
+        }
+
+        fun terrainParticleTint(): (BlockState, BlockPos, Level) -> Int {
+            return configuration.renderingConfig.tintConfig.particleColorGetter
         }
     }
 

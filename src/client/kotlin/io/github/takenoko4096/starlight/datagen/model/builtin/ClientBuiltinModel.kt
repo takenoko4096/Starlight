@@ -4,6 +4,7 @@ import io.github.takenoko4096.starlight.datagen.model.ClientModel
 import io.github.takenoko4096.starlight.render.model.builtin.NonClientBuiltinModel
 import net.minecraft.client.data.models.model.ModelTemplate
 import net.minecraft.client.data.models.model.TextureMapping
+import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.resources.Identifier
 
 abstract class ClientBuiltinModel(nonClient: NonClientBuiltinModel) : ClientModel() {
@@ -25,7 +26,9 @@ abstract class ClientBuiltinModel(nonClient: NonClientBuiltinModel) : ClientMode
         template = ClientBuiltinModelTemplate.convert(nonClient.template)
 
         mapping = TextureMapping().apply {
-            mappingBase.forEach(::put)
+            mappingBase.forEach {
+                put(it.key, Material(it.value))
+            }
         }
     }
 }

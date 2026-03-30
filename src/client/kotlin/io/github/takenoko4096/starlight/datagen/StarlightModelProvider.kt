@@ -5,15 +5,15 @@ import io.github.takenoko4096.starlight.datagen.model.BlockModelVariantsRegistra
 import io.github.takenoko4096.starlight.datagen.model.builder.ClientItemModelHandle
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.fabric.api.client.datagen.v1.provider.FabricModelProvider
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput
 import net.minecraft.client.data.models.BlockModelGenerators
 import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.model.TexturedModel
 import io.github.takenoko4096.starlight.registry.block.BlockRenderingConfiguration.SingleArgBlockModel.SingleArgBlockTextureMap
 import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
+import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 
-class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricDataOutput) : FabricModelProvider(output) {
+class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricPackOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
         val blockRegistry = mod.blockRegistry
 
@@ -37,9 +37,6 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
                 }
                 SingleArgBlockTextureMap.TRIVIAL_COLUMN_HORIZONTAL_ALT -> {
                     blockModelGenerators.createTrivialBlock(block, TexturedModel.COLUMN_HORIZONTAL_ALT)
-                }
-                SingleArgBlockTextureMap.GENRIC_CUBE -> {
-                    blockModelGenerators.createGenericCube(block)
                 }
                 SingleArgBlockTextureMap.ANVIL -> {
                     blockModelGenerators.createAnvil(block)

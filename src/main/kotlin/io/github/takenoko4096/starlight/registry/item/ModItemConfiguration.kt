@@ -6,6 +6,8 @@ import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelBuilder
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelHandle
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
@@ -48,11 +50,10 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
             throw IllegalStateException("'itemProperties' is unset!")
         }
 
-        return Items.registerItem(
-            itemResourceKey,
-            customBehaviourCreator,
-            itemProperties!!
-        )
+        val item = customBehaviourCreator(itemProperties!!)
+        Registry.register(BuiltInRegistries.ITEM, itemResourceKey, item)
+
+        return item
     }
 
     @StarlightDSL

@@ -5,15 +5,15 @@ import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.BlockModelProvider
-import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
-import io.github.takenoko4096.starlight.render.model.block.NonClientVariantMutator
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants0
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants2
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import net.minecraft.core.BlockPos
-import net.minecraft.world.level.BlockAndTintGetter
+import net.minecraft.core.Holder
+import net.minecraft.world.level.Level
+import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import org.jetbrains.annotations.ApiStatus
@@ -24,11 +24,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
     internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
 
-    internal var tintGetter: TintConfiguration.() -> Unit = {}
-
-    fun layer(callback: LayerConfiguration.() -> Unit) {
-        layerConfig = LayerConfiguration(callback)
-    }
+    internal var tintConfig: TintConfiguration = TintConfiguration {}
 
     fun models(callback: ModelConfiguration.() -> Unit) {
         val mc = ModelConfiguration(configuration)
@@ -37,7 +33,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     fun tint(callback: TintConfiguration.() -> Unit) {
-        tintGetter = callback
+        tintConfig = TintConfiguration(callback)
     }
 
     @StarlightDSL
@@ -66,17 +62,27 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     }
 
     @StarlightDSL
-    class TintConfiguration internal constructor(
-        val blockPos: BlockPos,
-        val blockState: BlockState,
-        val blockAndTintGetter: BlockAndTintGetter,
-        val i: Int,
-        callback: TintConfiguration.() -> Unit
-    ) {
-        var color: Int? = null
+    class TintConfiguration internal constructor(callback: TintConfiguration.() -> Unit) {
+        internal var defaultColorGetter: (BlockState) -> Int = { -1 }
+
+        internal var colorGetter: (BlockState, BlockPos, Level) -> Int = { a, b, c -> -1 }
+
+        internal var particleColorGetter: (BlockState, BlockPos, Level) -> Int = { a, b, c -> -1 }
 
         init {
             callback()
+        }
+
+        fun defaultColor(callback: (BlockState) -> Int) {
+            defaultColorGetter = callback
+        }
+
+        fun inWorldColor(callback: (BlockState, BlockPos, Level) -> Int) {
+            colorGetter = callback
+        }
+
+        fun terrainParticleColor(callback: (BlockState, BlockPos, Level) -> Int) {
+            particleColorGetter = callback
         }
     }
 
@@ -169,11 +175,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         }
 
         @ApiStatus.Obsolete
-        fun genericCube() {
-            singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.GENRIC_CUBE)
-        }
-
-        @ApiStatus.Obsolete
         fun anvil() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.ANVIL)
         }
@@ -204,7 +205,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             TRIVIAL_COLUMN_ALT,
             TRIVIAL_COLUMN_HORIZONTAL,
             TRIVIAL_COLUMN_HORIZONTAL_ALT,
-            GENRIC_CUBE,
             ANVIL,
             DOOR,
             LANTERN

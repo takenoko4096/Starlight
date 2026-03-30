@@ -5,6 +5,7 @@ import io.github.takenoko4096.starlight.render.model.custom.NonClientCustomModel
 import net.minecraft.client.data.models.model.ModelTemplate
 import net.minecraft.client.data.models.model.TextureMapping
 import net.minecraft.client.data.models.model.TextureSlot
+import net.minecraft.client.resources.model.sprite.Material
 import net.minecraft.resources.Identifier
 import java.util.Optional
 
@@ -27,7 +28,9 @@ abstract class ClientCustomModel(nonClient: NonClientCustomModel): ClientModel()
         )
 
         mapping = TextureMapping().apply {
-            mappingBase.forEach(::put)
+            mappingBase.forEach {
+                put(it.key, Material(it.value))
+            }
         }
     }
 }

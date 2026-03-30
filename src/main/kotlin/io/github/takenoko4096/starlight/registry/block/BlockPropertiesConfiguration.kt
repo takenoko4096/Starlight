@@ -56,6 +56,7 @@ class BlockPropertiesConfiguration internal constructor(private val configuratio
 
     internal fun build(): BlockBehaviour.Properties {
         val properties = BlockBehaviour.Properties.of()
+        properties.setId(configuration.blockResourceKey)
         properties.destroyTime(destroyTime)
         properties.sound(sound)
         if (!occlusion) properties.noOcclusion()
