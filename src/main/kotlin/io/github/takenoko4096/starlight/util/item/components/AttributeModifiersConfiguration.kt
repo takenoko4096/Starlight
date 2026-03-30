@@ -326,7 +326,6 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
                     output += defaults.getBaseValue(Attributes.ATTACK_DAMAGE)
                 }
                 else if (attribute == Attributes.ATTACK_SPEED.value()) {
-                    println("d:"+defaults.getBaseValue(Attributes.ATTACK_SPEED))
                     output += defaults.getBaseValue(Attributes.ATTACK_SPEED)
                 }
 
