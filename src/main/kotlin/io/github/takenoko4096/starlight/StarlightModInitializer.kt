@@ -1,10 +1,12 @@
 package io.github.takenoko4096.starlight
 
+import io.github.takenoko4096.starlight.registry.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.resources.Identifier
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -19,8 +21,14 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
 
     val translationRegistry: ModTranslationRegistry = ModTranslationRegistry(this)
 
+    val modCommandRegistry: ModCommandRegistry = ModCommandRegistry(this)
+
     init {
         logger.info("$identifier is powered by Starlight")
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
+            modCommandRegistry.use(dispatcher, registryAccess, environment)
+        }
     }
 
     abstract override fun onInitialize()
