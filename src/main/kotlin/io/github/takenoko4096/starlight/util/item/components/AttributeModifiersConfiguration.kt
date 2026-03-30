@@ -322,19 +322,18 @@ class AttributeModifiersConfiguration internal constructor(mod: StarlightModInit
                 val defaults = DefaultAttributes.getSupplier(EntityType.PLAYER)
                 var output = value
 
-                if (attribute == Attributes.ATTACK_DAMAGE) {
-                    // TODO なぜか加算されない
+                if (attribute == Attributes.ATTACK_DAMAGE.value()) {
                     output += defaults.getBaseValue(Attributes.ATTACK_DAMAGE)
                 }
-                else if (attribute == Attributes.ATTACK_SPEED) {
-                    // TODO なぜか加算されない
+                else if (attribute == Attributes.ATTACK_SPEED.value()) {
+                    println("d:"+defaults.getBaseValue(Attributes.ATTACK_SPEED))
                     output += defaults.getBaseValue(Attributes.ATTACK_SPEED)
                 }
 
                 if (operation == AttributeModifier.Operation.ADD_MULTIPLIED_BASE || operation == AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL) {
                     output *= 100.0
                 }
-                else if (attribute == Attributes.KNOCKBACK_RESISTANCE) {
+                else if (attribute == Attributes.KNOCKBACK_RESISTANCE.value()) {
                     output *= 10.0
                 }
 
