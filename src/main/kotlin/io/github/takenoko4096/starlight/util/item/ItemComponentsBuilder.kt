@@ -3,19 +3,24 @@ package io.github.takenoko4096.starlight.util.item
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.util.item.components.*
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.RegistryAccess
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.crafting.Recipe
 import net.minecraft.world.level.block.Blocks
 
 @StarlightDSL
-open class ItemComponentsBuilder(private val mod: StarlightModInitializer, private val dataSource: RegistryAccess?, callback: ItemComponentsBuilder.() -> Unit) {
-    private val components = mutableListOf<ItemComponent<*>>()
+open class ItemComponentsBuilder(private val mod: StarlightModInitializer, private val dataSource: HolderLookup.Provider?, callback: ItemComponentsBuilder.() -> Unit) {
+    private val components = mutableListOf<AbstractItemComponent<*>>()
 
     val templates = Templates()
 
@@ -27,6 +32,20 @@ open class ItemComponentsBuilder(private val mod: StarlightModInitializer, priva
         components.forEach {
             it.set(target)
         }
+    }
+
+    fun build(target: ItemStackTemplate) {
+        val builder = DataComponentPatch.builder()
+
+        components.forEach {
+            it.set(builder)
+        }
+
+        target.apply(builder.build())
+    }
+
+    fun <T : Any> negative(type: DataComponentType<T>) {
+        components.add(ItemComponent.negative(type))
     }
 
     fun attributeModifiers(callback: AttributeModifiersConfiguration.() -> Unit) {

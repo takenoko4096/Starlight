@@ -1,13 +1,23 @@
 package io.github.takenoko4096.starlight.util.item
 
+import net.minecraft.core.HolderLookup
+import net.minecraft.core.Registry
+import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.resources.ResourceKey
 import net.minecraft.util.Unit
 import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStackTemplate
 import java.util.Objects
 
-abstract class ItemComponent<T : Any> protected constructor(protected val type: DataComponentType<T>, protected val value: T) {
-    fun set(target: Item.Properties) {
+abstract class ItemComponent<T : Any> protected constructor(type: DataComponentType<T>, protected val value: T) : AbstractItemComponent<T>(type) {
+    override fun set(target: Item.Properties) {
         target.component(type, value)
+    }
+
+    override fun set(target: DataComponentPatch.Builder) {
+        target.set(type, value)
     }
 
     override fun hashCode(): Int {
@@ -20,9 +30,19 @@ abstract class ItemComponent<T : Any> protected constructor(protected val type: 
         return type == other.type && value == other.value
     }
 
-    class Valued<T : Any> internal constructor(type: DataComponentType<T>, value: T) : ItemComponent<T>(type, value)
+    open class Valued<T : Any> internal constructor(type: DataComponentType<T>, value: T) : ItemComponent<T>(type, value)
 
     class NonValued internal constructor(type: DataComponentType<Unit>) : ItemComponent<Unit>(type, Unit.INSTANCE)
+
+    class Negative<T : Any> internal constructor(type: DataComponentType<T>) : AbstractItemComponent<T>(type) {
+        override fun set(target: Item.Properties) {
+
+        }
+
+        override fun set(target: DataComponentPatch.Builder) {
+            target.remove(type)
+        }
+    }
 
     companion object {
         fun <T : Any> valued(type: DataComponentType<T>, value: T): Valued<T> {
@@ -31,6 +51,10 @@ abstract class ItemComponent<T : Any> protected constructor(protected val type: 
 
         fun nonValued(type: DataComponentType<Unit>): NonValued {
             return NonValued(type)
+        }
+
+        fun <T : Any> negative(type: DataComponentType<T>): Negative<T> {
+            return Negative(type)
         }
     }
 }

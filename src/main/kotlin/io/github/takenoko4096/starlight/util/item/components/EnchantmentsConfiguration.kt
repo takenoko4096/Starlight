@@ -3,6 +3,7 @@ package io.github.takenoko4096.starlight.util.item.components
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import net.minecraft.core.Holder
+import net.minecraft.core.HolderLookup
 import net.minecraft.core.RegistryAccess
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
@@ -11,7 +12,7 @@ import net.minecraft.world.item.enchantment.Enchantment
 import net.minecraft.world.item.enchantment.ItemEnchantments
 
 @StarlightDSL
-class EnchantmentsConfiguration internal constructor(mod: StarlightModInitializer, dataSource: RegistryAccess, callback: EnchantmentsConfiguration.() -> Unit) : AbstractDataDrivenComponentConfiguration<ItemEnchantments>(mod, dataSource, DataComponents.ENCHANTMENTS) {
+class EnchantmentsConfiguration internal constructor(mod: StarlightModInitializer, dataSource: HolderLookup.Provider, callback: EnchantmentsConfiguration.() -> Unit) : AbstractDataDrivenComponentConfiguration<ItemEnchantments>(mod, dataSource, DataComponents.ENCHANTMENTS) {
     private var enchantments = mutableMapOf<Holder<Enchantment>, Int>()
 
     init {

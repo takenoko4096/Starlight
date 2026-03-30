@@ -37,6 +37,7 @@ abstract class StarlightLanguageProvider(private val mod: StarlightModInitialize
         }
 
         val translationRegistry = mod.translationRegistry
+        translationRegistry
         for (translation in translationRegistry.getTranslations()) {
             getTranslation(translation.value)?.let {
                 translationBuilder.add(translation.key, it)
