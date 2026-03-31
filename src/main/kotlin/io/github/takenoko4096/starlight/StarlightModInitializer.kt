@@ -30,7 +30,7 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
         logger.info("$identifier is powered by Starlight")
     }
 
-    override fun onInitialize() {
+    final override fun onInitialize() {
         ServerLifecycleEvents.SERVER_STARTED.register(::onServerInitialize)
 
         commandRegistry.initialize()
