@@ -1,7 +1,6 @@
 package io.github.takenoko4096.starlight.registry.command.node
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import io.github.takenoko4096.starlight.registry.command.Command
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.Commands
 
@@ -10,10 +9,7 @@ open class ConfigurableCommandNode<S>(val registryAccess: CommandBuildContext, v
         builder()
     }
 
-    internal fun build(): Command<S> {
-        return Command(
-            argumentBuilder as LiteralArgumentBuilder<S>,
-            name
-        )
+    internal fun build(): LiteralArgumentBuilder<S> {
+        return argumentBuilder as LiteralArgumentBuilder<S>
     }
 }

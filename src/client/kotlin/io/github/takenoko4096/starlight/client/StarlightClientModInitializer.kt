@@ -1,8 +1,11 @@
 package io.github.takenoko4096.starlight.client
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry
 import net.minecraft.client.color.block.BlockTintSource
 import net.minecraft.client.multiplayer.ClientLevel
@@ -13,6 +16,7 @@ import net.minecraft.world.level.block.state.BlockState
 abstract class StarlightClientModInitializer(private val mod: StarlightModInitializer) : ClientModInitializer {
     override fun onInitializeClient() {
         val blockRegistry = mod.blockRegistry
+
         for (configuration in blockRegistry.getConfigurations()) {
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
             val block = blockRegistry.getBlock(configuration.blockResourceKey)
@@ -49,7 +53,5 @@ abstract class StarlightClientModInitializer(private val mod: StarlightModInitia
         onInitialize()
     }
 
-    open fun onInitialize() {
-
-    }
+    open fun onInitialize() {}
 }

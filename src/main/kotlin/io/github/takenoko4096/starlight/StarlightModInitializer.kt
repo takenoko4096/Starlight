@@ -1,13 +1,16 @@
 package io.github.takenoko4096.starlight
 
-import io.github.takenoko4096.starlight.registry.ModCommandRegistry
+import io.github.takenoko4096.starlight.event.StarlightInitializeEvent
+import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.resources.Identifier
+import net.minecraft.server.MinecraftServer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -21,17 +24,23 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
 
     val translationRegistry: ModTranslationRegistry = ModTranslationRegistry(this)
 
-    val modCommandRegistry: ModCommandRegistry = ModCommandRegistry(this)
+    val commandRegistry: ModCommandRegistry = ModCommandRegistry(this)
 
     init {
         logger.info("$identifier is powered by Starlight")
-
-        CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
-            modCommandRegistry.use(dispatcher, registryAccess, environment)
-        }
     }
 
-    abstract override fun onInitialize()
+    override fun onInitialize() {
+        ServerLifecycleEvents.SERVER_STARTED.register(::onServerInitialize)
+
+        commandRegistry.initialize()
+
+        onInitialize(StarlightInitializeEvent())
+    }
+
+    abstract fun onInitialize(event: StarlightInitializeEvent)
+
+    open fun onServerInitialize(server: MinecraftServer) {}
 
     override fun hashCode(): Int {
         return Objects.hash(identifier)
