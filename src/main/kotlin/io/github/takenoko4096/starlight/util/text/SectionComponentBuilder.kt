@@ -4,7 +4,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import net.minecraft.network.chat.contents.PlainTextContents
 
 class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
     private val children = mutableListOf<AbstractComponentBuilder>()
@@ -36,32 +35,40 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         children.add(TextComponentBuilder(text, copyCurrentStyle()))
     }
 
-    fun bold(flag: Boolean) {
+    fun bold(flag: Boolean = true) {
         style = style.withBold(flag)
     }
 
-    fun italic(flag: Boolean) {
+    fun italic(flag: Boolean = true) {
         style = style.withItalic(flag)
     }
 
-    fun underlined(flag: Boolean) {
+    fun underlined(flag: Boolean = true) {
         style = style.withUnderlined(flag)
     }
 
-    fun obfuscated(flag: Boolean) {
+    fun obfuscated(flag: Boolean = true) {
         style = style.withObfuscated(flag)
     }
 
-    fun strikeThrough(flag: Boolean) {
+    fun strikeThrough(flag: Boolean = true) {
         style = style.withStrikethrough(flag)
     }
 
-    fun color(color: Int) {
-        style = style.withColor(color)
+    fun textColor(color: Int? = null) {
+        style = if (color == null) style.withColor(null as TextColor?) else style.withColor(color)
     }
 
-    fun shadow(color: Int?) {
+    fun shadowColor(color: Int? = null) {
         style = if (color == null) style.withoutShadow() else style.withShadowColor(color)
+    }
+
+    fun textColor(color: BuiltinColor) {
+        textColor(color.color)
+    }
+
+    fun shadowColor(color: BuiltinColor) {
+        shadowColor(color.color)
     }
 
     fun section(callback: SectionComponentBuilder.() -> Unit) {
