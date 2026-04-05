@@ -1,6 +1,5 @@
 package io.github.takenoko4096.starlight.util.text
 
-import net.minecraft.data.AtlasIds
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
@@ -8,16 +7,11 @@ import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import net.minecraft.network.chat.contents.objects.AtlasSprite
-import net.minecraft.network.chat.contents.objects.ObjectInfo
-import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.component.ResolvableProfile
 
-class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
+class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder(parent?.copyCurrentStyle() ?: Style.EMPTY) {
     private val children = mutableListOf<AbstractComponentBuilder>()
-
-    private var style: Style = parent?.copyCurrentStyle() ?: Style.EMPTY
 
     init {
         callback()
@@ -45,15 +39,19 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
     }
 
     fun translate(key: String, vararg insertions: String, fallback: String? = null) {
-        children.add(TranslatableComponentBuilder(key, insertions, fallback))
+        children.add(TranslatableComponentBuilder(key, insertions, fallback, copyCurrentStyle()))
     }
 
     fun atlas(atlas: Identifier, sprite: Identifier, fallback: (SectionComponentBuilder.() -> Unit)? = null) {
-        children.add(AtlasComponentBuilder(atlas, sprite, SectionComponentBuilder(this, fallback ?: {})))
+        children.add(AtlasComponentBuilder(atlas, sprite, SectionComponentBuilder(this, fallback ?: {}), copyCurrentStyle()))
     }
 
     fun player(profile: ResolvableProfile, showHeadOverlay: Boolean = false, fallback: (SectionComponentBuilder.() -> Unit)? = null) {
-        children.add(PlayerComponentBuilder(profile, showHeadOverlay, SectionComponentBuilder(this, fallback ?: {})))
+        children.add(PlayerComponentBuilder(profile, showHeadOverlay, SectionComponentBuilder(this, fallback ?: {}), copyCurrentStyle()))
+    }
+
+    fun keybind(name: String) {
+        children.add(KeybindComponentBuilder(name, copyCurrentStyle()))
     }
 
     fun bold(flag: Boolean = true) {

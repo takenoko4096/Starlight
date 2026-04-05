@@ -2,10 +2,11 @@ package io.github.takenoko4096.starlight.util.text
 
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
+import net.minecraft.network.chat.Style
 
-class TranslatableComponentBuilder internal constructor(private val key: String, private val insertions: Array<out String>, private val fallback: String?) : AbstractComponentBuilder() {
+class TranslatableComponentBuilder internal constructor(private val key: String, private val insertions: Array<out String>, private val fallback: String?, style: Style) : AbstractComponentBuilder(style) {
     override fun build(): MutableComponent {
-        return if (insertions.isEmpty() && fallback == null) {
+        return (if (insertions.isEmpty() && fallback == null) {
             Component.translatable(key)
         }
         else if (insertions.isEmpty()) {
@@ -16,6 +17,6 @@ class TranslatableComponentBuilder internal constructor(private val key: String,
         }
         else {
             Component.translatable(key, fallback, insertions)
-        }
+        }).withStyle(style)
     }
 }
