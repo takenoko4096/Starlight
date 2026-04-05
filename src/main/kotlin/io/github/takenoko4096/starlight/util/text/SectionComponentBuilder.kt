@@ -1,9 +1,18 @@
 package io.github.takenoko4096.starlight.util.text
 
+import net.minecraft.data.AtlasIds
+import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.FontDescription
+import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
+import net.minecraft.network.chat.contents.objects.AtlasSprite
+import net.minecraft.network.chat.contents.objects.ObjectInfo
+import net.minecraft.network.chat.contents.objects.PlayerSprite
+import net.minecraft.resources.Identifier
+import net.minecraft.world.item.component.ResolvableProfile
 
 class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
     private val children = mutableListOf<AbstractComponentBuilder>()
@@ -35,6 +44,18 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         children.add(TextComponentBuilder(text, copyCurrentStyle()))
     }
 
+    fun translate(key: String, vararg insertions: String, fallback: String? = null) {
+        children.add(TranslatableComponentBuilder(key, insertions, fallback))
+    }
+
+    fun atlas(atlas: Identifier, sprite: Identifier, fallback: (SectionComponentBuilder.() -> Unit)? = null) {
+        children.add(AtlasComponentBuilder(atlas, sprite, SectionComponentBuilder(this, fallback ?: {})))
+    }
+
+    fun player(profile: ResolvableProfile, showHeadOverlay: Boolean = false, fallback: (SectionComponentBuilder.() -> Unit)? = null) {
+        children.add(PlayerComponentBuilder(profile, showHeadOverlay, SectionComponentBuilder(this, fallback ?: {})))
+    }
+
     fun bold(flag: Boolean = true) {
         style = style.withBold(flag)
     }
@@ -55,6 +76,10 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         style = style.withStrikethrough(flag)
     }
 
+    fun font(font: FontDescription? = null) {
+        style = style.withFont(font)
+    }
+
     fun textColor(color: Int? = null) {
         style = if (color == null) style.withColor(null as TextColor?) else style.withColor(color)
     }
@@ -73,6 +98,14 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
 
     fun section(callback: SectionComponentBuilder.() -> Unit) {
         children.add(SectionComponentBuilder(this, callback))
+    }
+
+    fun onClick(clickEvent: ClickEvent) {
+        style = style.withClickEvent(clickEvent)
+    }
+
+    fun onHover(hoverEvent: HoverEvent) {
+        style = style.withHoverEvent(hoverEvent)
     }
 
     override fun build(): MutableComponent {
