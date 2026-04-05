@@ -63,11 +63,11 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         style = if (color == null) style.withoutShadow() else style.withShadowColor(color)
     }
 
-    fun textColor(color: BuiltinColor) {
+    fun textColor(color: VanillaColor) {
         textColor(color.color)
     }
 
-    fun shadowColor(color: BuiltinColor) {
+    fun shadowColor(color: VanillaColor) {
         shadowColor(color.color)
     }
 

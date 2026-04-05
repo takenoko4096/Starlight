@@ -1,6 +1,6 @@
 package io.github.takenoko4096.starlight.util.text
 
-enum class BuiltinColor(internal val color: Int) {
+enum class VanillaColor(internal val color: Int) {
     RED(16733525),
     BLUE(5592575),
     YELLOW(16777045),
