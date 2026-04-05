@@ -3,8 +3,15 @@
     "id": "starlight",
     "version": "${version}",
     "name": "Starlight",
-    "description": "",
-    "authors": [],
+    "description": "library mod for kotlin development, including registry, event-dispatcher, model-generator, utilities",
+    "authors": [
+        {
+            "name": "takenoko4096",
+            "contact": {
+                "x": "https://x.com/Takenoko_4096"
+            }
+        }
+    ],
     "contact": {},
     "license": "All-Rights-Reserved",
     "icon": "assets/starlight/icon.png",

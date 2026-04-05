@@ -5,7 +5,7 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 
-class SectionComponentBuilder private constructor(callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
+class SectionComponentBuilder internal constructor(callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
     private val children = mutableListOf<AbstractComponentBuilder>()
 
     init {
@@ -58,18 +58,5 @@ class SectionComponentBuilder private constructor(callback: SectionComponentBuil
         }
 
         return root
-    }
-
-    companion object {
-        fun main() {
-            SectionComponentBuilder {
-                text("a")
-                color(2)
-
-                section {
-                    bold(true)
-                }
-            }
-        }
     }
 }

@@ -12,7 +12,7 @@ import net.minecraft.commands.Commands
 class ModCommandRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
     private val commands = mutableSetOf<(CommandBuildContext, Commands.CommandSelection) -> LiteralArgumentBuilder<CommandSourceStack>>()
 
-    internal fun initialize() {
+    init {
         CommandRegistrationCallback.EVENT.register { dispatcher, registryAccess, environment ->
             commands.forEach {
                 val command = it(registryAccess, environment)
