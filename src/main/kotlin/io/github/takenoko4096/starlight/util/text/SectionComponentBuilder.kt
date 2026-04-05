@@ -4,59 +4,77 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
+import net.minecraft.network.chat.contents.PlainTextContents
 
-class SectionComponentBuilder internal constructor(callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
+class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder() {
     private val children = mutableListOf<AbstractComponentBuilder>()
+
+    private var style: Style = parent?.copyCurrentStyle() ?: Style.EMPTY
 
     init {
         callback()
     }
 
+    private fun copyCurrentStyle(): Style {
+        val copy = Style.EMPTY
+            .withColor(style.color)
+            .withBold(style.isBold)
+            .withItalic(style.isItalic)
+            .withUnderlined(style.isUnderlined)
+            .withObfuscated(style.isObfuscated)
+            .withStrikethrough(style.isStrikethrough)
+            .withInsertion(style.insertion)
+            .withFont(style.font)
+            .withClickEvent(style.clickEvent)
+            .withHoverEvent(style.hoverEvent)
+
+        return if (style.shadowColor == null) copy.withoutShadow()
+        else copy.withShadowColor(style.shadowColor!!)
+    }
+
     fun text(text: String) {
-        children.add(TextComponentBuilder(text))
+        children.add(TextComponentBuilder(text, copyCurrentStyle()))
     }
 
     fun bold(flag: Boolean) {
-        children.add(BoldComponentBuilder(flag))
+        style = style.withBold(flag)
     }
 
     fun italic(flag: Boolean) {
-        children.add(ItalicComponentBuilder(flag))
+        style = style.withItalic(flag)
     }
 
     fun underlined(flag: Boolean) {
-        children.add(UnderlinedComponentBuilder(flag))
+        style = style.withUnderlined(flag)
     }
 
     fun obfuscated(flag: Boolean) {
-        children.add(ObfuscatedComponentBuilder(flag))
+        style = style.withObfuscated(flag)
     }
 
     fun strikeThrough(flag: Boolean) {
-        children.add(StrikeThroughComponentBuilder(flag))
+        style = style.withStrikethrough(flag)
     }
 
     fun color(color: Int) {
-        children.add(ColorComponentBuilder(color))
+        style = style.withColor(color)
+    }
+
+    fun shadow(color: Int?) {
+        style = if (color == null) style.withoutShadow() else style.withShadowColor(color)
     }
 
     fun section(callback: SectionComponentBuilder.() -> Unit) {
-        children.add(SectionComponentBuilder(callback))
+        children.add(SectionComponentBuilder(this, callback))
     }
 
     override fun build(): MutableComponent {
-        val root = Component.empty()
-        var component = root
+        val component = Component.empty()
 
         for (builder in children) {
-            if (builder is StyleComponentBuilder) {
-                component = builder.receive(component.style).build()
-            }
-            else {
-                component.append(builder.build())
-            }
+            component.append(builder.build())
         }
 
-        return root
+        return component
     }
 }
