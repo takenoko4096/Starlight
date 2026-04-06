@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.3.20"
     id("net.fabricmc.fabric-loom")
+    `maven-publish`
 }
 
 version = "1.0-SNAPSHOT"
@@ -67,9 +68,7 @@ dependencies {
 
     implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
 
-    include(
-        implementation("com.gmail.takenokoii78:JSON:1.0-SNAPSHOT")!!
-    )
+    include(api("com.gmail.takenokoii78:JSON:1.0-SNAPSHOT")!!)
 }
 
 tasks {
@@ -109,6 +108,32 @@ tasks {
     jar {
         from("LICENSE") {
             rename { "${it}_${project.base.archivesName.get()}" }
+        }
+    }
+
+    register<Copy>("copyJar") {
+        val jarTask = named<Jar>("jar")
+
+        dependsOn(jarTask)
+
+        from(jarTask.flatMap { it.archiveFile })
+
+        into("C:/Users/wakab/AppData/Roaming/.minecraft/mods")
+    }
+
+    named("build") {
+        finalizedBy("copyJar", "publishToMavenLocal")
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["java"])
+
+            groupId = project.group as String
+            artifactId = project.base.archivesName.get()
+            version = project.version as String
         }
     }
 }

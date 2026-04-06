@@ -20,35 +20,6 @@ class NbtSerializer private constructor(
     private val value: MojangsonStructure,
     private val indentationSpaceCount: Int
 ) {
-    companion object {
-        private const val LINE_BREAK: Char = '\n'
-        private const val QUOTE: Char = '"'
-        private const val COLON: Char = ':'
-        private const val COMMA: Char = ','
-        private const val SEMICOLON: Char = ';'
-        private val COMPOUND_BRACES: CharArray = charArrayOf('{', '}')
-        private val ARRAY_LIST_BRACES: CharArray = charArrayOf('[', ']')
-        private const val WHITESPACE: Char = ' '
-        private const val ESCAPE: Char = '\\'
-        private val SYMBOLS_ON_STRING = mutableSetOf<Char>()
-        private val ITERABLE_TYPE_SYMBOLS: Map<KClass<out MojangsonIterable<*>>, Char> = mapOf(
-            MojangsonByteArray::class to 'B',
-            MojangsonIntArray::class to 'I',
-            MojangsonLongArray::class to 'L'
-        )
-        private val NUMBER_TYPE_SYMBOLS: Map<KClass<out Number>, Char> = mapOf(
-            Byte::class to 'b',
-            Short::class to 's',
-            Long::class to 'L',
-            Float::class to 'f',
-            Double::class to 'd'
-        )
-
-        fun serialize(value: MojangsonStructure): Component {
-            return NbtSerializer(value, 4).serialize()
-        }
-    }
-
     private fun serialize(): Component {
         return serialize(value, 1)
     }
@@ -70,7 +41,7 @@ class NbtSerializer private constructor(
         val keys = compound.keys().toTypedArray()
         return component {
             textColor(VanillaColor.WHITE)
-            text(COMPOUND_BRACES[0].toString())
+            text(COMPOUND_BRACES[0])
 
             section {
                 for (i in keys.indices) {
@@ -79,9 +50,12 @@ class NbtSerializer private constructor(
                     try {
                         val childValue: Any = compound.get(key, compound.getTypeOf(key))
 
-                        text(
-                            LINE_BREAK + indentation(indentation + 1) + string(key) + COLON + WHITESPACE + serialize(childValue, indentation + 1)
-                        )
+                        text(LINE_BREAK)
+                        text(indentation(indentation + 1))
+                        component(string(key))
+                        text(COLON)
+                        text(WHITESPACE)
+                        component(serialize(childValue, indentation + 1))
                     }
                     catch (e: IllegalArgumentException) {
                         throw NbtSerializationException(
@@ -91,37 +65,38 @@ class NbtSerializer private constructor(
                     }
 
                     if (i != keys.size - 1) {
-                        text(COMMA.toString())
+                        text(COMMA)
                     }
                 }
 
                 if (keys.isNotEmpty()) {
-                    text(LINE_BREAK + indentation(indentation))
+                    text(LINE_BREAK)
+                    text(indentation(indentation))
                 }
             }
 
-            text(COMPOUND_BRACES[1].toString())
+            text(COMPOUND_BRACES[1])
         }
     }
 
     private fun iterable(iterable: MojangsonIterable<*>, indentation: Int): Component {
         return component {
             textColor(VanillaColor.WHITE)
-            text(ARRAY_LIST_BRACES[0].toString())
+            text(ARRAY_LIST_BRACES[0])
 
             section {
                 if (ITERABLE_TYPE_SYMBOLS.containsKey(iterable::class)) {
-                    text(ITERABLE_TYPE_SYMBOLS[iterable::class].toString())
-                    text(SEMICOLON.toString())
+                    text(ITERABLE_TYPE_SYMBOLS[iterable::class]!!)
+                    text(SEMICOLON)
                 }
 
                 for ((i, element) in iterable.withIndex()) {
                     if (i >= 1) {
-                        text(COMMA.toString())
+                        text(COMMA)
                     }
 
                     try {
-                        text(LINE_BREAK.toString())
+                        text(LINE_BREAK)
                         text(indentation(indentation + 1))
                         component(serialize(element, indentation + 1))
                     }
@@ -134,28 +109,27 @@ class NbtSerializer private constructor(
                 }
 
                 if (!iterable.isEmpty) {
-                    text(LINE_BREAK.toString())
+                    text(LINE_BREAK)
                     text(indentation(indentation))
                 }
             }
 
-            text(ARRAY_LIST_BRACES[1].toString())
+            text(ARRAY_LIST_BRACES[1])
         }
     }
 
     private fun string(value: String): Component {
-        val requireQuote = SYMBOLS_ON_STRING.stream()
-            .anyMatch { sym: Char -> value.contains(sym.toString()) }
+        val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
 
         return component {
             if (requireQuote) {
-                text(QUOTE.toString())
+                text(QUOTE)
             }
 
             text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
 
             if (requireQuote) {
-                text(QUOTE.toString())
+                text(QUOTE)
             }
         }
     }
@@ -171,12 +145,44 @@ class NbtSerializer private constructor(
             text(value.toString())
 
             if (NUMBER_TYPE_SYMBOLS.contains(value::class)) {
-                text(NUMBER_TYPE_SYMBOLS[value::class].toString())
+                text(NUMBER_TYPE_SYMBOLS[value::class]!!)
             }
         }
     }
 
     private fun indentation(indentation: Int): String {
         return WHITESPACE.toString().repeat(this.indentationSpaceCount).repeat(indentation - 1)
+    }
+
+    companion object {
+        private const val LINE_BREAK = '\n'
+        private const val QUOTE = '"'
+        private const val COLON = ':'
+        private const val COMMA = ','
+        private const val SEMICOLON = ';'
+        private val COMPOUND_BRACES = charArrayOf('{', '}')
+        private val ARRAY_LIST_BRACES = charArrayOf('[', ']')
+        private const val WHITESPACE = ' '
+        private const val ESCAPE = '\\'
+
+        private val SYMBOLS_ON_STRING = setOf<Char>()
+
+        private val ITERABLE_TYPE_SYMBOLS = mapOf<KClass<out MojangsonIterable<*>>, Char>(
+            MojangsonByteArray::class to 'B',
+            MojangsonIntArray::class to 'I',
+            MojangsonLongArray::class to 'L'
+        )
+
+        private val NUMBER_TYPE_SYMBOLS = mapOf<KClass<out Number>, Char>(
+            Byte::class to 'b',
+            Short::class to 's',
+            Long::class to 'L',
+            Float::class to 'f',
+            Double::class to 'd'
+        )
+
+        fun serialize(value: MojangsonStructure): Component {
+            return NbtSerializer(value, 4).serialize()
+        }
     }
 }

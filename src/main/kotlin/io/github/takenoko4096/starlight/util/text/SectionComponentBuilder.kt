@@ -38,6 +38,10 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         children.add(TextComponentBuilder(text, copyCurrentStyle()))
     }
 
+    fun text(text: Char) {
+        children.add(TextComponentBuilder(text.toString(), copyCurrentStyle()))
+    }
+
     fun translate(key: String, vararg insertions: String, fallback: String? = null) {
         children.add(TranslatableComponentBuilder(key, insertions, fallback, copyCurrentStyle()))
     }
@@ -57,7 +61,7 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
     fun component(component: Component) {
         children.add(object : AbstractComponentBuilder(copyCurrentStyle()) {
             override fun build(): MutableComponent {
-                return component.plainCopy()
+                return component.copy()
             }
         })
     }
