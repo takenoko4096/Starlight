@@ -54,6 +54,14 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         children.add(KeybindComponentBuilder(name, copyCurrentStyle()))
     }
 
+    fun component(component: Component) {
+        children.add(object : AbstractComponentBuilder(copyCurrentStyle()) {
+            override fun build(): MutableComponent {
+                return component.plainCopy()
+            }
+        })
+    }
+
     fun bold(flag: Boolean = true) {
         style = style.withBold(flag)
     }

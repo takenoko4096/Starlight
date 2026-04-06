@@ -1,23 +1,17 @@
 package io.github.takenoko4096.starlight.util.nbt
 
-import com.gmail.takenokoii78.mojangson.MojangsonSerializationException
-import com.gmail.takenokoii78.mojangson.MojangsonValue
+import com.gmail.takenokoii78.mojangson.values.MojangsonByteArray
 import com.gmail.takenokoii78.mojangson.values.MojangsonCompound
+import com.gmail.takenokoii78.mojangson.values.MojangsonIntArray
 import com.gmail.takenokoii78.mojangson.values.MojangsonIterable
-import com.gmail.takenokoii78.mojangson.values.MojangsonNull
-import com.gmail.takenokoii78.mojangson.values.MojangsonNumber
+import com.gmail.takenokoii78.mojangson.values.MojangsonLongArray
 import com.gmail.takenokoii78.mojangson.values.MojangsonPrimitive
-import com.gmail.takenokoii78.mojangson.values.MojangsonString
 import com.gmail.takenokoii78.mojangson.values.MojangsonStructure
 import io.github.takenoko4096.starlight.util.text.VanillaColor
 import io.github.takenoko4096.starlight.util.text.component
 import net.minecraft.network.chat.Component
-import java.util.function.IntFunction
-import java.util.function.Predicate
-import kotlin.arrayOfNulls
 import kotlin.charArrayOf
-import kotlin.compareTo
-import kotlin.text.StringBuilder
+import kotlin.reflect.KClass
 import kotlin.text.contains
 import kotlin.text.repeat
 import kotlin.toString
@@ -36,20 +30,32 @@ class NbtSerializer private constructor(
         private val ARRAY_LIST_BRACES: CharArray = charArrayOf('[', ']')
         private const val WHITESPACE: Char = ' '
         private const val ESCAPE: Char = '\\'
-        private val SIGNS: MutableSet<Char> = mutableSetOf('+', '-')
-        private const val DECIMAL_POINT: Char = '.'
         private val SYMBOLS_ON_STRING = mutableSetOf<Char>()
-        private val ITERABLE_TYPE_SYMBOLS: MutableMap<Class<out MojangsonIterable<*>>, Char> = null
-        private val NUMBER_TYPE_SYMBOLS: MutableMap<Class<out Number>, Char>? = null
+        private val ITERABLE_TYPE_SYMBOLS: Map<KClass<out MojangsonIterable<*>>, Char> = mapOf(
+            MojangsonByteArray::class to 'B',
+            MojangsonIntArray::class to 'I',
+            MojangsonLongArray::class to 'L'
+        )
+        private val NUMBER_TYPE_SYMBOLS: Map<KClass<out Number>, Char> = mapOf(
+            Byte::class to 'b',
+            Short::class to 's',
+            Long::class to 'L',
+            Float::class to 'f',
+            Double::class to 'd'
+        )
+
+        fun serialize(value: MojangsonStructure): Component {
+            return NbtSerializer(value, 4).serialize()
+        }
     }
 
-    private fun serialize(): StringBuilder {
-        return this.serialize(this.value, 1)
+    private fun serialize(): Component {
+        return serialize(value, 1)
     }
 
     private fun serialize(value: Any?, indentation: Int): Component {
         return when (value) {
-            null -> StringBuilder("null")
+            null -> component { text("null") }
             is Boolean -> bool(value)
             is Number -> number(value)
             is String -> string(value)
@@ -98,70 +104,79 @@ class NbtSerializer private constructor(
         }
     }
 
-    private fun iterable(iterable: MojangsonIterable<*>, indentation: Int): StringBuilder {
-        val stringBuilder = (StringBuilder()).append(ARRAY_LIST_BRACES[0])
-        if (ITERABLE_TYPE_SYMBOLS.containsKey(iterable.getClass())) {
-            stringBuilder.append(ITERABLE_TYPE_SYMBOLS.get(iterable.getClass())).append(';')
-        }
+    private fun iterable(iterable: MojangsonIterable<*>, indentation: Int): Component {
+        return component {
+            textColor(VanillaColor.WHITE)
+            text(ARRAY_LIST_BRACES[0].toString())
 
-        var i = 0
+            section {
+                if (ITERABLE_TYPE_SYMBOLS.containsKey(iterable::class)) {
+                    text(ITERABLE_TYPE_SYMBOLS[iterable::class].toString())
+                    text(SEMICOLON.toString())
+                }
 
-        for (element in iterable) {
-            if (i >= 1) {
-                stringBuilder.append(',')
+                for ((i, element) in iterable.withIndex()) {
+                    if (i >= 1) {
+                        text(COMMA.toString())
+                    }
+
+                    try {
+                        text(LINE_BREAK.toString())
+                        text(indentation(indentation + 1))
+                        component(serialize(element, indentation + 1))
+                    }
+                    catch (e: IllegalArgumentException) {
+                        throw NbtSerializationException(
+                            "インデックス'" + i + "における無効な型: ${element.javaClass.name}", e
+                        )
+                    }
+
+                }
+
+                if (!iterable.isEmpty) {
+                    text(LINE_BREAK.toString())
+                    text(indentation(indentation))
+                }
             }
 
-            try {
-                stringBuilder.append('\n').append(this.indentation(indentation + 1))
-                    .append(this.serialize(element, indentation + 1))
-            } catch (e: IllegalArgumentException) {
-                throw NbtSerializationException(
-                    "インデックス'" + i + "における無効な型: " + element.getClass().getName(), e
-                )
+            text(ARRAY_LIST_BRACES[1].toString())
+        }
+    }
+
+    private fun string(value: String): Component {
+        val requireQuote = SYMBOLS_ON_STRING.stream()
+            .anyMatch { sym: Char -> value.contains(sym.toString()) }
+
+        return component {
+            if (requireQuote) {
+                text(QUOTE.toString())
             }
 
-            ++i
-        }
+            text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
 
-        if (!iterable.isEmpty()) {
-            stringBuilder.append('\n').append(this.indentation(indentation))
+            if (requireQuote) {
+                text(QUOTE.toString())
+            }
         }
-
-        return stringBuilder.append(ARRAY_LIST_BRACES[1])
     }
 
-    private fun string(value: kotlin.String): StringBuilder {
-        val requireQuote = this.asJsonString || SYMBOLS_ON_STRING.stream()
-            .anyMatch(Predicate { sym: Char? -> value.contains(sym.toString()) })
-        val stringBuilder = StringBuilder()
-        if (requireQuote) {
-            stringBuilder.append('"')
+    private fun bool(value: Boolean): Component {
+        return component {
+            if (value) text("true") else text("false")
         }
-
-        val var10002 = String.valueOf('"')
-        val var10003 = String.valueOf('\\')
-        stringBuilder.append(value.replaceAll(var10002, var10003.repeat(2) + "\""))
-        if (requireQuote) {
-            stringBuilder.append('"')
-        }
-
-        return stringBuilder
     }
 
-    private fun bool(value: Boolean): StringBuilder {
-        return if (value) StringBuilder("true") else StringBuilder("false")
-    }
+    private fun number(value: Number): Component {
+        return component {
+            text(value.toString())
 
-    private fun number(value: Number): StringBuilder {
-        val stringBuilder = StringBuilder(String.valueOf(value))
-        if (!this.asJsonString && NUMBER_TYPE_SYMBOLS!!.containsKey(value.getClass())) {
-            stringBuilder.append(NUMBER_TYPE_SYMBOLS.get(value.getClass()))
+            if (NUMBER_TYPE_SYMBOLS.contains(value::class)) {
+                text(NUMBER_TYPE_SYMBOLS[value::class].toString())
+            }
         }
-
-        return stringBuilder
     }
 
-    private fun indentation(indentation: Int): kotlin.String {
-        return String.valueOf(' ').repeat(this.indentationSpaceCount).repeat(indentation - 1)
+    private fun indentation(indentation: Int): String {
+        return WHITESPACE.toString().repeat(this.indentationSpaceCount).repeat(indentation - 1)
     }
 }
