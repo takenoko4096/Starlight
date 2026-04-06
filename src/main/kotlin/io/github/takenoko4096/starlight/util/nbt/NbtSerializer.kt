@@ -14,7 +14,6 @@ import kotlin.charArrayOf
 import kotlin.reflect.KClass
 import kotlin.text.contains
 import kotlin.text.repeat
-import kotlin.toString
 
 class NbtSerializer private constructor(
     private val value: MojangsonStructure,
@@ -26,8 +25,10 @@ class NbtSerializer private constructor(
 
     private fun serialize(value: Any?, indentation: Int): Component {
         return when (value) {
-            null -> component { text("null") }
-            is Boolean -> bool(value)
+            null -> component {
+                textColor(VanillaColor.LIGHT_PURPLE)
+                text("null")
+            }
             is Number -> number(value)
             is String -> string(value)
             is MojangsonCompound -> compound(value, indentation)
@@ -52,7 +53,12 @@ class NbtSerializer private constructor(
 
                         text(LINE_BREAK)
                         text(indentation(indentation + 1))
-                        component(string(key))
+
+                        section {
+                            textColor(VanillaColor.AQUA)
+                            component(key(key))
+                        }
+
                         text(COLON)
                         text(WHITESPACE)
                         component(serialize(childValue, indentation + 1))
@@ -86,7 +92,10 @@ class NbtSerializer private constructor(
 
             section {
                 if (ITERABLE_TYPE_SYMBOLS.containsKey(iterable::class)) {
-                    text(ITERABLE_TYPE_SYMBOLS[iterable::class]!!)
+                    section {
+                        textColor(VanillaColor.RED)
+                        text(ITERABLE_TYPE_SYMBOLS[iterable::class]!!)
+                    }
                     text(SEMICOLON)
                 }
 
@@ -118,6 +127,25 @@ class NbtSerializer private constructor(
         }
     }
 
+    private fun key(value: String): Component {
+        val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
+
+        return component {
+            if (requireQuote) {
+                text(QUOTE)
+            }
+
+            section {
+                textColor(VanillaColor.AQUA)
+                text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
+            }
+
+            if (requireQuote) {
+                text(QUOTE)
+            }
+        }
+    }
+
     private fun string(value: String): Component {
         val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
 
@@ -126,7 +154,10 @@ class NbtSerializer private constructor(
                 text(QUOTE)
             }
 
-            text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
+            section {
+                textColor(VanillaColor.GREEN)
+                text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
+            }
 
             if (requireQuote) {
                 text(QUOTE)
@@ -134,17 +165,13 @@ class NbtSerializer private constructor(
         }
     }
 
-    private fun bool(value: Boolean): Component {
-        return component {
-            if (value) text("true") else text("false")
-        }
-    }
-
     private fun number(value: Number): Component {
         return component {
+            textColor(VanillaColor.GOLD)
             text(value.toString())
 
             if (NUMBER_TYPE_SYMBOLS.contains(value::class)) {
+                textColor(VanillaColor.RED)
                 text(NUMBER_TYPE_SYMBOLS[value::class]!!)
             }
         }
