@@ -129,38 +129,40 @@ class NbtSerializer private constructor(
 
     private fun key(value: String): Component {
         val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
+        val quote = if (value.contains(DOUBLE_QUOTE)) SINGLE_QUOTE else DOUBLE_QUOTE
 
         return component {
             if (requireQuote) {
-                text(QUOTE)
+                text(quote)
             }
 
             section {
                 textColor(VanillaColor.AQUA)
-                text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
+                text(value)
             }
 
             if (requireQuote) {
-                text(QUOTE)
+                text(quote)
             }
         }
     }
 
     private fun string(value: String): Component {
         val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
+        val quote = if (value.contains(DOUBLE_QUOTE)) SINGLE_QUOTE else DOUBLE_QUOTE
 
         return component {
             if (requireQuote) {
-                text(QUOTE)
+                text(quote)
             }
 
             section {
                 textColor(VanillaColor.GREEN)
-                text(value.replace(QUOTE.toString(), ESCAPE.toString().repeat(2) + QUOTE))
+                text(value)
             }
 
             if (requireQuote) {
-                text(QUOTE)
+                text(quote)
             }
         }
     }
@@ -183,7 +185,8 @@ class NbtSerializer private constructor(
 
     companion object {
         private const val LINE_BREAK = '\n'
-        private const val QUOTE = '"'
+        private const val SINGLE_QUOTE = '\''
+        private const val DOUBLE_QUOTE = '"'
         private const val COLON = ':'
         private const val COMMA = ','
         private const val SEMICOLON = ';'
