@@ -128,8 +128,8 @@ class NbtSerializer private constructor(
     }
 
     private fun key(value: String): Component {
-        val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
         val quote = if (value.contains(DOUBLE_QUOTE)) SINGLE_QUOTE else DOUBLE_QUOTE
+        val requireQuote = SYMBOLS_ON_QUOTED[quote]!!.any { value.contains(it) }
 
         return component {
             if (requireQuote) {
@@ -148,8 +148,8 @@ class NbtSerializer private constructor(
     }
 
     private fun string(value: String): Component {
-        val requireQuote = SYMBOLS_ON_STRING.any { value.contains(it) }
         val quote = if (value.contains(DOUBLE_QUOTE)) SINGLE_QUOTE else DOUBLE_QUOTE
+        val requireQuote = SYMBOLS_ON_QUOTED[quote]!!.any { value.contains(it) }
 
         return component {
             if (requireQuote) {
@@ -195,7 +195,22 @@ class NbtSerializer private constructor(
         private const val WHITESPACE = ' '
         private const val ESCAPE = '\\'
 
-        private val SYMBOLS_ON_STRING = setOf<Char>()
+        private val SYMBOLS_ON_QUOTED = mapOf(
+            SINGLE_QUOTE to setOf(
+                COLON, COMMA, SEMICOLON,
+                COMPOUND_BRACES[0], COMPOUND_BRACES[1],
+                ARRAY_LIST_BRACES[0], ARRAY_LIST_BRACES[1],
+                WHITESPACE, LINE_BREAK, ESCAPE,
+                SINGLE_QUOTE
+            ),
+            DOUBLE_QUOTE to setOf(
+                COLON, COMMA, SEMICOLON,
+                COMPOUND_BRACES[0], COMPOUND_BRACES[1],
+                ARRAY_LIST_BRACES[0], ARRAY_LIST_BRACES[1],
+                WHITESPACE, LINE_BREAK, ESCAPE,
+                DOUBLE_QUOTE
+            )
+        )
 
         private val ITERABLE_TYPE_SYMBOLS = mapOf<KClass<out MojangsonIterable<*>>, Char>(
             MojangsonByteArray::class to 'B',
