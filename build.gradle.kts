@@ -118,7 +118,7 @@ tasks {
 
         from(jarTask.flatMap { it.archiveFile })
 
-        into("${providers.systemProperty("user.home")}/AppData/Roaming/.minecraft/mods")
+        into("${System.getProperty("user.home").replace('\\', '/')}/AppData/Roaming/.minecraft/mods")
     }
 
     named("build") {
