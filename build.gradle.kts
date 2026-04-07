@@ -118,7 +118,7 @@ tasks {
 
         from(jarTask.flatMap { it.archiveFile })
 
-        into("C:/Users/wakab/AppData/Roaming/.minecraft/mods")
+        into("${providers.systemProperty("user.home")}/AppData/Roaming/.minecraft/mods")
     }
 
     named("build") {

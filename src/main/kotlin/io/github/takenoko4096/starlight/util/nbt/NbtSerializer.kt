@@ -128,40 +128,49 @@ class NbtSerializer private constructor(
     }
 
     private fun key(value: String): Component {
-        val quote = if (value.contains(DOUBLE_QUOTE)) SINGLE_QUOTE else DOUBLE_QUOTE
-        val requireQuote = SYMBOLS_ON_QUOTED[quote]!!.any { value.contains(it) }
-
-        return component {
-            if (requireQuote) {
-                text(quote)
-            }
-
-            section {
-                textColor(VanillaColor.AQUA)
-                text(value)
-            }
-
-            if (requireQuote) {
-                text(quote)
-            }
-        }
+        return quotable(value, VanillaColor.AQUA)
     }
 
     private fun string(value: String): Component {
-        val quote = if (value.contains(DOUBLE_QUOTE)) SINGLE_QUOTE else DOUBLE_QUOTE
-        val requireQuote = SYMBOLS_ON_QUOTED[quote]!!.any { value.contains(it) }
+        return quotable(value, VanillaColor.GREEN)
+    }
+
+    private fun quotable(value: String, color: VanillaColor): Component {
+        val quote: Char?
+        val string: String
+
+        if (value.contains(DOUBLE_QUOTE) && !value.contains(SINGLE_QUOTE)) {
+            quote = SINGLE_QUOTE
+            string = value
+        }
+        else if (!value.contains(DOUBLE_QUOTE) && value.contains(SINGLE_QUOTE)) {
+            quote = DOUBLE_QUOTE
+            string = value
+        }
+        else if (value.contains(DOUBLE_QUOTE) && value.contains(SINGLE_QUOTE)) {
+            quote = DOUBLE_QUOTE
+            string = value.replace(DOUBLE_QUOTE.toString(), ESCAPE.toString() + DOUBLE_QUOTE)
+        }
+        else if (SYMBOLS_ON_STRING.any { value.contains(it) }) {
+            quote = DOUBLE_QUOTE
+            string = value
+        }
+        else {
+            quote = null
+            string = value
+        }
 
         return component {
-            if (requireQuote) {
+            if (quote != null) {
                 text(quote)
             }
 
             section {
-                textColor(VanillaColor.GREEN)
-                text(value)
+                textColor(color)
+                text(string)
             }
 
-            if (requireQuote) {
+            if (quote != null) {
                 text(quote)
             }
         }
@@ -195,21 +204,11 @@ class NbtSerializer private constructor(
         private const val WHITESPACE = ' '
         private const val ESCAPE = '\\'
 
-        private val SYMBOLS_ON_QUOTED = mapOf(
-            SINGLE_QUOTE to setOf(
-                COLON, COMMA, SEMICOLON,
-                COMPOUND_BRACES[0], COMPOUND_BRACES[1],
-                ARRAY_LIST_BRACES[0], ARRAY_LIST_BRACES[1],
-                WHITESPACE, LINE_BREAK, ESCAPE,
-                SINGLE_QUOTE
-            ),
-            DOUBLE_QUOTE to setOf(
-                COLON, COMMA, SEMICOLON,
-                COMPOUND_BRACES[0], COMPOUND_BRACES[1],
-                ARRAY_LIST_BRACES[0], ARRAY_LIST_BRACES[1],
-                WHITESPACE, LINE_BREAK, ESCAPE,
-                DOUBLE_QUOTE
-            )
+        private val SYMBOLS_ON_STRING = setOf(
+            COLON, COMMA, SEMICOLON,
+            COMPOUND_BRACES[0], COMPOUND_BRACES[1],
+            ARRAY_LIST_BRACES[0], ARRAY_LIST_BRACES[1],
+            WHITESPACE, LINE_BREAK, ESCAPE
         )
 
         private val ITERABLE_TYPE_SYMBOLS = mapOf<KClass<out MojangsonIterable<*>>, Char>(
