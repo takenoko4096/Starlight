@@ -29,7 +29,10 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
 
     init {
         logger.info("$identifier is powered by Starlight")
-        ServerLifecycleEvents.SERVER_STARTED.register { DataDrivenStarlight(this, it) }
+        ServerLifecycleEvents.SERVER_STARTED.register {
+            val data = DataDrivenStarlight(this, it)
+            onServerStart(data)
+        }
     }
 
     abstract override fun onInitialize()
