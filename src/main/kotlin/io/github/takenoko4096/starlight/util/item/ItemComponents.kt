@@ -4,37 +4,33 @@ import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.util.item.components.*
 import net.minecraft.core.HolderLookup
-import net.minecraft.core.RegistryAccess
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.component.DataComponentType
 import net.minecraft.core.component.DataComponents
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
-import net.minecraft.tags.BlockTags
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.crafting.Recipe
-import net.minecraft.world.level.block.Blocks
 
 @StarlightDSL
-open class ItemComponentsBuilder(private val mod: StarlightModInitializer, private val dataSource: HolderLookup.Provider?, callback: ItemComponentsBuilder.() -> Unit) {
+open class ItemComponents internal constructor(private val mod: StarlightModInitializer, private val dataSource: HolderLookup.Provider?, callback: ItemComponents.() -> Unit) {
     private val components = mutableListOf<AbstractItemComponent<*>>()
 
-    val templates = Templates()
+    val templates = ItemDefaultComponentSets()
 
     init {
         callback()
     }
 
-    fun build(target: Item.Properties) {
+    internal fun apply(target: Item.Properties) {
         components.forEach {
             it.set(target)
         }
     }
 
-    fun build(target: ItemStackTemplate) {
+    protected fun apply(target: ItemStackTemplate) {
         val builder = DataComponentPatch.builder()
 
         components.forEach {
@@ -64,7 +60,7 @@ open class ItemComponentsBuilder(private val mod: StarlightModInitializer, priva
         components.add(ItemComponent.valued(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, flag))
     }
 
-    protected fun enchantments(callback: EnchantmentsConfiguration.() -> Unit) {
+    fun enchantments(callback: EnchantmentsConfiguration.() -> Unit) {
         if (dataSource == null) {
             throw IllegalStateException()
         }
@@ -140,67 +136,11 @@ open class ItemComponentsBuilder(private val mod: StarlightModInitializer, priva
         components.add(WeaponConfiguration(mod, callback).toComponent())
     }
 
-    fun by(template: Template) {
+    fun customData(callback: CustomDataConfiguration.() -> Unit) {
+        components.add(CustomDataConfiguration(mod, callback).toComponent())
+    }
+
+    fun by(template: ItemDefaultComponentSet) {
         template.apply(this)
-    }
-
-    class Template internal constructor(private val callback: ItemComponentsBuilder.() -> Unit) {
-        internal fun apply(builder: ItemComponentsBuilder) {
-            callback(builder)
-        }
-    }
-
-    class Templates internal constructor() {
-        fun sword(durability: Int, attackDamage: Double) = Template {
-            maxStackSize(1)
-            maxDamage(durability)
-            damage(0)
-            weapon {
-                itemDamagePerAttack = 1
-            }
-            attributeModifiers {
-                attackDamage {
-                    slot {
-                        weapon.mainhand()
-                    }
-                    operation {
-                        addValue()
-                    }
-                    value = attackDamage
-                    display {
-                        builtin()
-                    }
-                }
-                attackSpeed {
-                    slot {
-                        weapon.mainhand()
-                    }
-                    operation {
-                        addValue()
-                    }
-                    value = -2.4
-                    display {
-                        builtin()
-                    }
-                }
-            }
-            tool {
-                damagePerBlock = 2
-                defaultMiningSpeed = 1.0f
-                canDestroyBlocksInCreative = false
-
-                rules {
-                    tag(BlockTags.SWORD_INSTANTLY_MINES) {
-                        speed = Float.MAX_VALUE
-                    }
-                    tag(BlockTags.SWORD_EFFICIENT) {
-                        speed = 1.5f
-                    }
-                    blocks(Blocks.COBWEB) {
-                        speed = 15.0f
-                    }
-                }
-            }
-        }
     }
 }

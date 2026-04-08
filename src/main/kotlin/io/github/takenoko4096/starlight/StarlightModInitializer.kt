@@ -5,8 +5,13 @@ import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
+import io.github.takenoko4096.starlight.util.item.ItemComponents
+import io.github.takenoko4096.starlight.util.item.ItemStackBuilder
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.Items
+import net.minecraft.world.item.enchantment.Enchantments
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -24,9 +29,14 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
 
     init {
         logger.info("$identifier is powered by Starlight")
+        ServerLifecycleEvents.SERVER_STARTED.register { DataDrivenStarlight(this, it) }
     }
 
     abstract override fun onInitialize()
+
+    open fun onServerStart(data: DataDrivenStarlight) {
+
+    }
 
     override fun hashCode(): Int {
         return Objects.hash(identifier)

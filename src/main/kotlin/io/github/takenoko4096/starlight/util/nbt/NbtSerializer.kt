@@ -15,26 +15,20 @@ import kotlin.reflect.KClass
 import kotlin.text.contains
 import kotlin.text.repeat
 
-class NbtSerializer private constructor(
-    private val value: MojangsonStructure,
-    private val indentationSpaceCount: Int
-) {
+class NbtSerializer private constructor(private val value: MojangsonStructure, private val indentationSpaceCount: Int) {
     private fun serialize(): Component {
         return serialize(value, 1)
     }
 
     private fun serialize(value: Any?, indentation: Int): Component {
         return when (value) {
-            null -> component {
-                textColor(VanillaColor.LIGHT_PURPLE)
-                text("null")
-            }
             is Number -> number(value)
             is String -> string(value)
             is MojangsonCompound -> compound(value, indentation)
             is MojangsonIterable<*> -> iterable(value, indentation)
             is MojangsonPrimitive<*> -> serialize(value.value, indentation)
-            else -> throw NbtSerializationException("このオブジェクトは無効な型の値を含みます")
+            null -> `null`()
+            else -> throw NbtSerializationException("このオブジェクトは無効な型の値を含みます: $value (${value::class.qualifiedName})")
         }
     }
 
@@ -45,9 +39,7 @@ class NbtSerializer private constructor(
             text(COMPOUND_BRACES[0])
 
             section {
-                for (i in keys.indices) {
-                    val key = keys[i]
-
+                for ((i, key) in keys.withIndex()) {
                     try {
                         val childValue: Any = compound.get(key, compound.getTypeOf(key))
 
@@ -111,10 +103,9 @@ class NbtSerializer private constructor(
                     }
                     catch (e: IllegalArgumentException) {
                         throw NbtSerializationException(
-                            "インデックス'" + i + "における無効な型: ${element.javaClass.name}", e
+                            "インデックス '$i' における無効な型: ${element.javaClass.name}", e
                         )
                     }
-
                 }
 
                 if (!iterable.isEmpty) {
@@ -188,8 +179,15 @@ class NbtSerializer private constructor(
         }
     }
 
+    private fun `null`(): Component {
+        return component {
+            textColor(VanillaColor.LIGHT_PURPLE)
+            text("null")
+        }
+    }
+
     private fun indentation(indentation: Int): String {
-        return WHITESPACE.toString().repeat(this.indentationSpaceCount).repeat(indentation - 1)
+        return WHITESPACE.toString().repeat(indentationSpaceCount).repeat(indentation - 1)
     }
 
     companion object {

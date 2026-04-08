@@ -1,15 +1,14 @@
 package io.github.takenoko4096.starlight.registry.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.util.item.ItemComponentsBuilder
-import net.minecraft.core.component.DataComponents
+import io.github.takenoko4096.starlight.util.item.ItemComponents
 import net.minecraft.world.item.Item
 
 @StarlightDSL
 class ItemPropertiesConfiguration internal constructor(private val configuration: ModItemConfiguration, callback: ItemPropertiesConfiguration.() -> Unit) {
     private var translationKey: String? = null
 
-    private var components: ItemComponentsBuilder? = null
+    private var components: ItemComponents? = null
 
     init {
         callback()
@@ -23,8 +22,8 @@ class ItemPropertiesConfiguration internal constructor(private val configuration
         translationKeyOf(configuration.identifier)
     }
 
-    fun components(callback: ItemComponentsBuilder.() -> Unit) {
-        components = ItemComponentsBuilder(configuration.registry.mod, null, callback)
+    fun components(callback: ItemComponents.() -> Unit) {
+        components = ItemComponents(configuration.registry.mod, null, callback)
     }
 
     internal fun build(): Item.Properties {
@@ -36,7 +35,7 @@ class ItemPropertiesConfiguration internal constructor(private val configuration
 
         if (components == null) throw IllegalStateException("Cannot build item properties: item components is unset")
 
-        components!!.build(properties)
+        components!!.apply(properties)
 
         return properties
     }

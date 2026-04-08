@@ -19,7 +19,7 @@ class EnchantmentsConfiguration internal constructor(mod: StarlightModInitialize
         callback()
     }
 
-    private fun enchant(enchantment: ResourceKey<Enchantment>, level: Int) {
+    fun enchant(enchantment: ResourceKey<Enchantment>, level: Int) {
         val registry = dataSource.lookupOrThrow(Registries.ENCHANTMENT)
         val holder = registry.getOrThrow(enchantment)
         enchantments[holder] = level
