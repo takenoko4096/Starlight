@@ -2,16 +2,18 @@ package io.github.takenoko4096.starlight
 
 import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
+import io.github.takenoko4096.starlight.registry.creativetab.ModCreativeModeTabRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
+import io.github.takenoko4096.starlight.registry.tag.ModTagRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
-import io.github.takenoko4096.starlight.util.item.ItemComponents
-import io.github.takenoko4096.starlight.util.item.ItemStackBuilder
+import io.github.takenoko4096.starlight.util.text.VanillaColor
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.enchantment.Enchantments
+import net.minecraft.world.level.block.Blocks
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -27,11 +29,34 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
 
     val commandRegistry: ModCommandRegistry = ModCommandRegistry(this)
 
+    val tagRegistry: ModTagRegistry = ModTagRegistry(this)
+
+    val creativeModeTabRegistry: ModCreativeModeTabRegistry = ModCreativeModeTabRegistry(this)
+
     init {
         logger.info("$identifier is powered by Starlight")
+
         ServerLifecycleEvents.SERVER_STARTED.register {
             val data = DataDrivenStarlight(this, it)
             onServerStart(data)
+        }
+
+        commandRegistry.register("starlight") {
+            "logger" {
+                "info" {
+                    "message"(greedyString()) {
+                        executes {
+                            val message = "message"[String::class]
+                            logger.info(message)
+                            context.successful {
+                                text("ログに書き込みました: ")
+                                textColor(VanillaColor.AQUA)
+                                text(message)
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

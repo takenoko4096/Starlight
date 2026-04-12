@@ -2,8 +2,9 @@ package io.github.takenoko4096.starlight.datagen
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
+import io.github.takenoko4096.starlight.registry.creativetab.ModCreativeModeTabConfiguration
 import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
-import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.registry.translation.ModTranslationConfiguration
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider
 import net.minecraft.core.HolderLookup
@@ -11,7 +12,7 @@ import java.util.concurrent.CompletableFuture
 import kotlin.collections.iterator
 
 abstract class StarlightLanguageProvider(private val mod: StarlightModInitializer, output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider>, private val languageCode: String) : FabricLanguageProvider(output, languageCode, registryLookup) {
-    protected abstract fun getTranslation(translationConfiguration: TranslationConfiguration): String?
+    protected abstract fun getTranslation(translationConfiguration: ModTranslationConfiguration): String?
 
     override fun generateTranslations(holderLookupProvider: HolderLookup.Provider, translationBuilder: TranslationBuilder) {
         val blockRegistry = mod.blockRegistry
@@ -36,8 +37,17 @@ abstract class StarlightLanguageProvider(private val mod: StarlightModInitialize
             }
         }
 
+        val creativeModeTabRegistry = mod.creativeModeTabRegistry
+        for (configuration in creativeModeTabRegistry.getConfigurations()) {
+            val accessor = ModCreativeModeTabConfiguration.getAccessor(configuration)
+            val translation = accessor.translation()
+
+            getTranslation(translation)?.let {
+                translationBuilder.add(accessor.translationKey(), it)
+            }
+        }
+
         val translationRegistry = mod.translationRegistry
-        translationRegistry
         for (translation in translationRegistry.getTranslations()) {
             getTranslation(translation.value)?.let {
                 translationBuilder.add(translation.key, it)
@@ -50,13 +60,13 @@ abstract class StarlightLanguageProvider(private val mod: StarlightModInitialize
     }
 
     class EnUs(mod: StarlightModInitializer, output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : StarlightLanguageProvider(mod, output, registryLookup, "en_us") {
-        override fun getTranslation(translationConfiguration: TranslationConfiguration): String? {
+        override fun getTranslation(translationConfiguration: ModTranslationConfiguration): String? {
             return translationConfiguration.enUs
         }
     }
 
     class JaJp(mod: StarlightModInitializer, output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : StarlightLanguageProvider(mod, output, registryLookup, "ja_jp") {
-        override fun getTranslation(translationConfiguration: TranslationConfiguration): String? {
+        override fun getTranslation(translationConfiguration: ModTranslationConfiguration): String? {
             return translationConfiguration.jaJp
         }
     }

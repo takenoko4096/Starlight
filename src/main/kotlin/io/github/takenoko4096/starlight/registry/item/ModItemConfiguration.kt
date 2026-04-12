@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.registry.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.registry.translation.ModTranslationConfiguration
 import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelBuilder
@@ -12,7 +12,6 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.resources.Identifier
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.Items
 
 class ModItemConfiguration(internal val registry: ModItemRegistry, internal val identifier: String) {
     val itemResourceKey: ResourceKey<Item> = ResourceKey.create(
@@ -26,7 +25,7 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
 
     internal var renderingConfig: ItemRenderingConfiguration = ItemRenderingConfiguration(this)
 
-    internal var translation = TranslationConfiguration()
+    internal var translation = ModTranslationConfiguration()
 
     fun itemProperties(callback: ItemPropertiesConfiguration.() -> Unit) {
         val ipc = ItemPropertiesConfiguration(this, callback)
@@ -39,8 +38,8 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
         renderingConfig = brc
     }
 
-    fun translation(callback: TranslationConfiguration.() -> Unit) {
-        val tc = TranslationConfiguration()
+    fun translation(callback: ModTranslationConfiguration.() -> Unit) {
+        val tc = ModTranslationConfiguration()
         tc.callback()
         translation = tc
     }
@@ -91,7 +90,7 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
             return configuration.renderingConfig.modelConfig.handle ?: throw IllegalStateException()
         }
 
-        fun translation(): TranslationConfiguration {
+        fun translation(): ModTranslationConfiguration {
             return configuration.translation
         }
     }

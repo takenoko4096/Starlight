@@ -23,6 +23,22 @@ abstract class StarlightDataGenerator(private val mod: StarlightModInitializer) 
             StarlightLanguageProvider.JaJp(mod, output, registryLookup)
         }
 
+        pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
+            StarlightItemTagsProvider(mod, output, registryLookup)
+        }
+
+        pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
+            StarlightBlockTagsProvider(mod, output, registryLookup)
+        }
+
+        pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
+            StarlightEntityTypeTagsProvider(mod, output, registryLookup)
+        }
+
+        pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
+            StarlightBlockEntityTypeTagsProvider(mod, output, registryLookup)
+        }
+
         onInitialize(pack)
     }
 

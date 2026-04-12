@@ -30,7 +30,7 @@ open class ItemComponents internal constructor(private val mod: StarlightModInit
         }
     }
 
-    protected fun apply(target: ItemStackTemplate) {
+    internal fun apply(target: ItemStackTemplate) {
         val builder = DataComponentPatch.builder()
 
         components.forEach {

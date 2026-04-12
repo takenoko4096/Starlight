@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.registry.translation.TranslationConfiguration
+import io.github.takenoko4096.starlight.registry.translation.ModTranslationConfiguration
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import net.minecraft.core.BlockPos
@@ -37,7 +37,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
 
     internal var renderingConfig: BlockRenderingConfiguration = BlockRenderingConfiguration(this)
 
-    internal var translation = TranslationConfiguration()
+    internal var translation = ModTranslationConfiguration()
 
     fun blockProperties(callback: BlockPropertiesConfiguration.() -> Unit) {
         val bpc = BlockPropertiesConfiguration(this, callback)
@@ -62,8 +62,8 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         return CustomBehaviourInfo(Properties(cbc.propertyDefinitions.toSet()))
     }
 
-    fun translation(callback: TranslationConfiguration.() -> Unit) {
-        val tc = TranslationConfiguration()
+    fun translation(callback: ModTranslationConfiguration.() -> Unit) {
+        val tc = ModTranslationConfiguration()
         tc.callback()
         translation = tc
     }
@@ -97,7 +97,7 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.renderingConfig.modelConfig.itemModelConfig.model
         }
 
-        fun translation(): TranslationConfiguration {
+        fun translation(): ModTranslationConfiguration {
             return configuration.translation
         }
 

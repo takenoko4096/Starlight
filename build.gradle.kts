@@ -45,9 +45,7 @@ loom {
 }
 
 fabricApi {
-    /*configureDataGeneration {
-        client = true
-    }*/
+
 }
 
 repositories {
