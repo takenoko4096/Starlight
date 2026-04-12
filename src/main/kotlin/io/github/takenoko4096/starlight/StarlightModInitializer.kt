@@ -63,7 +63,7 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
     abstract override fun onInitialize()
 
     open fun onServerStart(data: DataDrivenStarlight) {
-
+        //
     }
 
     override fun hashCode(): Int {
