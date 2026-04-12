@@ -17,25 +17,25 @@ class ModTagRegistry internal constructor(mod: StarlightModInitializer) : Starli
 
     private val tags = mutableMapOf<TagKey<*>, Tag<*>>()
 
-    fun register(tag: TagKey<Item>, configuration: ModTagConfiguration<Item>.() -> Unit) {
+    fun registerOfItem(tag: TagKey<Item>, configuration: ModTagConfiguration<Item>.() -> Unit) {
         val configuration = ModTagConfiguration(Registries.ITEM, tag, configuration)
         configurations.add(configuration)
         tags[tag] = configuration.build()
     }
 
-    fun register(tag: TagKey<Block>, configuration: ModTagConfiguration<Block>.() -> Unit) {
+    fun registerOfBlock(tag: TagKey<Block>, configuration: ModTagConfiguration<Block>.() -> Unit) {
         val configuration = ModTagConfiguration(Registries.BLOCK, tag, configuration)
         configurations.add(configuration)
         tags[tag] = configuration.build()
     }
 
-    fun register(tag: TagKey<EntityType<*>>, configuration: ModTagConfiguration<EntityType<*>>.() -> Unit) {
+    fun registerOfEntityType(tag: TagKey<EntityType<*>>, configuration: ModTagConfiguration<EntityType<*>>.() -> Unit) {
         val configuration = ModTagConfiguration(Registries.ENTITY_TYPE, tag, configuration)
         configurations.add(configuration)
         tags[tag] = configuration.build()
     }
 
-    fun register(tag: TagKey<BlockEntityType<*>>, configuration: ModTagConfiguration<BlockEntityType<*>>.() -> Unit) {
+    fun registerOfBlockEntityType(tag: TagKey<BlockEntityType<*>>, configuration: ModTagConfiguration<BlockEntityType<*>>.() -> Unit) {
         val configuration = ModTagConfiguration(Registries.BLOCK_ENTITY_TYPE, tag, configuration)
         configurations.add(configuration)
         tags[tag] = configuration.build()
