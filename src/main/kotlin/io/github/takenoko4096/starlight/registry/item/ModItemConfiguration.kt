@@ -44,6 +44,12 @@ class ModItemConfiguration(internal val registry: ModItemRegistry, internal val 
         translation = tc
     }
 
+    fun customBehaviour(callback: CustomBehaviourConfiguration.() -> Unit) {
+        val cbc = CustomBehaviourConfiguration()
+        cbc.callback()
+        customBehaviourCreator = cbc.build()
+    }
+
     internal fun register(): Item {
         if (itemProperties == null) {
             throw IllegalStateException("'itemProperties' is unset!")

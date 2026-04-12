@@ -94,7 +94,7 @@ class BlockEventsConfiguration internal constructor() {
         val level: Level,
         val blockState: BlockState,
         val blockPos: BlockPos,
-        val player: Player?,
+        val player: Player,
         val blockHitResult: BlockHitResult,
         val interactionHand: InteractionHand,
         val itemStack: ItemStack?,
