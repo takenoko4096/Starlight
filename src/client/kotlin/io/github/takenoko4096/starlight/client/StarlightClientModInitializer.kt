@@ -1,11 +1,8 @@
 package io.github.takenoko4096.starlight.client
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
-import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry
 import net.minecraft.client.Minecraft
