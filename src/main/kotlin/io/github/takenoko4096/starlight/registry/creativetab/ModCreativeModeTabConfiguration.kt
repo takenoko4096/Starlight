@@ -3,8 +3,8 @@ package io.github.takenoko4096.starlight.registry.creativetab
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationConfiguration
-import io.github.takenoko4096.starlight.util.item.ItemComponents
-import io.github.takenoko4096.starlight.util.item.ItemStackBuilder
+import io.github.takenoko4096.starlight.item.ItemComponents
+import io.github.takenoko4096.starlight.item.ItemStackBuilder
 import io.github.takenoko4096.starlight.text.component
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab
 import net.minecraft.core.HolderLookup

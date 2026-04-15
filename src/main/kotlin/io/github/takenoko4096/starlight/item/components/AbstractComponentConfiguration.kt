@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
-import io.github.takenoko4096.starlight.util.item.ItemComponent
+import io.github.takenoko4096.starlight.item.ItemComponent
 import net.minecraft.core.component.DataComponentType
 
 abstract class AbstractComponentConfiguration<T : Any>(protected val mod: StarlightModInitializer, protected val type: DataComponentType<T>) {

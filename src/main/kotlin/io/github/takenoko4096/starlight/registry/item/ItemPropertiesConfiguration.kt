@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.registry.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.util.item.ItemComponents
+import io.github.takenoko4096.starlight.item.ItemComponents
 import net.minecraft.world.item.Item
 
 @StarlightDSL

@@ -1,8 +1,8 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightModInitializer
-import io.github.takenoko4096.starlight.util.item.AbstractItemComponent
-import io.github.takenoko4096.starlight.util.item.ItemComponent
+import io.github.takenoko4096.starlight.item.AbstractItemComponent
+import io.github.takenoko4096.starlight.item.ItemComponent
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponentType

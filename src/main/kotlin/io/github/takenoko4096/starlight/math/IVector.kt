@@ -3,11 +3,11 @@ package io.github.takenoko4096.starlight.math
 interface IVector<T : IVector<T, U>, U : Number> {
     val isZero: Boolean
 
+    val components: List<U>
+
     override fun hashCode(): Int
 
     override operator fun equals(other: Any?): Boolean
-
-    fun components(): List<U>
 
     @Destructive
     fun calculate(operator: (U) -> U): T
@@ -32,6 +32,8 @@ interface IVector<T : IVector<T, U>, U : Number> {
 
     @Destructive
     fun clamp(min: T, max: T): T
+
+    fun format(pattern: String, digits: Int): String
 
     override fun toString(): String
 
