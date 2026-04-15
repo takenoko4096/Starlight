@@ -2,9 +2,9 @@ package io.github.takenoko4096.starlight.registry.command.execution
 
 import com.mojang.brigadier.context.CommandContext
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.util.text.SectionComponentBuilder
-import io.github.takenoko4096.starlight.util.text.VanillaColor
-import io.github.takenoko4096.starlight.util.text.component
+import io.github.takenoko4096.starlight.text.SectionComponentBuilder
+import io.github.takenoko4096.starlight.text.VanillaColor
+import io.github.takenoko4096.starlight.text.component
 import net.minecraft.commands.CommandSourceStack
 
 @StarlightDSL

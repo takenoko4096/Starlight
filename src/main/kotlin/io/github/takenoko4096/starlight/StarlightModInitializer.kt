@@ -7,13 +7,10 @@ import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.tag.ModTagRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
-import io.github.takenoko4096.starlight.util.text.VanillaColor
+import io.github.takenoko4096.starlight.text.VanillaColor
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.Items
-import net.minecraft.world.item.enchantment.Enchantments
-import net.minecraft.world.level.block.Blocks
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
