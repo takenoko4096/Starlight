@@ -33,15 +33,15 @@ class OrientedBoundingPlane internal constructor(
             )
         }
 
+    override fun hashCode(): Int {
+        return Objects.hash(center, orientation, width, height)
+    }
+
     override fun equals(other: Any?): Boolean {
         if (other == null) return false
         if (this === other) return true
         if (other !is OrientedBoundingPlane) return false
         return center == other.center && orientation == other.orientation && width == other.width && height == other.height
-    }
-
-    override fun hashCode(): Int {
-        return Objects.hash(center, orientation, width, height)
     }
 
     fun rayCast(from: Vector3d, to: Vector3d): Vector3d? {

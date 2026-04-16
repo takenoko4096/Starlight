@@ -64,6 +64,14 @@ class Rotation2f(var yaw: Float, var pitch: Float) : IVector<Rotation2f, Float> 
         return calculate { component -> component * scalar }
     }
 
+    override infix fun divide(scalar: Float): Rotation2f {
+        if (scalar == 0f) {
+            throw IllegalArgumentException("0 で割ることはできません")
+        }
+
+        return calculate { component -> component / scalar }
+    }
+
     @Destructive
     override fun invert(): Rotation2f {
         yaw += 180f
@@ -131,5 +139,9 @@ class Rotation2f(var yaw: Float, var pitch: Float) : IVector<Rotation2f, Float> 
 
         val DOWN
             get() = Rotation2f(0f, 90f)
+
+        fun from(vec2: Vec2): Rotation2f {
+            return Rotation2f(vec2.y, vec2.x)
+        }
     }
 }

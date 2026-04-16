@@ -58,6 +58,14 @@ class Position3i(var x: Int, var y: Int, var z: Int) : IVector<Position3i, Int> 
         return calculate { component -> component * scalar }
     }
 
+    override infix fun divide(scalar: Int): Position3i {
+        if (scalar == 0) {
+            throw IllegalArgumentException("0 で割ることはできません")
+        }
+
+        return calculate { component -> component / scalar }
+    }
+
     override fun invert(): Position3i {
         return scale(-1)
     }
@@ -66,6 +74,16 @@ class Position3i(var x: Int, var y: Int, var z: Int) : IVector<Position3i, Int> 
         return calculate(min, max) { value, minValue, maxValue ->
             max(minValue, min(value, maxValue))
         }
+    }
+
+    fun axisAlignedBox(other: Position3i): AxisAlignedBoundingBox {
+        val min = Vector3d.min(toVector3d(), other.toVector3d())
+        val max = Vector3d.max(toVector3d(), other.toVector3d())
+
+        return AxisAlignedBoundingBox(
+            min,
+            max.add(Vector3d(1, 1, 1))
+        )
     }
 
     override fun format(pattern: String, digits: Int): String {
@@ -90,5 +108,11 @@ class Position3i(var x: Int, var y: Int, var z: Int) : IVector<Position3i, Int> 
 
     fun toBlockPos(): BlockPos {
         return BlockPos(x, y, z)
+    }
+
+    companion object {
+        fun from(blockPos: BlockPos): Position3i {
+            return Position3i(blockPos.x, blockPos.y, blockPos.z)
+        }
     }
 }

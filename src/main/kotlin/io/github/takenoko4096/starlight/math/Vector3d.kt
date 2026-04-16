@@ -73,6 +73,14 @@ class Vector3d(var x: Double, var y: Double, var z: Double) : IVector<Vector3d, 
         return calculate { component -> component * scalar }
     }
 
+    override infix fun divide(scalar: Double): Vector3d {
+        if (scalar == 0.0) {
+            throw IllegalArgumentException("0 で割ることはできません")
+        }
+
+        return calculate { component -> component / scalar }
+    }
+
     @Destructive
     override fun invert(): Vector3d {
         return scale(-1.0)
@@ -163,6 +171,16 @@ class Vector3d(var x: Double, var y: Double, var z: Double) : IVector<Vector3d, 
         }
     }
 
+    infix fun middle(other: Vector3d): Vector3d {
+        return copy().add(other).scale(0.5)
+    }
+
+    infix fun axisAlignedBox(other: Vector3d): AxisAlignedBoundingBox {
+        return AxisAlignedBoundingBox(this, other)
+    }
+
+    operator fun rangeTo(other: Vector3d): AxisAlignedBoundingBox = axisAlignedBox(other)
+
     @Destructive
     fun rotate(axis: Vector3d, degree: Float): Vector3d {
         val theta = Math.toRadians(degree.toDouble())
@@ -224,6 +242,10 @@ class Vector3d(var x: Double, var y: Double, var z: Double) : IVector<Vector3d, 
 
         fun max(a: Vector3d, b: Vector3d): Vector3d {
             return a.copy().calculate(b) { a, b -> max(a, b) }
+        }
+
+        fun from(vec3: Vec3): Vector3d {
+            return Vector3d(vec3.x, vec3.y, vec3.z)
         }
 
         val FORWARD

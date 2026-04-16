@@ -28,6 +28,9 @@ interface IVector<T : IVector<T, U>, U : Number> {
     infix fun scale(scalar: U): T
 
     @Destructive
+    infix fun divide(scalar: U): T
+
+    @Destructive
     fun invert(): T
 
     @Destructive
@@ -38,4 +41,16 @@ interface IVector<T : IVector<T, U>, U : Number> {
     override fun toString(): String
 
     fun copy(): T
+
+    operator fun plus(other: T): T = copy().add(other)
+
+    operator fun minus(other: T): T = copy().subtract(other)
+
+    operator fun unaryMinus(): T = copy().invert()
+
+    operator fun times(scale: U): T = copy().scale(scale)
+
+    operator fun div(divider: U): T = copy().divide(divider)
+
+    operator fun get(index: Int): U = components[index]
 }

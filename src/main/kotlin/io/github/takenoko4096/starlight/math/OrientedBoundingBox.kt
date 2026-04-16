@@ -2,7 +2,7 @@ package io.github.takenoko4096.starlight.math
 
 import kotlin.math.*
 
-class OrientedBoundingBox(
+open class OrientedBoundingBox(
     private val _center: Vector3d,
     private val _orientation: Orientation3f,
     private val _size: Vector3d
@@ -109,6 +109,8 @@ class OrientedBoundingBox(
 
         return true
     }
+
+    operator fun contains(point: Vector3d): Boolean = isInside(point)
 
     fun isCollides(other: OrientedBoundingBox): Boolean {
         // Separating Axis Theorem (SAT: 分離軸定理)

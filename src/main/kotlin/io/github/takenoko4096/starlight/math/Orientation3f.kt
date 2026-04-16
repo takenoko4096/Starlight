@@ -70,6 +70,14 @@ class Orientation3f(var yaw: Float, var pitch: Float, var roll: Float) : IVector
         return calculate { component -> component * scalar }
     }
 
+    override infix fun divide(scalar: Float): Orientation3f {
+        if (scalar == 0f) {
+            throw IllegalArgumentException("0 で割ることはできません")
+        }
+
+        return calculate { component -> component / scalar }
+    }
+
     override fun invert(): Orientation3f {
         return this.localCoordinateSystem.back()
     }
