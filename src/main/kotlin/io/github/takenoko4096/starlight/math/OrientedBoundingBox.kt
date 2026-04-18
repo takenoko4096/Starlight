@@ -143,19 +143,9 @@ open class OrientedBoundingBox(
         // それぞれの分離軸について
         for (axis in axes) {
             // 分離軸とAの頂点座標の内積たち
-            val vA = mutableSetOf<Double>()
+            val vA = cornersA.map { axis dot it }.toSet()
             // 分離軸とBの頂点座標の内積たち
-            val vB = mutableSetOf<Double>()
-
-            // vAにぶち込む
-            for (cornerA in cornersA) {
-                vA.add(axis.dot(cornerA))
-            }
-
-            // vBにぶち込む
-            for (cornerB in cornersB) {
-                vB.add(axis.dot(cornerB))
-            }
+            val vB = cornersB.map { axis dot it }.toSet()
 
             // vAの最小値と最大値
             val minA = vA.reduce(::min)

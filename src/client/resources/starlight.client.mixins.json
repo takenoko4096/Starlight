@@ -3,6 +3,7 @@
     "package": "io.github.takenoko4096.starlight.mixin.client",
     "compatibilityLevel": "JAVA_25",
     "client": [
+
     ],
     "injectors": {
         "defaultRequire": 1
