@@ -1,6 +1,5 @@
 package io.github.takenoko4096.starlight
 
-import io.github.takenoko4096.starlight.item.ItemStackBuilder
 import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
 import io.github.takenoko4096.starlight.registry.creativetab.ModCreativeModeTabRegistry
@@ -9,18 +8,16 @@ import io.github.takenoko4096.starlight.registry.tag.ModTagRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.text.VanillaColor
-import io.github.takenoko4096.starlight.text.component
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
-import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.Items
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.Marker
 import java.util.*
 
 abstract class StarlightModInitializer(val identifier: String) : ModInitializer {
+    val version: String = "1.0-SNAPSHOT"
+
     val logger: Logger = LoggerFactory.getLogger(identifier)
 
     val itemRegistry: ModItemRegistry = ModItemRegistry(this)
@@ -59,14 +56,23 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
                     }
                 }
             }
+
+            "version" {
+                executes {
+                    context.successful {
+                        text("Starlight Version")
+                        text(' ')
+                        textColor(VanillaColor.GREEN)
+                        text(version)
+                    }
+                }
+            }
         }
     }
 
     abstract override fun onInitialize()
 
-    open fun onServerStart(data: DataDrivenStarlight) {
-
-    }
+    open fun onServerStart(data: DataDrivenStarlight) {}
 
     override fun hashCode(): Int {
         return Objects.hash(identifier)

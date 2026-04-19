@@ -11,10 +11,13 @@ import com.mojang.brigadier.builder.ArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import io.github.takenoko4096.starlight.registry.command.execution.AssignableCommandExecution
+import io.github.takenoko4096.starlight.registry.command.execution.ErrorHandlerExecution
 import io.github.takenoko4096.starlight.registry.command.execution.ReturnableCommandExecution
 
 open class CommandNode<S> internal constructor(protected open val argumentBuilder: ArgumentBuilder<S, *>) {
     private var executed: Boolean = false
+
+    private var catcher: (ErrorHandlerExecution<S>.() -> Unit)? = null
 
     private val identifiers = mutableSetOf<String>()
 
@@ -62,9 +65,19 @@ open class CommandNode<S> internal constructor(protected open val argumentBuilde
         executed = true
         argumentBuilder.executes {
             val execution = AssignableCommandExecution(it)
-            execution.callback()
+            try {
+                execution.callback()
+            }
+            catch (error: Throwable) {
+                catcher?.invoke(ErrorHandlerExecution(it, error))
+                execution.returns = 0
+            }
             return@executes execution.returns
         }
+    }
+
+    fun catches(callback: ErrorHandlerExecution<S>.() -> Unit) {
+        catcher = callback
     }
 
     fun returns(callback: ReturnableCommandExecution<S>.() -> Int) {
@@ -74,7 +87,15 @@ open class CommandNode<S> internal constructor(protected open val argumentBuilde
 
         executed = true
         argumentBuilder.executes {
-            return@executes ReturnableCommandExecution(it).callback()
+            val execution = ReturnableCommandExecution(it)
+            val result: Int = try {
+                execution.callback()
+            }
+            catch (error: Throwable) {
+                catcher?.invoke(ErrorHandlerExecution(it, error))
+                0
+            }
+            return@executes result
         }
     }
 

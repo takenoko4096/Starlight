@@ -1,5 +1,6 @@
 package io.github.takenoko4096.starlight.execute
 
+import net.minecraft.server.MinecraftServer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.GameType
 
@@ -39,18 +40,30 @@ class EntitySelector(callback: EntitySelector.() -> Unit) {
             types.add(value)
         }
 
-    var name: InvertibleValue<String>
+    var name: Any
         get() {
             throw IllegalSelectorArgumentException("このプロパティは getter が無効です")
         }
         set(value) {
-            if (names.any { !it.not }) {
-                throw IllegalSelectorArgumentException("この引数は既に単一の名前が指定されています")
+            when (value) {
+                is String -> {
+                    ::name.set(InvertibleValue.of(value))
+                }
+                is InvertibleValue<*> if value.value is String -> {
+                    if (names.any { !it.not }) {
+                        throw IllegalSelectorArgumentException("この引数は既に単一の名前が指定されています")
+                    }
+                    names.add(value as InvertibleValue<String>)
+                }
+                else -> {
+                    throw IllegalSelectorArgumentException("このプロパティに型 ${value::class} は無効です")
+                }
             }
-            names.add(value)
         }
 
-    fun String.invertible(): InvertibleValue<String> = InvertibleValue.of(this)
+    operator fun String.not(): InvertibleValue<String> {
+        return !InvertibleValue.of(this)
+    }
 
     val acaciaBoat = InvertibleValue.entityType(EntityType.ACACIA_BOAT)
     val acaciaChestBoat = InvertibleValue.entityType(EntityType.ACACIA_CHEST_BOAT)
@@ -77,22 +90,6 @@ class EntitySelector(callback: EntitySelector.() -> Unit) {
 
     init {
         callback()
-    }
-
-    companion object {
-        fun main() {
-            EntitySelector {
-                type=acaciaBoat
-                type=!allay
-                type=armorStand
-                type=!breezeWindCharge
-                distance = 1.0..4.0
-                yRotation = 1f..4f
-                sort = SelectorSortOrder.NEAREST
-                xRotation= 1.0.toFloat()..2.0f
-                name = !"a".invertible()
-            }
-        }
     }
 
     private class IllegalSelectorArgumentException(message: String) : RuntimeException(message)
