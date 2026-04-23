@@ -1,6 +1,5 @@
 package io.github.takenoko4096.starlight.execute
 
-import net.minecraft.server.MinecraftServer
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.GameType
 
@@ -29,15 +28,26 @@ class EntitySelector(callback: EntitySelector.() -> Unit) {
 
     var sort: SelectorSortOrder = SelectorSortOrder.ARBITRARY
 
-    var type: InvertibleValue<EntityType<*>>
+    var type: Any
         get() {
             throw IllegalSelectorArgumentException("このプロパティは getter が無効です")
         }
         set(value) {
-            if (types.any { !it.not }) {
-                throw IllegalSelectorArgumentException("この引数は既に単一のエンティティタイプが指定されています")
+            when (value) {
+                is Not<*> if value.value is EntityType<*> -> {
+                    if (types.any { !it.not }) {
+                        throw IllegalSelectorArgumentException("この引数は既に単一のエンティティタイプが指定されています")
+                    }
+
+                    types.add(InvertibleValue.of(value.value))
+                }
+                is EntityType<*> -> {
+                    types.add(InvertibleValue.of(value))
+                }
+                else -> {
+                    throw IllegalSelectorArgumentException("セレクタ引数 'type' に対して無効な型です: ${value::class.qualifiedName}")
+                }
             }
-            types.add(value)
         }
 
     var name: Any
@@ -46,51 +56,75 @@ class EntitySelector(callback: EntitySelector.() -> Unit) {
         }
         set(value) {
             when (value) {
-                is String -> {
-                    ::name.set(InvertibleValue.of(value))
-                }
-                is InvertibleValue<*> if value.value is String -> {
+                is Not<*> if value.value is String -> {
                     if (names.any { !it.not }) {
                         throw IllegalSelectorArgumentException("この引数は既に単一の名前が指定されています")
                     }
-                    names.add(value as InvertibleValue<String>)
+
+                    names.add(InvertibleValue.of(value.value))
+                }
+                is String -> {
+                    names.add(InvertibleValue.of(value))
                 }
                 else -> {
-                    throw IllegalSelectorArgumentException("このプロパティに型 ${value::class} は無効です")
+                    throw IllegalSelectorArgumentException("セレクタ引数 'name' に対して無効な型です: ${value::class.qualifiedName}")
                 }
             }
         }
 
-    operator fun String.not(): InvertibleValue<String> {
-        return !InvertibleValue.of(this)
+    var gameMode: Any
+        get() {
+            throw IllegalSelectorArgumentException("このプロパティは getter が無効です")
+        }
+        set(value) {
+            when (value) {
+                is Not<*> if value.value is GameType -> {
+                    if (names.any { !it.not }) {
+                        throw IllegalSelectorArgumentException("この引数は既に単一のゲームモードが指定されています")
+                    }
+
+                    gameModes.add(InvertibleValue.of(value.value))
+                }
+                is GameType -> {
+                    gameModes.add(InvertibleValue.of(value))
+                }
+                else -> {
+                    throw IllegalSelectorArgumentException("セレクタ引数 'gameMode' に対して無効な型です: ${value::class.qualifiedName}")
+                }
+            }
+        }
+
+    var tag: Any
+        get() {
+            throw IllegalSelectorArgumentException("このプロパティは getter が無効です")
+        }
+        set(value) {
+            when (value) {
+                is Not<*> if value.value is String -> {
+                    tags.add(InvertibleValue.of(value.value))
+                }
+                is String -> {
+                    tags.add(InvertibleValue.of(value))
+                }
+                else -> {
+                    throw IllegalSelectorArgumentException("セレクタ引数 'tag' に対して無効な型です: ${value::class.qualifiedName}")
+                }
+            }
+        }
+
+    operator fun String.not(): Not<String> {
+        return Not(this)
     }
 
-    val acaciaBoat = InvertibleValue.entityType(EntityType.ACACIA_BOAT)
-    val acaciaChestBoat = InvertibleValue.entityType(EntityType.ACACIA_CHEST_BOAT)
-    val allay = InvertibleValue.entityType(EntityType.ALLAY)
-    val areaEffectCloud = InvertibleValue.entityType(EntityType.ARMADILLO)
-    val armorStand = InvertibleValue.entityType(EntityType.ARMOR_STAND)
-    val arrow = InvertibleValue.entityType(EntityType.ARROW)
-    val axolotl = InvertibleValue.entityType(EntityType.AXOLOTL)
-    val bambooChestRaft = InvertibleValue.entityType(EntityType.BAMBOO_CHEST_RAFT)
-    val bambooRaft = InvertibleValue.entityType(EntityType.BAMBOO_RAFT)
-    val bat = InvertibleValue.entityType(EntityType.BAT)
-    val bee = InvertibleValue.entityType(EntityType.BEE)
-    val birchBoat = InvertibleValue.entityType(EntityType.BIRCH_BOAT)
-    val birchChestBoat = InvertibleValue.entityType(EntityType.BIRCH_CHEST_BOAT)
-    val blaze = InvertibleValue.entityType(EntityType.BLAZE)
-    val blockDisplay = InvertibleValue.entityType(EntityType.BLOCK_DISPLAY)
-    val bogged = InvertibleValue.entityType(EntityType.BOGGED)
-    val breeze = InvertibleValue.entityType(EntityType.BREEZE)
-    val breezeWindCharge = InvertibleValue.entityType(EntityType.BREEZE_WIND_CHARGE)
-    val camel = InvertibleValue.entityType(EntityType.CAMEL)
-    val camelHusk = InvertibleValue.entityType(EntityType.CAMEL_HUSK)
-    val cat = InvertibleValue.entityType(EntityType.CAT)
-    val caveSpider = InvertibleValue.entityType(EntityType.CAVE_SPIDER)
+    operator fun EntityType<*>.not(): Not<EntityType<*>> {
+        return Not(this)
+    }
 
     init {
         callback()
     }
+
+    class Not<T : Any> internal constructor(internal val value: T)
 
     private class IllegalSelectorArgumentException(message: String) : RuntimeException(message)
 }

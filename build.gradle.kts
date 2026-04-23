@@ -95,7 +95,7 @@ tasks {
         // this fixes some edge cases with special characters not displaying correctly
         // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
         // If Javadoc is generated, this must be specified in that task too.
-        options.encoding = "UTF-8"
+        options.encoding = Charsets.UTF_8.name()
         options.release.set(javaVersion)
     }
 
@@ -116,7 +116,7 @@ tasks {
 
         from(jarTask.flatMap { it.archiveFile })
 
-        into("${System.getProperty("user.home").replace('\\', '/')}/AppData/Roaming/.minecraft/mods")
+        into("${System.getProperty("user.home").replace(File.separatorChar, '/')}/AppData/Roaming/.minecraft/mods")
     }
 
     named("build") {

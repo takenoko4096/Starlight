@@ -1,6 +1,5 @@
 package io.github.takenoko4096.starlight.execute
 
-import net.minecraft.world.entity.EntityType
 import java.util.Objects
 
 class InvertibleValue<T : Any> private constructor(internal val not: Boolean, internal val value: T) {
@@ -22,7 +21,5 @@ class InvertibleValue<T : Any> private constructor(internal val not: Boolean, in
         fun <T : Any> of(value: T): InvertibleValue<T> {
             return InvertibleValue(not = false, value)
         }
-
-        fun entityType(type: EntityType<*>): InvertibleValue<EntityType<*>> = of(type)
     }
 }
