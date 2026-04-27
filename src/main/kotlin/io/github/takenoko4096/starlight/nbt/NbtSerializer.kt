@@ -1,12 +1,12 @@
 package io.github.takenoko4096.starlight.nbt
 
-import com.gmail.takenokoii78.mojangson.values.MojangsonByteArray
-import com.gmail.takenokoii78.mojangson.values.MojangsonCompound
-import com.gmail.takenokoii78.mojangson.values.MojangsonIntArray
-import com.gmail.takenokoii78.mojangson.values.MojangsonIterable
-import com.gmail.takenokoii78.mojangson.values.MojangsonLongArray
-import com.gmail.takenokoii78.mojangson.values.MojangsonPrimitive
-import com.gmail.takenokoii78.mojangson.values.MojangsonStructure
+import io.github.takenoko4096.mojangson.values.MojangsonByteArray
+import io.github.takenoko4096.mojangson.values.MojangsonCompound
+import io.github.takenoko4096.mojangson.values.MojangsonIntArray
+import io.github.takenoko4096.mojangson.values.MojangsonIterable
+import io.github.takenoko4096.mojangson.values.MojangsonLongArray
+import io.github.takenoko4096.mojangson.values.MojangsonPrimitive
+import io.github.takenoko4096.mojangson.values.MojangsonStructure
 import io.github.takenoko4096.starlight.text.VanillaColor
 import io.github.takenoko4096.starlight.text.component
 import net.minecraft.network.chat.Component

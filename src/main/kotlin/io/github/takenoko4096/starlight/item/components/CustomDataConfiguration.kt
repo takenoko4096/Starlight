@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.item.components
 
-import com.gmail.takenokoii78.mojangson.MojangsonSerializer
-import com.gmail.takenokoii78.mojangson.values.MojangsonCompound
+import io.github.takenoko4096.mojangson.MojangsonSerializer
+import io.github.takenoko4096.mojangson.values.MojangsonCompound
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.TagParser
