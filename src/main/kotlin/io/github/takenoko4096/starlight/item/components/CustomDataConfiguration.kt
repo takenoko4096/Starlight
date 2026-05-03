@@ -15,7 +15,7 @@ class CustomDataConfiguration internal constructor(mod: StarlightModInitializer,
     }
 
     override fun build(): CustomData {
-        val tag = TagParser.parseCompoundFully(MojangsonSerializer.serialize(compound))
+        val tag = TagParser.parseCompoundFully(MojangsonSerializer.structure(compound, false))
         return CustomData.of(tag)
     }
 }

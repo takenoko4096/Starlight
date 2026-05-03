@@ -106,6 +106,10 @@ class Position3i(var x: Int, var y: Int, var z: Int) : IVector<Position3i, Int> 
         return Vector3d(x, y, z)
     }
 
+    fun bottomCenter(): Vector3d {
+        return toVector3d() + Vector3d(0.5, 0.0, 0.5)
+    }
+
     fun toBlockPos(): BlockPos {
         return BlockPos(x, y, z)
     }

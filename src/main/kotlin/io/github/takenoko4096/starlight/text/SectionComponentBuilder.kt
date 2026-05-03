@@ -42,6 +42,10 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         children.add(TextComponentBuilder(text.toString(), copyCurrentStyle()))
     }
 
+    fun linebreak() = text('\n')
+
+    fun space() = text(' ')
+
     fun translate(key: String, vararg insertions: String, fallback: String? = null) {
         children.add(TranslatableComponentBuilder(key, insertions, fallback, copyCurrentStyle()))
     }

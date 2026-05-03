@@ -1,9 +1,11 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
+import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationConfiguration
 import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
+import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelHandle
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -93,8 +95,8 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
             return configuration.renderingConfig.modelConfig.blockModelConfig.variants
         }
 
-        fun blockDefaultItemModel(): NonClientModel? {
-            return configuration.renderingConfig.modelConfig.itemModelConfig.model
+        fun blockItemModel(): ItemModelHandle? {
+            return configuration.renderingConfig.modelConfig.itemModelConfig?.handle
         }
 
         fun translation(): ModTranslationConfiguration {

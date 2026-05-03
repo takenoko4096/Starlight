@@ -61,7 +61,7 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
                 executes {
                     context.successful {
                         text("Starlight Version")
-                        text(' ')
+                        space()
                         textColor(VanillaColor.GREEN)
                         text(version)
                     }

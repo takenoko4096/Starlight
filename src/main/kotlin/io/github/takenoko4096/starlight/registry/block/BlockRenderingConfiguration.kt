@@ -1,6 +1,7 @@
 package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
+import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
 import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.render.model.NonClientModel
@@ -20,8 +21,6 @@ import org.jetbrains.annotations.ApiStatus
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
-    internal var layerConfig = LayerConfiguration {}
-
     internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
 
     internal var tintConfig: TintConfiguration = TintConfiguration {}
@@ -34,31 +33,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
     fun tint(callback: TintConfiguration.() -> Unit) {
         tintConfig = TintConfiguration(callback)
-    }
-
-    @StarlightDSL
-    class LayerConfiguration internal constructor(callback: LayerConfiguration.() -> Unit) {
-        internal var layer: NonClientChunkSectionLayer = NonClientChunkSectionLayer.SOLID
-
-        init {
-            callback()
-        }
-
-        fun solid() {
-            layer = NonClientChunkSectionLayer.SOLID
-        }
-
-        fun cutout() {
-            layer = NonClientChunkSectionLayer.CUTOUT
-        }
-
-        fun translucent() {
-            layer = NonClientChunkSectionLayer.TRANSLUCENT
-        }
-
-        fun tripwire() {
-            layer = NonClientChunkSectionLayer.TRIPWIRE
-        }
     }
 
     @StarlightDSL
@@ -90,7 +64,7 @@ class BlockRenderingConfiguration internal constructor(private val configuration
     class ModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
         internal var blockModelConfig = BlockModelConfiguration(configuration)
 
-        internal var itemModelConfig = ItemModelConfiguration(configuration)
+        internal var itemModelConfig: ModItemConfiguration.ItemModelConfiguration? = null
 
         val blockDefaultTexturePath = TexturePath.blockDefault(configuration.blockResourceKey)
 
@@ -106,9 +80,8 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             blockModelConfig = bmc
         }
 
-        fun item(callback: ItemModelConfiguration.() -> Unit) {
-            val imc = ItemModelConfiguration(configuration)
-            imc.callback()
+        fun item(callback: ModItemConfiguration.ItemModelConfiguration.() -> Unit) {
+            val imc = ModItemConfiguration.ItemModelConfiguration(configuration.itemResourceKey, callback)
             itemModelConfig = imc
         }
     }
@@ -187,14 +160,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
         @ApiStatus.Obsolete
         fun lantern() {
             singleArg(SingleArgBlockModel.SingleArgBlockTextureMap.LANTERN)
-        }
-    }
-
-    class ItemModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
-        internal var model: NonClientModel? = null
-
-        fun NonClientModel.useAsItemModel() {
-            model = this
         }
     }
 

@@ -56,7 +56,7 @@ class StarlightModelProvider(private val mod: StarlightModInitializer, output: F
                 val registrar = BlockModelVariantsRegistrar(
                     blockModelGenerators,
                     block,
-                    accessor.blockDefaultItemModel(),
+                    accessor.blockItemModel(),
                     variants
                 )
                 registrar.register()

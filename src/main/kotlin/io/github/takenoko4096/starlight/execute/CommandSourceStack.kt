@@ -6,27 +6,17 @@ import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.Level
 
-class CommandSourceStack(sender: CommandSender) {
-    private var executor: Entity? = null
-
-    private var position: Vector3d = Vector3d()
-
-    private var rotation: Rotation2f = Rotation2f()
-
-    private var dimension: Level = sender.registryAccess
-        .lookupOrThrow(Registries.DIMENSION)
-        .getOrThrow(Level.OVERWORLD)
-        .value()
-
-    private var entityAnchor: EntityAnchor = EntityAnchor.FEET
-
-    init {
-
+class CommandSourceStack(val sender: CommandSender) {
+    val entity: Entity? = when (sender) {
+        is CommandSender.EntityCommandSender -> sender.entity
+        is CommandSender.BlockEntityCommandSender, is CommandSender.LevelCommandSender -> null
     }
 
-    fun clone(): CommandSourceStack {
-        return CommandSourceStack(
+    val position: Vector3d = sender.position
 
-        )
-    }
+    val rotation: Rotation2f = sender.rotation
+
+    val dimension: Level = sender.dimension
+
+    val entityAnchor: EntityAnchor = EntityAnchor.FEET
 }

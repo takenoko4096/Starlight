@@ -1,13 +1,15 @@
 package io.github.takenoko4096.starlight.datagen.model
 
-import io.github.takenoko4096.starlight.render.model.NonClientModel
+import io.github.takenoko4096.starlight.datagen.model.builder.ClientItemModelHandle
 import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
 import io.github.takenoko4096.starlight.render.model.block.NonClientVariantMutator
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants0
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants2
+import io.github.takenoko4096.starlight.render.model.item.builder.ItemModelHandle
 import net.minecraft.client.data.models.BlockModelGenerators
+import net.minecraft.client.data.models.ItemModelGenerators
 import net.minecraft.client.data.models.MultiVariant
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator
 import net.minecraft.client.data.models.blockstates.PropertyDispatch
@@ -17,7 +19,7 @@ import net.minecraft.world.level.block.Block
 class BlockModelVariantsRegistrar internal constructor(
     internal val blockModelGenerators: BlockModelGenerators,
     internal val block: Block,
-    internal val itemModel: NonClientModel?,
+    internal val itemModel: ItemModelHandle?,
     internal val variants: PropertyVariants
 ) {
     private fun toClientMutator(nonClientMutator: NonClientVariantMutator): VariantMutator {
@@ -90,10 +92,12 @@ class BlockModelVariantsRegistrar internal constructor(
         blockModelGenerators.blockStateOutput.accept(generator)
 
         if (itemModel != null) {
-            blockModelGenerators.registerSimpleItemModel(
-                block,
-                ClientModel.getOrCreate(block, itemModel, blockModelGenerators).identifier
+            val client = ClientItemModelHandle.toClient(
+                ItemModelGenerators(blockModelGenerators.itemModelOutput, blockModelGenerators.modelOutput),
+                block.asItem(),
+                itemModel
             )
+            blockModelGenerators.itemModelOutput.accept(block.asItem(), client.convert())
         }
     }
 }
