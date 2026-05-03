@@ -60,7 +60,7 @@ class ModCreativeModeTabConfiguration internal constructor(private val mod: Star
 
     fun register(): CreativeModeTab {
         if (translationKey == null) {
-            throw IllegalStateException("クリエイティブモードタブを作成できません: 翻訳キーが定義されていません")
+            translationKeyAuto()
         }
         else if (translation == null) {
             throw IllegalStateException("クリエイティブモードタブを作成できません: 翻訳が設定されていません")
@@ -72,9 +72,11 @@ class ModCreativeModeTabConfiguration internal constructor(private val mod: Star
             throw IllegalStateException("クリエイティブモードタブを作成できません: 表示アイテムが設定されていません")
         }
 
+        val trk = translationKey!!
+
         val tab = FabricCreativeModeTab.builder()
             .title(component {
-                translate(translationKey!!)
+                translate(trk)
             })
             .icon { icon!!.build(mod) }
             .displayItems { parameters, output ->

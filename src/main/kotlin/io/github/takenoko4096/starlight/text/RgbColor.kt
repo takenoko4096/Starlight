@@ -1,5 +1,6 @@
 package io.github.takenoko4096.starlight.text
 
+import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
 import java.util.Objects

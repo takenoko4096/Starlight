@@ -1,10 +1,12 @@
 package io.github.takenoko4096.starlight.text
 
+import io.github.takenoko4096.starlight.StarlightDSL
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
 import net.minecraft.network.chat.Style
 
-class GradientSectionComponentBuilder(private val left: RgbColor, private val right: RgbColor, style: Style, callback: GradientSectionComponentBuilder.() -> Unit) : AbstractComponentBuilder(style) {
+@StarlightDSL
+class GradientTextComponentBuilder(private val left: RgbColor, private val right: RgbColor, style: Style, callback: GradientTextComponentBuilder.() -> Unit) : AbstractComponentBuilder(style) {
     private var chars: String = ""
 
     private val decorations = mutableListOf<Pair<Int, Style>>()

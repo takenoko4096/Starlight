@@ -16,8 +16,6 @@ import org.slf4j.LoggerFactory
 import java.util.*
 
 abstract class StarlightModInitializer(val identifier: String) : ModInitializer {
-    val version: String = "1.0-SNAPSHOT"
-
     val logger: Logger = LoggerFactory.getLogger(identifier)
 
     val itemRegistry: ModItemRegistry = ModItemRegistry(this)
@@ -33,7 +31,7 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
     val creativeModeTabRegistry: ModCreativeModeTabRegistry = ModCreativeModeTabRegistry(this)
 
     init {
-        logger.info("$identifier is powered by Starlight")
+        logger.info("$identifier is powered by starlight v. ${BuildConfig.STARLIGHT_VERSION}")
 
         ServerLifecycleEvents.SERVER_STARTED.register {
             val data = DataDrivenStarlight(this, it)
@@ -60,16 +58,57 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
             "version" {
                 executes {
                     context.successful {
-                        text("Starlight Version")
-                        space()
-                        textColor(RgbColor.GREEN)
-                        text(version)
+                        gradient(RgbColor.BLUE, RgbColor.LIGHT_PURPLE) {
+                            text("A versatile library for fabric mod - Starlight")
+                        }
+
                         linebreak()
-                        gradated(RgbColor.RED, RgbColor.BLUE) {
-                            text("Hello,")
-                            space()
-                            bold()
-                            text("World!")
+                        text("starlight version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.STARLIGHT_VERSION)
+                        }
+
+                        linebreak()
+                        text("minecraft version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.MINECRAFT_VERSION)
+                        }
+
+                        linebreak()
+                        text("java version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.JAVA_VERSION.toString())
+                        }
+
+                        linebreak()
+                        text("fabric loader version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.FABRIC_LOADER_VERSION)
+                        }
+
+                        linebreak()
+                        text("fabric api version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.FABRIC_API_VERSION)
+                        }
+
+                        linebreak()
+                        text("fabric loom version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.FABRIC_LOOM_VERSION)
+                        }
+
+                        linebreak()
+                        text("kotlin loader version:")
+                        space()
+                        section(textColor = RgbColor.GREEN) {
+                            text(BuildConfig.KOTLIN_LOADER_VERSION)
                         }
                     }
                 }

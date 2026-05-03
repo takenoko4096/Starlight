@@ -1,5 +1,6 @@
 package io.github.takenoko4096.starlight.text
 
+import io.github.takenoko4096.starlight.StarlightDSL
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.FontDescription
@@ -9,6 +10,7 @@ import net.minecraft.network.chat.Style
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.component.ResolvableProfile
 
+@StarlightDSL
 open class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder(parent?.copyCurrentStyle() ?: Style.EMPTY) {
     private val children = mutableListOf<AbstractComponentBuilder>()
 
@@ -99,13 +101,46 @@ open class SectionComponentBuilder internal constructor(parent: SectionComponent
         })
     }
 
-    fun gradated(left: RgbColor, right: RgbColor, callback: GradientSectionComponentBuilder.() -> Unit) {
-        children.add(GradientSectionComponentBuilder(
+    fun gradient(left: RgbColor, right: RgbColor, callback: GradientTextComponentBuilder.() -> Unit) {
+        children.add(GradientTextComponentBuilder(
             left,
             right,
             copyCurrentStyle(),
             callback
         ))
+    }
+
+    fun rainbow(text: String, hOffset: Double = 0.0, s: Double = 0.8, v: Double = 1.0) {
+        val style0 = copyCurrentStyle()
+        val root = Component.empty().withStyle(style0)
+
+        val n = text.length - text.count { it == ' ' || it == '\n' }
+
+        for ((i, char) in text.withIndex()) {
+            if (char == ' ' || char == '\n') {
+                root.append(
+                    Component.literal(char.toString())
+                )
+                continue
+            }
+
+            val t = if (n == 1) {
+                0.0
+            }
+            else {
+                i.toDouble() / (n + 1)
+            }
+
+            val h = (360.0 * t + hOffset) % 360
+            val color = HsvColor(h, s, v).toRgb()
+
+            root.append(
+                Component.literal(char.toString())
+                    .withStyle(color.applyToText(style0))
+            )
+        }
+
+        component(root)
     }
 
     fun onClick(clickEvent: ClickEvent) {

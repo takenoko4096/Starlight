@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "2.3.20"
     id("net.fabricmc.fabric-loom")
+    id("com.github.gmazzo.buildconfig") version "6.0.9"
     `maven-publish`
 }
 
@@ -67,6 +68,49 @@ dependencies {
     implementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_api_version")}")
 
     include(api("io.github.takenoko4096:mojangson-bridge:0.1.1")!!)
+}
+
+buildConfig {
+    sourceSets {
+        getByName("main") {
+            packageName("io.github.takenoko4096.starlight")
+            buildConfigField(
+                "String",
+                "STARLIGHT_VERSION",
+                "\"${project.version}\""
+            )
+            buildConfigField(
+                "String",
+                "MINECRAFT_VERSION",
+                "\"${project.property("minecraft_version")}\""
+            )
+            buildConfigField(
+                "String",
+                "FABRIC_LOADER_VERSION",
+                "\"${project.property("loader_version")}\""
+            )
+            buildConfigField(
+                "String",
+                "FABRIC_API_VERSION",
+                "\"${project.property("fabric_api_version")}\""
+            )
+            buildConfigField(
+                "String",
+                "KOTLIN_LOADER_VERSION",
+                "\"${project.property("kotlin_loader_version")}\""
+            )
+            buildConfigField(
+                "Int",
+                "JAVA_VERSION",
+                "$javaVersion"
+            )
+            buildConfigField(
+                "String",
+                "FABRIC_LOOM_VERSION",
+                 "\"${project.property("loom_version")}\""
+            )
+        }
+    }
 }
 
 tasks {
