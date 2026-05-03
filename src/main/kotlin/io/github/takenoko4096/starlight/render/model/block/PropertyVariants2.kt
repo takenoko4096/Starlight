@@ -8,9 +8,9 @@ class PropertyVariants2<T : Comparable<T>, U : Comparable<U>>(
 ) : PropertyVariants() {
     val selects = mutableSetOf<NonClientBlockSelect2<T, U>>()
 
-    fun NonClientBlockModelVariant.useWhen(value1: T, value2: U) {
+    fun case(value1: T, value2: U, variant: NonClientBlockModelVariant) {
         selects.add(
-            NonClientBlockSelect2(value1, value2, this)
+            NonClientBlockSelect2(value1, value2, variant)
         )
     }
 }

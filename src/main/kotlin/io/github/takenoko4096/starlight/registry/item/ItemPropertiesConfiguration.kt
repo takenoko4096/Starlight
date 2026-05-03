@@ -30,7 +30,10 @@ class ItemPropertiesConfiguration internal constructor(private val configuration
         val properties = Item.Properties()
         properties.setId(configuration.itemResourceKey)
 
-        if (translationKey == null) throw IllegalStateException("Cannot build item properties: translation key is null")
+        if (translationKey == null) {
+            translationKeyAuto()
+        }
+
         properties.overrideDescription(translationKey!!)
 
         if (components == null) throw IllegalStateException("Cannot build item properties: item components is unset")

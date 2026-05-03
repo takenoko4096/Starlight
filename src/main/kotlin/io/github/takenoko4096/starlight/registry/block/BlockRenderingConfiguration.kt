@@ -2,36 +2,34 @@ package io.github.takenoko4096.starlight.registry.block
 
 import io.github.takenoko4096.starlight.StarlightDSL
 import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
-import io.github.takenoko4096.starlight.render.NonClientChunkSectionLayer
 import io.github.takenoko4096.starlight.render.TexturePath
-import io.github.takenoko4096.starlight.render.model.NonClientModel
 import io.github.takenoko4096.starlight.render.model.block.BlockModelProvider
+import io.github.takenoko4096.starlight.render.model.block.NonClientBlockModelVariant
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants0
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants1
 import io.github.takenoko4096.starlight.render.model.block.PropertyVariants2
 import io.github.takenoko4096.starlight.render.model.item.ItemModelProvider
 import net.minecraft.core.BlockPos
-import net.minecraft.core.Holder
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.biome.Biome
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.properties.Property
 import org.jetbrains.annotations.ApiStatus
 
 @StarlightDSL
 class BlockRenderingConfiguration internal constructor(private val configuration: ModBlockConfiguration) {
-    internal var modelConfig: ModelConfiguration = ModelConfiguration(configuration)
+    internal var modelConfig: ModelsConfiguration? = null
 
     internal var tintConfig: TintConfiguration = TintConfiguration {}
 
-    fun models(callback: ModelConfiguration.() -> Unit) {
-        val mc = ModelConfiguration(configuration)
-        mc.callback()
-        modelConfig = mc
+    fun models(callback: ModelsConfiguration.() -> Unit) {
+        modelConfig = ModelsConfiguration(configuration, callback)
+        if (modelConfig?.blockModelConfig == null) {
+            throw IllegalStateException("ブロック '${configuration.blockResourceKey.identifier()}' のブロックモデルが未設定です")
+        }
     }
 
-    fun tint(callback: TintConfiguration.() -> Unit) {
+    fun color(callback: TintConfiguration.() -> Unit) {
         tintConfig = TintConfiguration(callback)
     }
 
@@ -47,22 +45,22 @@ class BlockRenderingConfiguration internal constructor(private val configuration
             callback()
         }
 
-        fun defaultColor(callback: (BlockState) -> Int) {
+        fun default(callback: (BlockState) -> Int) {
             defaultColorGetter = callback
         }
 
-        fun inWorldColor(callback: (BlockState, BlockPos, Level) -> Int) {
+        fun inWorld(callback: (BlockState, BlockPos, Level) -> Int) {
             colorGetter = callback
         }
 
-        fun terrainParticleColor(callback: (BlockState, BlockPos, Level) -> Int) {
+        fun terrainParticle(callback: (BlockState, BlockPos, Level) -> Int) {
             particleColorGetter = callback
         }
     }
 
     @StarlightDSL
-    class ModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
-        internal var blockModelConfig = BlockModelConfiguration(configuration)
+    class ModelsConfiguration internal constructor(internal val configuration: ModBlockConfiguration, callback: ModelsConfiguration.() -> Unit) {
+        internal var blockModelConfig: BlockModelConfiguration? = null
 
         internal var itemModelConfig: ModItemConfiguration.ItemModelConfiguration? = null
 
@@ -74,31 +72,29 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
         val itemModels = ItemModelProvider(configuration.itemResourceKey)
 
+        init {
+            callback()
+        }
+
         fun block(callback: BlockModelConfiguration.() -> Unit) {
-            val bmc = BlockModelConfiguration(configuration)
-            bmc.callback()
-            blockModelConfig = bmc
+            blockModelConfig = BlockModelConfiguration(configuration, callback)
         }
 
         fun item(callback: ModItemConfiguration.ItemModelConfiguration.() -> Unit) {
-            val imc = ModItemConfiguration.ItemModelConfiguration(configuration.itemResourceKey, callback)
-            itemModelConfig = imc
+            itemModelConfig = ModItemConfiguration.ItemModelConfiguration(configuration.itemResourceKey, callback)
         }
     }
 
     @StarlightDSL
-    class BlockModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration) {
+    class BlockModelConfiguration internal constructor(internal val configuration: ModBlockConfiguration, callback: BlockModelConfiguration.() -> Unit) {
         internal var variants: PropertyVariants? = null
 
-        fun variants(callback: PropertyVariants0.() -> Unit) {
-            val vp0 = PropertyVariants0()
-            vp0.callback()
+        init {
+            callback()
+        }
 
-            if (vp0.variant == null) {
-                throw IllegalStateException("Please use 'useAsBlockModel()' in variants")
-            }
-
-            variants = vp0
+        fun always(variant: NonClientBlockModelVariant) {
+            variants = PropertyVariants0(variant)
         }
 
         fun <T : Comparable<T>> variants(property: Property<T>, callback: PropertyVariants1<T>.() -> Unit) {

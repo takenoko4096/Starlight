@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.Block
 class BlockModelVariantsRegistrar internal constructor(
     internal val blockModelGenerators: BlockModelGenerators,
     internal val block: Block,
-    internal val itemModel: ItemModelHandle?,
+    internal val itemModelHandle: ItemModelHandle?,
     internal val variants: PropertyVariants
 ) {
     private fun toClientMutator(nonClientMutator: NonClientVariantMutator): VariantMutator {
@@ -91,11 +91,11 @@ class BlockModelVariantsRegistrar internal constructor(
 
         blockModelGenerators.blockStateOutput.accept(generator)
 
-        if (itemModel != null) {
+        if (itemModelHandle != null) {
             val client = ClientItemModelHandle.toClient(
                 ItemModelGenerators(blockModelGenerators.itemModelOutput, blockModelGenerators.modelOutput),
                 block.asItem(),
-                itemModel
+                itemModelHandle
             )
             blockModelGenerators.itemModelOutput.accept(block.asItem(), client.convert())
         }

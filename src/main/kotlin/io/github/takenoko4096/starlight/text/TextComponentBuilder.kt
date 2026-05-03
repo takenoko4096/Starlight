@@ -9,3 +9,4 @@ class TextComponentBuilder internal constructor(private val text: String, style:
         return Component.literal(text).withStyle(style)
     }
 }
+

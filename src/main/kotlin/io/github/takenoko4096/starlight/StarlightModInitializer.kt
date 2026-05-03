@@ -7,7 +7,7 @@ import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.tag.ModTagRegistry
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegistry
 import io.github.takenoko4096.starlight.render.TexturePath
-import io.github.takenoko4096.starlight.text.VanillaColor
+import io.github.takenoko4096.starlight.text.RgbColor
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.minecraft.resources.Identifier
@@ -49,7 +49,7 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
                             logger.info(message)
                             context.successful {
                                 text("ログに書き込みました: ")
-                                textColor(VanillaColor.AQUA)
+                                textColor(RgbColor.AQUA)
                                 text(message)
                             }
                         }
@@ -62,8 +62,15 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
                     context.successful {
                         text("Starlight Version")
                         space()
-                        textColor(VanillaColor.GREEN)
+                        textColor(RgbColor.GREEN)
                         text(version)
+                        linebreak()
+                        gradated(RgbColor.RED, RgbColor.BLUE) {
+                            text("Hello,")
+                            space()
+                            bold()
+                            text("World!")
+                        }
                     }
                 }
             }

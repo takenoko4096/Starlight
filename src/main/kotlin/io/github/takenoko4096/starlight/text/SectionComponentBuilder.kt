@@ -6,40 +6,22 @@ import net.minecraft.network.chat.FontDescription
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.Style
-import net.minecraft.network.chat.TextColor
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.component.ResolvableProfile
 
-class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder(parent?.copyCurrentStyle() ?: Style.EMPTY) {
+open class SectionComponentBuilder internal constructor(parent: SectionComponentBuilder?, callback: SectionComponentBuilder.() -> Unit) : AbstractComponentBuilder(parent?.copyCurrentStyle() ?: Style.EMPTY) {
     private val children = mutableListOf<AbstractComponentBuilder>()
 
     init {
         callback()
     }
 
-    private fun copyCurrentStyle(): Style {
-        val copy = Style.EMPTY
-            .withColor(style.color)
-            .withBold(style.isBold)
-            .withItalic(style.isItalic)
-            .withUnderlined(style.isUnderlined)
-            .withObfuscated(style.isObfuscated)
-            .withStrikethrough(style.isStrikethrough)
-            .withInsertion(style.insertion)
-            .withFont(style.font)
-            .withClickEvent(style.clickEvent)
-            .withHoverEvent(style.hoverEvent)
-
-        return if (style.shadowColor == null) copy.withoutShadow()
-        else copy.withShadowColor(style.shadowColor!!)
-    }
-
-    fun text(text: String) {
+    open fun text(text: String) {
         children.add(TextComponentBuilder(text, copyCurrentStyle()))
     }
 
     fun text(text: Char) {
-        children.add(TextComponentBuilder(text.toString(), copyCurrentStyle()))
+        text(text.toString())
     }
 
     fun linebreak() = text('\n')
@@ -94,24 +76,36 @@ class SectionComponentBuilder internal constructor(parent: SectionComponentBuild
         style = style.withFont(font)
     }
 
-    fun textColor(color: Int? = null) {
-        style = if (color == null) style.withColor(null as TextColor?) else style.withColor(color)
+    fun textColor(color: RgbColor) {
+        style = color.applyToText(style)
     }
 
-    fun shadowColor(color: Int? = null) {
-        style = if (color == null) style.withoutShadow() else style.withShadowColor(color)
+    fun shadowColor(color: RgbColor) {
+        style = color.applyToShadow(style)
     }
 
-    fun textColor(color: VanillaColor) {
-        textColor(color.color)
+    fun section(bold: Boolean? = null, italic: Boolean? = null, underlined: Boolean? = null, obfuscated: Boolean? = null, strikeThrough: Boolean? = null, font: FontDescription? = null, textColor: RgbColor? = null, shadowColor: RgbColor? = null, callback: SectionComponentBuilder.() -> Unit) {
+        children.add(SectionComponentBuilder(this) {
+            if (bold != null) bold(bold)
+            if (italic != null) italic(italic)
+            if (underlined != null) underlined(underlined)
+            if (bold != null) bold(bold)
+            if (obfuscated != null) obfuscated(obfuscated)
+            if (strikeThrough != null) strikeThrough(strikeThrough)
+            if (font != null) font(font)
+            if (textColor != null) textColor(textColor)
+            if (shadowColor != null) shadowColor(shadowColor)
+            callback()
+        })
     }
 
-    fun shadowColor(color: VanillaColor) {
-        shadowColor(color.color)
-    }
-
-    fun section(callback: SectionComponentBuilder.() -> Unit) {
-        children.add(SectionComponentBuilder(this, callback))
+    fun gradated(left: RgbColor, right: RgbColor, callback: GradientSectionComponentBuilder.() -> Unit) {
+        children.add(GradientSectionComponentBuilder(
+            left,
+            right,
+            copyCurrentStyle(),
+            callback
+        ))
     }
 
     fun onClick(clickEvent: ClickEvent) {

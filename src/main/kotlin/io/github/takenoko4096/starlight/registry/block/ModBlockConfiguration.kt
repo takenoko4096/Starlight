@@ -55,6 +55,9 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         val brc = BlockRenderingConfiguration(this)
         brc.callback()
         renderingConfig = brc
+        if (renderingConfig.modelConfig == null) {
+            throw IllegalStateException("ブロック '${blockResourceKey.identifier()}' のモデル設定がありません")
+        }
     }
 
     fun customBehaviour(callback: CustomBehaviourConfiguration.() -> Unit): CustomBehaviourInfo {
@@ -68,6 +71,10 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
         val tc = ModTranslationConfiguration()
         tc.callback()
         translation = tc
+    }
+
+    fun withItem() {
+        itemProperties {}
     }
 
     internal fun register(): Block {
@@ -88,15 +95,15 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
 
     class AccessorForClient internal constructor(private val configuration: ModBlockConfiguration) {
         fun blockModelLegacy(): BlockRenderingConfiguration.SingleArgBlockModel? {
-            return configuration.renderingConfig.modelConfig.blockModelConfig.model
+            return configuration.renderingConfig.modelConfig?.blockModelConfig?.model
         }
 
         fun blockModelVariants(): PropertyVariants? {
-            return configuration.renderingConfig.modelConfig.blockModelConfig.variants
+            return configuration.renderingConfig.modelConfig?.blockModelConfig?.variants
         }
 
         fun blockItemModel(): ItemModelHandle? {
-            return configuration.renderingConfig.modelConfig.itemModelConfig?.handle
+            return configuration.renderingConfig.modelConfig?.itemModelConfig?.handle
         }
 
         fun translation(): ModTranslationConfiguration {

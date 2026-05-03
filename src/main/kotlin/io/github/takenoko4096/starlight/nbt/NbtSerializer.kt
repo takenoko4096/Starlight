@@ -7,7 +7,7 @@ import io.github.takenoko4096.mojangson.values.MojangsonIterable
 import io.github.takenoko4096.mojangson.values.MojangsonLongArray
 import io.github.takenoko4096.mojangson.values.MojangsonPrimitive
 import io.github.takenoko4096.mojangson.values.MojangsonStructure
-import io.github.takenoko4096.starlight.text.VanillaColor
+import io.github.takenoko4096.starlight.text.RgbColor
 import io.github.takenoko4096.starlight.text.component
 import net.minecraft.network.chat.Component
 import kotlin.charArrayOf
@@ -35,7 +35,7 @@ class NbtSerializer private constructor(private val value: MojangsonStructure, p
     private fun compound(compound: MojangsonCompound, indentation: Int): Component {
         val keys = compound.keys().toTypedArray()
         return component {
-            textColor(VanillaColor.WHITE)
+            textColor(RgbColor.WHITE)
             text(COMPOUND_BRACES[0])
 
             section {
@@ -47,7 +47,7 @@ class NbtSerializer private constructor(private val value: MojangsonStructure, p
                         text(indentation(indentation + 1))
 
                         section {
-                            textColor(VanillaColor.AQUA)
+                            textColor(RgbColor.AQUA)
                             component(key(key))
                         }
 
@@ -79,13 +79,13 @@ class NbtSerializer private constructor(private val value: MojangsonStructure, p
 
     private fun iterable(iterable: MojangsonIterable<*>, indentation: Int): Component {
         return component {
-            textColor(VanillaColor.WHITE)
+            textColor(RgbColor.WHITE)
             text(ARRAY_LIST_BRACES[0])
 
             section {
                 if (ITERABLE_TYPE_SYMBOLS.containsKey(iterable::class)) {
                     section {
-                        textColor(VanillaColor.RED)
+                        textColor(RgbColor.RED)
                         text(ITERABLE_TYPE_SYMBOLS[iterable::class]!!)
                     }
                     text(SEMICOLON)
@@ -119,14 +119,14 @@ class NbtSerializer private constructor(private val value: MojangsonStructure, p
     }
 
     private fun key(value: String): Component {
-        return quotable(value, VanillaColor.AQUA)
+        return quotable(value, RgbColor.AQUA)
     }
 
     private fun string(value: String): Component {
-        return quotable(value, VanillaColor.GREEN)
+        return quotable(value, RgbColor.GREEN)
     }
 
-    private fun quotable(value: String, color: VanillaColor): Component {
+    private fun quotable(value: String, color: RgbColor): Component {
         val quote: Char?
         val string: String
 
@@ -169,11 +169,11 @@ class NbtSerializer private constructor(private val value: MojangsonStructure, p
 
     private fun number(value: Number): Component {
         return component {
-            textColor(VanillaColor.GOLD)
+            textColor(RgbColor.GOLD)
             text(value.toString())
 
             if (NUMBER_TYPE_SYMBOLS.contains(value::class)) {
-                textColor(VanillaColor.RED)
+                textColor(RgbColor.RED)
                 text(NUMBER_TYPE_SYMBOLS[value::class]!!)
             }
         }
@@ -181,7 +181,7 @@ class NbtSerializer private constructor(private val value: MojangsonStructure, p
 
     private fun `null`(): Component {
         return component {
-            textColor(VanillaColor.LIGHT_PURPLE)
+            textColor(RgbColor.LIGHT_PURPLE)
             text("null")
         }
     }

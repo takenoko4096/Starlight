@@ -21,7 +21,7 @@ abstract class NonClientModel(private val resourceKey: ResourceKey<*>, val optio
         return result
     }
 
-    fun toBlockVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
+    fun toVariant(vararg mutators: NonClientVariantMutator): NonClientBlockModelVariant {
         return NonClientBlockModelVariant(
             this,
             mutators.toList()
