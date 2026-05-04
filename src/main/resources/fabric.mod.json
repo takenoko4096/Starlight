@@ -19,7 +19,12 @@
     "entrypoints": {
         "fabric-datagen": [],
         "client": [],
-        "main": []
+        "main": [
+            {
+                "adapter": "kotlin",
+                "value": "io.github.takenoko4096.starlight.Starlight"
+            }
+        ]
     },
     "mixins": [
         "starlight.mixins.json",

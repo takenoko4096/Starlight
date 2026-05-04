@@ -3,7 +3,7 @@ package io.github.takenoko4096.starlight.text
 import net.minecraft.util.StringRepresentable
 import kotlin.math.floor
 
-class HsvColor(val h: Double, val s: Double, val v: Double) : StringRepresentable {
+class HsvColor(val h: Double, val s: Double, val v: Double) {
     fun toRgb(): RgbColor {
         if (s == 0.0) {
             val value = (v * 255).toInt()
@@ -51,8 +51,6 @@ class HsvColor(val h: Double, val s: Double, val v: Double) : StringRepresentabl
             (b * 255).toInt()
         )
     }
-
-    override fun getSerializedName(): String = toString()
 
     override fun toString(): String {
         return "HSV($h, $s, $v)"

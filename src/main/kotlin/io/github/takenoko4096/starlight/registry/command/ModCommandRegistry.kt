@@ -1,7 +1,6 @@
 package io.github.takenoko4096.starlight.registry.command
 
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
-import com.mojang.brigadier.exceptions.CommandSyntaxException
 import io.github.takenoko4096.starlight.StarlightModInitializer
 import io.github.takenoko4096.starlight.registry.StarlightRegistry
 import io.github.takenoko4096.starlight.registry.command.node.ConfigurableCommandNode
@@ -10,7 +9,7 @@ import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.util.StringRepresentable
-import kotlin.reflect.KClass
+import kotlin.enums.enumEntries
 
 class ModCommandRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
     private val commands = mutableSetOf<(CommandBuildContext, Commands.CommandSelection) -> LiteralArgumentBuilder<CommandSourceStack>>()
@@ -30,15 +29,14 @@ class ModCommandRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) 
         }
     }
 
-    fun <T: StringRepresentable> argument(name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit): () -> ModCommandArgumentType<T> {
-        val c = ModCommandArgumentTypeConfiguration(mod, name, callback)
-        return c.build()
+    fun <T: StringRepresentable> registerArgument(name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit): () -> ModCommandArgumentType<T> {
+        return ModCommandArgumentTypeConfiguration(mod, name, callback).register()
     }
 
-    fun <E> enumArgument(name: String, enum: KClass<E>) where E : StringRepresentable, E : Enum<E> {
-        val values: Array<E> = enum.java.getMethod("values").invoke(null) as Array<E>
+    inline fun <reified E> registerEnumArgument(name: String): () -> ModCommandArgumentType<E> where E : StringRepresentable, E : Enum<E> {
+        val values = enumEntries<E>()
 
-        argument(name) {
+        return registerArgument(name) {
             parses {
                 val s = reader.readUnquotedString()
 
@@ -52,7 +50,7 @@ class ModCommandRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) 
             }
 
             suggests {
-                strings(*values.map { it.name.lowercase() }.toTypedArray())
+                strings(values.map { it.name.lowercase() })
             }
         }
     }

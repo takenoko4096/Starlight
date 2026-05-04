@@ -31,14 +31,15 @@ class ModCommandArgumentTypeConfiguration<T : StringRepresentable>(private val m
     }
 
     fun suggests(callback: SuggestibleCommandNode.UserInputDependingSuggestionProvider<*>.() -> Unit) {
-        suggester = { a, b ->
-            val s = SuggestibleCommandNode.UserInputDependingSuggestionProvider(a, b)
+        suggester = { context, suggestionsBuilder ->
+            val s = SuggestibleCommandNode.UserInputDependingSuggestionProvider(context, suggestionsBuilder)
             s.callback()
-            b.buildFuture()
+            s.suggestAbove()
+            suggestionsBuilder.buildFuture()
         }
     }
 
-    fun build(): () -> ModCommandArgumentType<T> {
+    fun register(): () -> ModCommandArgumentType<T> {
         if (argumentTypes.contains(name)) {
             throw IllegalArgumentException("argument type ${mod.identifier}:$name is already registered!")
         }

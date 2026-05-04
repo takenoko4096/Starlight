@@ -17,7 +17,7 @@ class SuggestibleCommandNode<S, T>(override val argumentBuilder: RequiredArgumen
         argumentBuilder.suggests { context, builder ->
             val p = UserInputDependingSuggestionProvider(context, builder)
             p.callback()
-            p.addAll()
+            p.suggestAbove()
             return@suggests p.suggestionsBuilder.buildFuture()
         }
     }
@@ -29,8 +29,9 @@ class SuggestibleCommandNode<S, T>(override val argumentBuilder: RequiredArgumen
     ) {
         private val suggestions: MutableList<Suggestion<*>> = mutableListOf()
 
-        internal fun addAll() {
+        fun suggestAbove() {
             suggestions.forEach { it.add(suggestionsBuilder) }
+            suggestions.clear()
         }
 
         private fun string(value: String, tooltip: Message? = null) {
@@ -55,6 +56,10 @@ class SuggestibleCommandNode<S, T>(override val argumentBuilder: RequiredArgumen
             }
         }
 
+        fun strings(values: List<String>, tooltipBuilder: ((String) -> Component)? = null) {
+            strings(*values.toTypedArray(), tooltipBuilder = tooltipBuilder)
+        }
+
         fun integers(vararg values: Int, tooltipBuilder: ((Int) -> Component)? = null) {
             if (tooltipBuilder == null) {
                 values.forEach(this::int)
@@ -67,6 +72,10 @@ class SuggestibleCommandNode<S, T>(override val argumentBuilder: RequiredArgumen
                     )
                 }
             }
+        }
+
+        fun integers(values: List<Int>, tooltipBuilder: ((Int) -> Component)? = null) {
+            integers(*values.toIntArray(), tooltipBuilder = tooltipBuilder)
         }
     }
 

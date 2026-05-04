@@ -2,18 +2,17 @@ package io.github.takenoko4096.starlight.text
 
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import net.minecraft.util.StringRepresentable
 import java.util.Objects
 
-class RgbColor private constructor(private val rgb: Int?) : StringRepresentable {
+class RgbColor private constructor(private val rgb: Int?) {
     val r: Int
-        get() = if (rgb != null) (rgb shr 16) and 0xFF else throw IllegalStateException()
+        get() = if (rgb != null) (rgb shr 16) and 0xFF else throw IllegalStateException("NULLの色成分は取得できません")
 
     val g: Int
-        get() = if (rgb != null) (rgb shr 8) and 0xFF else throw IllegalStateException()
+        get() = if (rgb != null) (rgb shr 8) and 0xFF else throw IllegalStateException("NULLの色成分は取得できません")
 
     val b: Int
-        get() = if (rgb != null) rgb and 0xFF else throw IllegalStateException()
+        get() = if (rgb != null) rgb and 0xFF else throw IllegalStateException("NULLの色成分は取得できません")
 
     internal constructor(r: Int, g: Int, b: Int): this((r shl 16) + (g shl 8) + b)
 
@@ -33,15 +32,13 @@ class RgbColor private constructor(private val rgb: Int?) : StringRepresentable 
         return if (rgb == null) style.withoutShadow() else style.withShadowColor(rgb)
     }
 
-    override fun getSerializedName(): String = toString()
-
     override fun toString(): String {
         return if (rgb == null) "RGB(UNSET)" else "RGB($r, $g, $b)"
     }
 
     fun toHsv(): HsvColor {
         if (rgb == null) {
-            throw IllegalStateException("RGB値がnullであるためHSVに変換できません: これはUNSETをHSVに変換しようとしたことを意味します")
+            throw IllegalStateException("RGB値がnullであるためHSVに変換できません: これはNULLをHSVに変換しようとしたことを意味します")
         }
 
         val r = r / 255.0
@@ -87,7 +84,7 @@ class RgbColor private constructor(private val rgb: Int?) : StringRepresentable 
             return RgbColor(rgb)
         }
 
-        val UNSET = RgbColor(null)
+        val NULL = RgbColor(null)
 
         val RED = RgbColor(16733525)
         val BLUE = RgbColor(5592575)
@@ -112,7 +109,8 @@ class RgbColor private constructor(private val rgb: Int?) : StringRepresentable 
         val MATERIAL_REDSTONE = RgbColor(0x971607)
         val MATERIAL_COPPER = RgbColor(0xB4684D)
         val MATERIAL_GOLD = RgbColor(0xDEB12D)
-        val MATERIAL_EMERALD = RgbColor(0x2CBAA8)
+        val MATERIAL_DIAMOND = RgbColor(0x2CBAA8)
+        val MATERIAL_EMERALD = RgbColor(0x47A036)
         val MATERIAL_LAPIS = RgbColor(0x21497B)
         val MATERIAL_AMETHYST = RgbColor(0x9A5CC6)
         val MATERIAL_RESIN = RgbColor(0xEB7114)

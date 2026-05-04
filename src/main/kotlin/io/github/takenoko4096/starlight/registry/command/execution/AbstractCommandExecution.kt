@@ -9,4 +9,6 @@ abstract class AbstractCommandExecution<S>(val context: CommandContext<S>) {
     operator fun <T : Any> String.get(clazz: KClass<T>): T {
         return context.getArgument(this, clazz.java)
     }
+
+    inline operator fun <reified T : Any> String.invoke(): T = get(T::class)
 }
