@@ -1,7 +1,9 @@
 package io.github.takenoko4096.starlight
 
-import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
+import com.mojang.brigadier.StringReader
+import com.mojang.brigadier.arguments.ArgumentType
 import io.github.takenoko4096.starlight.registry.block.ModBlockRegistry
+import io.github.takenoko4096.starlight.registry.command.ModCommandRegistry
 import io.github.takenoko4096.starlight.registry.creativetab.ModCreativeModeTabRegistry
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import io.github.takenoko4096.starlight.registry.tag.ModTagRegistry
@@ -9,11 +11,16 @@ import io.github.takenoko4096.starlight.registry.translation.ModTranslationRegis
 import io.github.takenoko4096.starlight.render.TexturePath
 import io.github.takenoko4096.starlight.text.RgbColor
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
+import net.minecraft.commands.CommandBuildContext
+import net.minecraft.commands.synchronization.SingletonArgumentInfo
 import net.minecraft.resources.Identifier
+import net.minecraft.util.StringRepresentable
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
+
 
 abstract class StarlightModInitializer(val identifier: String) : ModInitializer {
     val logger: Logger = LoggerFactory.getLogger(identifier)
@@ -58,7 +65,13 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
             "version" {
                 executes {
                     context.successful {
+                        section(textColor = RgbColor.GOLD) {
+                            text("----------------------------------------------")
+                            linebreak()
+                        }
+
                         gradient(RgbColor.BLUE, RgbColor.LIGHT_PURPLE) {
+                            bold()
                             text("A versatile library for fabric mod - Starlight")
                         }
 
@@ -110,8 +123,19 @@ abstract class StarlightModInitializer(val identifier: String) : ModInitializer 
                         section(textColor = RgbColor.GREEN) {
                             text(BuildConfig.KOTLIN_LOADER_VERSION)
                         }
+
+                        section(textColor = RgbColor.GOLD) {
+                            linebreak()
+                            text("----------------------------------------------")
+                        }
                     }
                 }
+            }
+        }
+
+        class S : StringRepresentable {
+            override fun getSerializedName(): String {
+                return "S"
             }
         }
     }

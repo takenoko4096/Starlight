@@ -79,11 +79,11 @@ open class SectionComponentBuilder internal constructor(parent: SectionComponent
     }
 
     fun textColor(color: RgbColor) {
-        style = color.applyToText(style)
+        style = color.textAppliedCopyOf(style)
     }
 
     fun shadowColor(color: RgbColor) {
-        style = color.applyToShadow(style)
+        style = color.shadowAppliedCopyOf(style)
     }
 
     fun section(bold: Boolean? = null, italic: Boolean? = null, underlined: Boolean? = null, obfuscated: Boolean? = null, strikeThrough: Boolean? = null, font: FontDescription? = null, textColor: RgbColor? = null, shadowColor: RgbColor? = null, callback: SectionComponentBuilder.() -> Unit) {
@@ -101,46 +101,35 @@ open class SectionComponentBuilder internal constructor(parent: SectionComponent
         })
     }
 
-    fun gradient(left: RgbColor, right: RgbColor, callback: GradientTextComponentBuilder.() -> Unit) {
-        children.add(GradientTextComponentBuilder(
-            left,
-            right,
-            copyCurrentStyle(),
-            callback
-        ))
+    /*fun gradient(left: RgbColor, right: RgbColor, callback: AbstractGradientComponentBuilder.() -> Unit) {
+        children.add(
+            SimpleGradientComponentBuilder(
+                left,
+                right,
+                copyCurrentStyle(),
+                callback
+            )
+        )
+    }*/
+
+    fun gradient(vararg colors: RgbColor, callback: AbstractGradientComponentBuilder.() -> Unit) {
+        children.add(
+            MultiGradientComponentBuilder(
+                colors.toList(),
+                style,
+                callback
+            )
+        )
     }
 
-    fun rainbow(text: String, hOffset: Double = 0.0, s: Double = 0.8, v: Double = 1.0) {
-        val style0 = copyCurrentStyle()
-        val root = Component.empty().withStyle(style0)
-
-        val n = text.length - text.count { it == ' ' || it == '\n' }
-
-        for ((i, char) in text.withIndex()) {
-            if (char == ' ' || char == '\n') {
-                root.append(
-                    Component.literal(char.toString())
-                )
-                continue
-            }
-
-            val t = if (n == 1) {
-                0.0
-            }
-            else {
-                i.toDouble() / (n + 1)
-            }
-
-            val h = (360.0 * t + hOffset) % 360
-            val color = HsvColor(h, s, v).toRgb()
-
-            root.append(
-                Component.literal(char.toString())
-                    .withStyle(color.applyToText(style0))
+    fun rainbow(start: RgbColor? = null, callback: AbstractGradientComponentBuilder.() -> Unit) {
+        children.add(
+            RainbowGradientComponentBuilder(
+                start,
+                copyCurrentStyle(),
+                callback
             )
-        }
-
-        component(root)
+        )
     }
 
     fun onClick(clickEvent: ClickEvent) {

@@ -1,18 +1,19 @@
 package io.github.takenoko4096.starlight.text
 
+import net.minecraft.util.StringRepresentable
 import kotlin.math.floor
 
-class HsvColor(val h: Double, val s: Double, val v: Double) {
+class HsvColor(val h: Double, val s: Double, val v: Double) : StringRepresentable {
     fun toRgb(): RgbColor {
         if (s == 0.0) {
             val value = (v * 255).toInt()
             return RgbColor(value, value, value)
         }
 
-        val hNorm = (h % 360 + 360) % 360
-        val hPrime = hNorm / 60.0
-        val i = floor(hPrime).toInt()
-        val f = hPrime - i
+        val normal = (h % 360 + 360) % 360
+        val prime = normal / 60.0
+        val i = floor(prime).toInt()
+        val f = prime - i
 
         val p = v * (1 - s)
         val q = v * (1 - s * f)
@@ -41,7 +42,7 @@ class HsvColor(val h: Double, val s: Double, val v: Double) {
             5 -> {
                 r = v; g = p; b = q
             }
-            else -> throw IllegalStateException()
+            else -> throw IllegalStateException("NEVER HAPPENS")
         }
 
         return RgbColor(
@@ -49,5 +50,11 @@ class HsvColor(val h: Double, val s: Double, val v: Double) {
             (g * 255).toInt(),
             (b * 255).toInt()
         )
+    }
+
+    override fun getSerializedName(): String = toString()
+
+    override fun toString(): String {
+        return "HSV($h, $s, $v)"
     }
 }

@@ -22,6 +22,7 @@ class SuggestibleCommandNode<S, T>(override val argumentBuilder: RequiredArgumen
         }
     }
 
+    @StarlightDSL
     class UserInputDependingSuggestionProvider<S> internal constructor(
         val context: CommandContext<S>,
         val suggestionsBuilder: SuggestionsBuilder

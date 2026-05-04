@@ -20,7 +20,7 @@ class AssignableCommandExecution<S>(context: CommandContext<S>) : AbstractComman
     fun CommandContext<CommandSourceStack>.failure(callback: SectionComponentBuilder.() -> Unit): Int {
         source.sendSystemMessage(component {
             textColor(RgbColor.RED)
-            section(callback=callback)
+            callback()
         })
         returns = 0
         return 0
