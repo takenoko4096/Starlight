@@ -89,10 +89,6 @@ class BlockModelProvider internal constructor(resourceKey: ResourceKey<Block>) :
         )
     }
 
-    fun fire() {
-
-    }
-
     fun custom(modelTemplate: Identifier, textureMapping: Map<String, TexturePath>, callback: ModelOptions.() -> Unit = {}): NonClientCustomModel {
         return NonClientCustomModel(
             resourceKey,
