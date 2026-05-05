@@ -112,7 +112,7 @@ object TestMod : NoctilucaModInitializer("testmod") {
 ```
 
 うまくいくと:
-<img src="md_assets/output.png">
+<img src="document_assets/output.png">
 
 #### 実装予定
 
