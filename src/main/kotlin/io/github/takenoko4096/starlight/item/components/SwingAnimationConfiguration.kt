@@ -1,13 +1,13 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.SwingAnimationType
 import net.minecraft.world.item.component.SwingAnimation
 
 @StarlightDSL
-class SwingAnimationConfiguration(mod: StarlightModInitializer, callback: SwingAnimationConfiguration.() -> Unit) : AbstractComponentConfiguration<SwingAnimation>(mod, DataComponents.SWING_ANIMATION) {
+class SwingAnimationConfiguration(mod: NoctilucaModInitializer, callback: SwingAnimationConfiguration.() -> Unit) : AbstractComponentConfiguration<SwingAnimation>(mod, DataComponents.SWING_ANIMATION) {
     private var animationType: SwingAnimationType = SwingAnimationType.WHACK
 
     var duration: Int = 6

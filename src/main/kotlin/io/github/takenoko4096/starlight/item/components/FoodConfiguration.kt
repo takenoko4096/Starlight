@@ -1,12 +1,12 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.food.FoodProperties
 
 @StarlightDSL
-class FoodConfiguration(mod: StarlightModInitializer, callback: FoodConfiguration.() -> Unit) : AbstractComponentConfiguration<FoodProperties>(mod, DataComponents.FOOD) {
+class FoodConfiguration(mod: NoctilucaModInitializer, callback: FoodConfiguration.() -> Unit) : AbstractComponentConfiguration<FoodProperties>(mod, DataComponents.FOOD) {
     var nutrition: Int = 0
 
     var saturation: Float = 0f

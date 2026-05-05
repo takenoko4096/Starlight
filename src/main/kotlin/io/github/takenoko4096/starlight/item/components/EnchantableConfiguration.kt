@@ -1,12 +1,12 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.enchantment.Enchantable
 
 @StarlightDSL
-class EnchantableConfiguration(mod: StarlightModInitializer, callback: EnchantableConfiguration.() -> Unit) : AbstractComponentConfiguration<Enchantable>(mod, DataComponents.ENCHANTABLE) {
+class EnchantableConfiguration(mod: NoctilucaModInitializer, callback: EnchantableConfiguration.() -> Unit) : AbstractComponentConfiguration<Enchantable>(mod, DataComponents.ENCHANTABLE) {
     var enchantmentAptitude: Int? = null
 
     init {

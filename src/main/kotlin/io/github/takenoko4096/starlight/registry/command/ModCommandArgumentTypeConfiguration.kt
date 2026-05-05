@@ -1,22 +1,14 @@
 package io.github.takenoko4096.starlight.registry.command
 
 import com.mojang.brigadier.StringReader
-import com.mojang.brigadier.arguments.ArgumentType
-import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.CommandSyntaxException
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.command.node.SuggestibleCommandNode
-import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry
-import net.minecraft.commands.synchronization.SingletonArgumentInfo
 import net.minecraft.util.StringRepresentable
-import java.util.Objects
-import java.util.concurrent.CompletableFuture
 
 @StarlightDSL
-class ModCommandArgumentTypeConfiguration<T : StringRepresentable>(private val mod: StarlightModInitializer, private val name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit) {
+class ModCommandArgumentTypeConfiguration<T : StringRepresentable>(private val mod: NoctilucaModInitializer, private val name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit) {
     internal var parser: (ArgumentParser.() -> T)? = null
 
     internal var suggester: (SuggestibleCommandNode.UserInputDependingSuggestionProvider<*>.() -> Unit)? = null

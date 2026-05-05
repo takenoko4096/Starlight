@@ -1,12 +1,12 @@
 package io.github.takenoko4096.starlight.registry.item
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.StarlightRegistry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.Item
 import kotlin.collections.set
 
-class ModItemRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
+class ModItemRegistry(mod: NoctilucaModInitializer) : StarlightRegistry(mod) {
     private val configurations = mutableSetOf<ModItemConfiguration>()
 
     private val items = mutableMapOf<ResourceKey<Item>, Item>()

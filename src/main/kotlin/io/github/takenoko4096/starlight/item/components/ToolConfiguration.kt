@@ -1,20 +1,17 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
-import net.minecraft.core.Holder
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.core.HolderSet
 import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.tags.TagKey
-import net.minecraft.world.item.ToolMaterial
 import net.minecraft.world.item.component.Tool
 import net.minecraft.world.level.block.Block
-import net.minecraft.world.level.block.Blocks
 import java.util.*
 
 @StarlightDSL
-class ToolConfiguration(mod: StarlightModInitializer, callback: ToolConfiguration.() -> Unit) : AbstractComponentConfiguration<Tool>(mod, DataComponents.TOOL) {
+class ToolConfiguration(mod: NoctilucaModInitializer, callback: ToolConfiguration.() -> Unit) : AbstractComponentConfiguration<Tool>(mod, DataComponents.TOOL) {
     private var rules = RulesConfiguration {}
 
     var defaultMiningSpeed: Float = 1f

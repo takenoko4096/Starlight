@@ -1,11 +1,11 @@
 package io.github.takenoko4096.starlight.registry.creativetab
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.StarlightRegistry
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.CreativeModeTab
 
-class ModCreativeModeTabRegistry internal constructor(mod: StarlightModInitializer) : StarlightRegistry(mod) {
+class ModCreativeModeTabRegistry internal constructor(mod: NoctilucaModInitializer) : StarlightRegistry(mod) {
     private val configurations = mutableSetOf<ModCreativeModeTabConfiguration>()
 
     private val tabs = mutableMapOf<ResourceKey<CreativeModeTab>, CreativeModeTab>()

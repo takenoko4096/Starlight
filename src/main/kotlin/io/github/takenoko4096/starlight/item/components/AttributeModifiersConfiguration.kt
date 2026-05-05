@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.ChatFormatting
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponents
@@ -14,12 +14,10 @@ import net.minecraft.world.entity.ai.attributes.Attribute
 import net.minecraft.world.entity.ai.attributes.AttributeModifier
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes
-import net.minecraft.world.item.Items
-import net.minecraft.world.item.ToolMaterial
 import net.minecraft.world.item.component.ItemAttributeModifiers
 
 @StarlightDSL
-class AttributeModifiersConfiguration internal constructor(mod: StarlightModInitializer, callback: AttributeModifiersConfiguration.() -> Unit) : AbstractComponentConfiguration<ItemAttributeModifiers>(mod, DataComponents.ATTRIBUTE_MODIFIERS) {
+class AttributeModifiersConfiguration internal constructor(mod: NoctilucaModInitializer, callback: AttributeModifiersConfiguration.() -> Unit) : AbstractComponentConfiguration<ItemAttributeModifiers>(mod, DataComponents.ATTRIBUTE_MODIFIERS) {
     private val entries = mutableListOf<ItemAttributeModifiers.Entry>()
 
     private var id: Int = 0

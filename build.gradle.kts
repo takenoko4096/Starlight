@@ -11,8 +11,10 @@ plugins {
 version = "1.0-SNAPSHOT"
 group = "io.github.takenoko4096"
 
+val modName = "${project.property("mod_name")}"
+
 base {
-    archivesName.set(project.property("archives_base_name") as String)
+    archivesName.set(modName)
 }
 
 val javaVersion = 25
@@ -38,7 +40,7 @@ loom {
     splitEnvironmentSourceSets()
 
     mods {
-        register("starlight") {
+        register(modName.lowercase()) {
             sourceSet("main")
             sourceSet("client")
         }
@@ -76,7 +78,7 @@ buildConfig {
             packageName("io.github.takenoko4096.starlight")
             buildConfigField(
                 "String",
-                "STARLIGHT_VERSION",
+                "${modName.uppercase()}_VERSION",
                 "\"${project.version}\""
             )
             buildConfigField(

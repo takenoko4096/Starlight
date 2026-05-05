@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.item
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.item.components.*
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.component.DataComponentPatch
@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.world.item.crafting.Recipe
 
 @StarlightDSL
-open class ItemComponents internal constructor(private val mod: StarlightModInitializer, private val dataSource: HolderLookup.Provider?, callback: ItemComponents.() -> Unit) {
+open class ItemComponents internal constructor(private val mod: NoctilucaModInitializer, private val dataSource: HolderLookup.Provider?, callback: ItemComponents.() -> Unit) {
     private val components = mutableListOf<AbstractItemComponent<*>>()
 
     val templates = ItemDefaultComponentSets()

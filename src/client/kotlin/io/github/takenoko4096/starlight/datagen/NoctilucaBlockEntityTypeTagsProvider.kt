@@ -1,16 +1,16 @@
 package io.github.takenoko4096.starlight.datagen
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagsProvider
 import net.minecraft.core.HolderLookup
 import net.minecraft.core.registries.Registries
 import java.util.concurrent.CompletableFuture
 
-class StarlightBlockTagsProvider internal constructor(val mod: StarlightModInitializer, output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : FabricTagsProvider.BlockTagsProvider(output, registryLookup) {
-    override fun addTags(p0: HolderLookup.Provider) {
+class NoctilucaBlockEntityTypeTagsProvider internal constructor(val mod: NoctilucaModInitializer, output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider>) : FabricTagsProvider.BlockEntityTypeTagsProvider(output, registryLookup) {
+    override fun addTags(provider: HolderLookup.Provider) {
         val registry = mod.tagRegistry
-        for (configuration in registry.getConfigurations(Registries.BLOCK)) {
+        for (configuration in registry.getConfigurations(Registries.BLOCK_ENTITY_TYPE)) {
             val tag = registry.getTag(configuration.key)
 
             valueLookupBuilder(tag.tag)

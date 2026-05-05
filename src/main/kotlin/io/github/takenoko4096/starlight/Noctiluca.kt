@@ -3,7 +3,7 @@ package io.github.takenoko4096.starlight
 import io.github.takenoko4096.starlight.text.RgbColor
 import net.minecraft.resources.Identifier
 
-object Starlight : StarlightModInitializer("starlight") {
+object Noctiluca : NoctilucaModInitializer("noctiluca") {
     override fun onInitialize() {
         val debuggerNameArgumentType = commandRegistry.registerArgumentType<Debugger>("debugger") {
             parses {
@@ -25,7 +25,7 @@ object Starlight : StarlightModInitializer("starlight") {
             }
         }
 
-        commandRegistry.register("starlight") {
+        commandRegistry.register(identifier) {
             "logger" {
                 "info" {
                     "message"(greedyString()) {
@@ -60,15 +60,15 @@ object Starlight : StarlightModInitializer("starlight") {
 
                         gradient(RgbColor.BLUE, RgbColor.LIGHT_PURPLE) {
                             bold()
-                            text("A versatile library for fabric mod - Starlight")
+                            text("A versatile library for fabric mod - Noctiluca")
                         }
 
                         linebreak()
                         section(textColor = RgbColor.DARK_GRAY) { text('-'); space() }
-                        text("starlight version:")
+                        text("noctiluca version:")
                         space()
                         section(textColor = RgbColor.GREEN) {
-                            text(BuildConfig.STARLIGHT_VERSION)
+                            text(BuildConfig.NOCTILUCA_VERSION)
                         }
 
                         linebreak()
@@ -131,7 +131,7 @@ object Starlight : StarlightModInitializer("starlight") {
         debugger("test") {
             context.successful {
                 gradient(RgbColor.BLUE, RgbColor.LIGHT_PURPLE, RgbColor.GRAY) {
-                    text("THIS IS A TEST MESSAGE FROM STARLIGHT!")
+                    text("THIS IS A TEST MESSAGE FROM NOCTILUCA!")
                 }
             }
         }

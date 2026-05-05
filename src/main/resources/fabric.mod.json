@@ -1,9 +1,9 @@
 {
     "schemaVersion": 1,
-    "id": "starlight",
+    "id": "noctiluca",
     "version": "${version}",
-    "name": "Starlight",
-    "description": "library mod for kotlin development, including registry, event-dispatcher, model-generator, utilities",
+    "name": "Noctiluca",
+    "description": "A versatile library mod for fabric mod development by kotlin dsl, including registry, text-component-builder, itemstack-builder, event-dispatcher, model-generator, and other utilities.",
     "authors": [
         {
             "name": "takenoko4096",
@@ -14,7 +14,7 @@
     ],
     "contact": {},
     "license": "All-Rights-Reserved",
-    "icon": "assets/starlight/icon.png",
+    "icon": "assets/noctiluca/icon.png",
     "environment": "*",
     "entrypoints": {
         "fabric-datagen": [],
@@ -22,7 +22,7 @@
         "main": [
             {
                 "adapter": "kotlin",
-                "value": "io.github.takenoko4096.starlight.Starlight"
+                "value": "io.github.takenoko4096.starlight.Noctiluca"
             }
         ]
     },

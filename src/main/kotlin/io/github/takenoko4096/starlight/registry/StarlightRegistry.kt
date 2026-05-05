@@ -1,6 +1,5 @@
 package io.github.takenoko4096.starlight.registry
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
-import kotlin.collections.set
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 
-abstract class StarlightRegistry(internal open val mod: StarlightModInitializer)
+abstract class StarlightRegistry(internal open val mod: NoctilucaModInitializer)

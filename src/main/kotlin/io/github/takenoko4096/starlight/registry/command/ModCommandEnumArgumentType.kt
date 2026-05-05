@@ -1,10 +1,10 @@
 package io.github.takenoko4096.starlight.registry.command
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.util.StringRepresentable
 import kotlin.reflect.KClass
 
-abstract class ModCommandEnumArgumentType<T>(mod: StarlightModInitializer, name: String, clazz: KClass<T>) : ModCommandArgumentType<T>(mod, name, {
+abstract class ModCommandEnumArgumentType<T>(mod: NoctilucaModInitializer, name: String, clazz: KClass<T>) : ModCommandArgumentType<T>(mod, name, {
     val values = clazz.java.enumConstants
 
     parses {

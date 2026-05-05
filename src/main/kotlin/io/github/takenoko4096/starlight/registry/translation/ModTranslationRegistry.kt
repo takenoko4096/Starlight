@@ -1,9 +1,9 @@
 package io.github.takenoko4096.starlight.registry.translation
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.StarlightRegistry
 
-class ModTranslationRegistry(mod: StarlightModInitializer) : StarlightRegistry(mod) {
+class ModTranslationRegistry(mod: NoctilucaModInitializer) : StarlightRegistry(mod) {
     private val translations = mutableMapOf<String, ModTranslationConfiguration>()
 
     fun register(key: String, callback: ModTranslationConfiguration.() -> Unit) {

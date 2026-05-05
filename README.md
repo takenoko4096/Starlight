@@ -1,71 +1,84 @@
-# Starlight
+# Noctiluca
 
 コンテンツ追加系はクライアント用コードもアセット生成コードも全部一箇所にまとめて書きたい！！！！！！
 
-<br>っていう人(=我)のためのFabric Mod 用の API
+<br>っていう人(我)のためのFabric Mod 用の API
 
 ## Usage
 
-### セットアップ
+### Features
+
+- 新規アイテムのDSLによる完全 `main` ソースセット内定義
+- 新規ブロックのDSLによる完全 `main` ソースセット内定義
+- 新規コマンドのDSLによる定義
+- 主にコンテンツ追加のケースにおけるクライアントコードの省略
+- アイテムスタックビルダー
+- テキストコンポーネントビルダー
+- 新規クリエイティブタブのDSLによる定義
+- NBT編集／コンポーネントへのシリアライザー
+- 汎用イベントディスパッチャー
+- `runDatagen` 実行によるアイテムモデル／ブロックモデル／翻訳ファイル／タグの自動定義
+- その他ユーティリティ等
+
+### Setup
 
 > [!WARNING]
-> - `fabric.mod.json` に `TestMod`, `TestModClient`, `TestModDataGenerator` について記述すること
-> - Starlight は MOD であり、 `mods` フォルダに配置する必要があります
+> - `fabric.mod.json` に `TestMod`, `TestClientMod`, `TestModDataGenerator` の3つすべてについて記述すること
+> - Noctiluca は MOD であり、 `mods` フォルダに配置する必要があります
 
 ```kotlin
-object TestMod : StarlightModInitializer() {
-    override val identifier = "testmod"
-
+object TestMod : NoctilucaModInitializer("testmod") {
     override fun onInitialize() {}
 }
 
-object TestModClient : StarlightClientModInitializer(TestMod)
+object TestClientMod : NoctilucaClientModInitializer(TestMod)
 
-object TestModDataGenerator : StarlightDataGenerator(TestMod)
+object TestModDataGenerator : NoctilucaDataGenerator(TestMod)
 ```
 
-### Register New Block
+### Example
 
-#### Prismarine Lamp を登録する例
+#### ブロック：プリズマリンランプを登録する例
 
 > [!WARNING]
-> - assets/MOD_ID/textures/block/に対応する画像ファイルを配置すること
-> (↓の例の場合, `block/prismarine_lamp.png`, `block/prismarine_lamp_on.png` が必要)
+> - assets/MOD_ID/textures/block/の位置に対応する画像ファイルを配置すること
+> (この場合, `block/prismarine_lamp.png`, `block/prismarine_lamp_on.png` が必要)
 
 ```kotlin
-object TestMod : StarlightModInitializer() {
-    override val identifier = "testmod"
-
+object TestMod : NoctilucaModInitializer("testmod") {
     override fun onInitialize() {
         val prismarineLamp = blockRegistry.register("prismarine_lamp") {
+            val lit = "lit"
+
             val info = customBehaviour {
-                blockStates {
-                    booleanProperty("lit") {
+                val properties = blockStates {
+                    booleanProperty(lit) {
                         defaultValue = false
                     }
                 }
 
+                val litProperty = properties.boolean(lit)
+
                 events {
                     onInteract {
-                        val property = props.boolean("lit")
-                        val value = blockState.getValue(property)
-                        level.setBlockAndUpdate(blockPos, blockState.setValue(property, !value))
+                        val value = blockState.getValue(litProperty)
+                        level.setBlockAndUpdate(blockPos, blockState.setValue(litProperty, !value))
                     }
                 }
             }
+
+            val litProperty = info.properties.boolean(lit)
 
             blockProperties {
                 destroyTime = 0.5f
                 sound = SoundType.METAL
                 requiresCorrectToolForDrops = true
                 lightLevel {
-                    if (it.getValue(info.properties.boolean("luminance"))) 15 else 0
+                    if (it.getValue(litProperty)) 15 else 0
                 }
             }
 
-            itemProperties {
-                translationKeyAuto()
-            }
+            withItem()
 
             translation {
                 jaJp = "プリズマリンランプ"
@@ -73,26 +86,24 @@ object TestMod : StarlightModInitializer() {
             }
 
             rendering {
-                val off = blockModels.cubeAll(blockDefaultTexturePath)
-                val lit = blockModels.cubeAll(blockDefaultTexturePath.suffixed("on")) {
-                    suffix = "on"
-                }
-
                 models {
+                    val off = blockModels.cubeAll(blockDefaultTexturePath)
+                    val on = blockModels.cubeAll(blockDefaultTexturePath underscore "on") {
+                        suffix = "on"
+                    }
+
                     block {
-                        variants(info.properties.boolean("luminance")) {
-                            off.toVariant().useWhen(false)
-                            on.toVariant().useWhen(true)
+                        variants(litProperty) {
+                            case(false, off.toVariant())
+                            case(true, on.toVariant())
                         }
                     }
 
                     item {
-                        unlit.setAsItemModel()
+                        handling {
+                            use(off)
+                        }
                     }
-                }
-
-                layer {
-                    solid()
                 }
             }
         }
@@ -103,36 +114,14 @@ object TestMod : StarlightModInitializer() {
 うまくいくと:
 <img src="md_assets/output.png">
 
-### Register New Translation
-> [!NOTE]
-> これを使用せずとも、ブロック等の翻訳名は定義可能
-
-```kotlin
-object TestMod : StarlightModInitializer() {
-    override val identifier = "testmod"
-
-    override fun onInitialize() {
-        translationRegistry.register("foo.testmod.test_message") {
-            enUs = "Test Message"
-            jaJp = "テストメッセージ"
-        }
-    }
-}
-```
-
-### 他の機能
-
-まだ
-
 #### 実装予定
+
 - `BlockEntity` 追加
 - モデル生成API拡張
-- アイテム追加
 - エンティティ追加
-- アイテムコンポーネントビルダー
-- メッセージコンポーネントビルダー
 
 など
 
-### 使用例
+### Example Mod
+
 [**TestMod**](https://github.com/takenoko4096/TestMod)

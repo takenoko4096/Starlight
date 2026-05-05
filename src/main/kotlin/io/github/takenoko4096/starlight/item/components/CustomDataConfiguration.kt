@@ -2,12 +2,12 @@ package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.mojangson.MojangsonSerializer
 import io.github.takenoko4096.mojangson.values.MojangsonCompound
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.TagParser
 import net.minecraft.world.item.component.CustomData
 
-class CustomDataConfiguration internal constructor(mod: StarlightModInitializer, callback: CustomDataConfiguration.() -> Unit) : AbstractComponentConfiguration<CustomData>(mod, DataComponents.CUSTOM_DATA) {
+class CustomDataConfiguration internal constructor(mod: NoctilucaModInitializer, callback: CustomDataConfiguration.() -> Unit) : AbstractComponentConfiguration<CustomData>(mod, DataComponents.CUSTOM_DATA) {
     val compound = MojangsonCompound()
 
     init {

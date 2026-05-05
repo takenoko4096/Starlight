@@ -5,13 +5,13 @@ import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.command.ModCommandArgumentTypeConfiguration.ArgumentParser
 import io.github.takenoko4096.starlight.registry.command.node.SuggestibleCommandNode
 import net.minecraft.util.StringRepresentable
 import java.util.concurrent.CompletableFuture
 
-abstract class ModCommandArgumentType<T : StringRepresentable>(mod: StarlightModInitializer, name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit) : ArgumentType<T> {
+abstract class ModCommandArgumentType<T : StringRepresentable>(mod: NoctilucaModInitializer, name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit) : ArgumentType<T> {
     private val parser: ArgumentParser.() -> T
     private val suggester: SuggestibleCommandNode.UserInputDependingSuggestionProvider<*>.() -> Unit
 

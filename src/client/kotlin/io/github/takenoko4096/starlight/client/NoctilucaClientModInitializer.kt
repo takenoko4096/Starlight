@@ -1,18 +1,25 @@
 package io.github.takenoko4096.starlight.client
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
+import io.github.takenoko4096.starlight.registry.command.node.ConfigurableCommandNode
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.rendering.v1.BlockColorRegistry
 import net.minecraft.client.Minecraft
 import net.minecraft.client.color.block.BlockTintSource
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.renderer.block.BlockAndTintGetter
+import net.minecraft.commands.CommandBuildContext
 import net.minecraft.core.BlockPos
 import net.minecraft.world.level.block.state.BlockState
 
-abstract class StarlightClientModInitializer(private val mod: StarlightModInitializer) : ClientModInitializer {
+abstract class NoctilucaClientModInitializer(private val mod: NoctilucaModInitializer) : ClientModInitializer {
+    private val commands = mutableSetOf<(CommandBuildContext) -> LiteralArgumentBuilder<FabricClientCommandSource>>()
+
     override fun onInitializeClient() {
         val blockRegistry = mod.blockRegistry
 
@@ -49,9 +56,22 @@ abstract class StarlightClientModInitializer(private val mod: StarlightModInitia
             )
         }
 
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->
+            commands.forEach {
+                val command = it(registryAccess)
+                dispatcher.register(command)
+            }
+        }
+
         onInitialize()
 
         ClientLifecycleEvents.CLIENT_STARTED.register(::onClientStart)
+    }
+
+    fun registerClientCommand(name: String, callback: ConfigurableCommandNode<FabricClientCommandSource>.() -> Unit) {
+        commands.add {
+            ConfigurableCommandNode(it, name, callback).build()
+        }
     }
 
     open fun onInitialize() {}

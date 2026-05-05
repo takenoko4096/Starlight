@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.render.TexturePath
 import net.minecraft.core.Holder
 import net.minecraft.core.HolderSet
@@ -18,7 +18,7 @@ import net.minecraft.world.item.equipment.Equippable
 import java.util.Optional
 
 @StarlightDSL
-class EquippableConfiguration(mod: StarlightModInitializer, callback: EquippableConfiguration.() -> Unit) : AbstractComponentConfiguration<Equippable>(mod, DataComponents.EQUIPPABLE) {
+class EquippableConfiguration(mod: NoctilucaModInitializer, callback: EquippableConfiguration.() -> Unit) : AbstractComponentConfiguration<Equippable>(mod, DataComponents.EQUIPPABLE) {
     private var sounds = SoundEventConfiguration {}
 
     private var slot: EquipmentSlot? = null

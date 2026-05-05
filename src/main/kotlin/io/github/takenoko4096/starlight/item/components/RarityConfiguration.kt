@@ -1,12 +1,12 @@
 package io.github.takenoko4096.starlight.item.components
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.minecraft.core.component.DataComponents
 import net.minecraft.world.item.Rarity
 
 @StarlightDSL
-class RarityConfiguration(mod: StarlightModInitializer, callback: RarityConfiguration.() -> Unit) : AbstractComponentConfiguration<Rarity>(mod, DataComponents.RARITY) {
+class RarityConfiguration(mod: NoctilucaModInitializer, callback: RarityConfiguration.() -> Unit) : AbstractComponentConfiguration<Rarity>(mod, DataComponents.RARITY) {
     private var rarity: Rarity = Rarity.COMMON
 
     init {

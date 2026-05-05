@@ -4,12 +4,12 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import net.minecraft.commands.CommandBuildContext
 import net.minecraft.commands.Commands
 
-open class ConfigurableCommandNode<S>(val registryAccess: CommandBuildContext, val environment: Commands.CommandSelection, val name: String, builder: ConfigurableCommandNode<S>.() -> Unit) : CommandNode<S>(LiteralArgumentBuilder.literal<S>(name)) {
+open class ConfigurableCommandNode<S>(val registryAccess: CommandBuildContext, val name: String, builder: ConfigurableCommandNode<S>.() -> Unit) : CommandNode<S>(LiteralArgumentBuilder.literal<S>(name)) {
     init {
         builder()
     }
 
-    internal fun build(): LiteralArgumentBuilder<S> {
+    fun build(): LiteralArgumentBuilder<S> {
         return argumentBuilder as LiteralArgumentBuilder<S>
     }
 }

@@ -1,18 +1,17 @@
 package io.github.takenoko4096.starlight.registry.tag
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.StarlightRegistry
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.Registries
 import net.minecraft.resources.ResourceKey
 import net.minecraft.tags.TagKey
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.entity.BlockEntityType
 
-class ModTagRegistry internal constructor(mod: StarlightModInitializer) : StarlightRegistry(mod) {
+class ModTagRegistry internal constructor(mod: NoctilucaModInitializer) : StarlightRegistry(mod) {
     private val configurations = mutableSetOf<ModTagConfiguration<*>>()
 
     private val tags = mutableMapOf<TagKey<*>, Tag<*>>()

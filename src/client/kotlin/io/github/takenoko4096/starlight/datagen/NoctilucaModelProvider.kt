@@ -1,6 +1,6 @@
 package io.github.takenoko4096.starlight.datagen
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.datagen.model.BlockModelVariantsRegistrar
 import io.github.takenoko4096.starlight.datagen.model.builder.ClientItemModelHandle
 import io.github.takenoko4096.starlight.registry.block.ModBlockConfiguration
@@ -13,7 +13,7 @@ import io.github.takenoko4096.starlight.registry.item.ModItemConfiguration
 import io.github.takenoko4096.starlight.registry.item.ModItemRegistry
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 
-class StarlightModelProvider(private val mod: StarlightModInitializer, output: FabricPackOutput) : FabricModelProvider(output) {
+class NoctilucaModelProvider(private val mod: NoctilucaModInitializer, output: FabricPackOutput) : FabricModelProvider(output) {
     override fun generateBlockStateModels(blockModelGenerators: BlockModelGenerators) {
         val blockRegistry = mod.blockRegistry
 

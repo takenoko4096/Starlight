@@ -1,7 +1,7 @@
 package io.github.takenoko4096.starlight.registry.creativetab
 
 import io.github.takenoko4096.starlight.StarlightDSL
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import io.github.takenoko4096.starlight.registry.translation.ModTranslationConfiguration
 import io.github.takenoko4096.starlight.item.ItemComponents
 import io.github.takenoko4096.starlight.item.ItemStackBuilder
@@ -19,7 +19,7 @@ import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
 
 @StarlightDSL
-class ModCreativeModeTabConfiguration internal constructor(private val mod: StarlightModInitializer, private val name: String, callback: ModCreativeModeTabConfiguration.() -> Unit) {
+class ModCreativeModeTabConfiguration internal constructor(private val mod: NoctilucaModInitializer, private val name: String, callback: ModCreativeModeTabConfiguration.() -> Unit) {
     val resourceKey: ResourceKey<CreativeModeTab> = ResourceKey.create(
         Registries.CREATIVE_MODE_TAB,
         mod.identifierOf(name)

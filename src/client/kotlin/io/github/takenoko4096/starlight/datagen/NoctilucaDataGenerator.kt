@@ -1,42 +1,42 @@
 package io.github.takenoko4096.starlight.datagen
 
-import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.NoctilucaModInitializer
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.FabricPackOutput
 import net.minecraft.core.HolderLookup
 import java.util.concurrent.CompletableFuture
 
-abstract class StarlightDataGenerator(private val mod: StarlightModInitializer) : DataGeneratorEntrypoint {
+abstract class NoctilucaDataGenerator(private val mod: NoctilucaModInitializer) : DataGeneratorEntrypoint {
     override fun onInitializeDataGenerator(fabricDataGenerator: FabricDataGenerator) {
         val pack = fabricDataGenerator.createPack()
 
         pack.addProvider { output: FabricPackOutput ->
-            StarlightModelProvider(mod, output)
+            NoctilucaModelProvider(mod, output)
         }
 
         pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightLanguageProvider.EnUs(mod, output, registryLookup)
+            NoctilucaLanguageProvider.EnUs(mod, output, registryLookup)
         }
 
         pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightLanguageProvider.JaJp(mod, output, registryLookup)
+            NoctilucaLanguageProvider.JaJp(mod, output, registryLookup)
         }
 
         pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightItemTagsProvider(mod, output, registryLookup)
+            NoctilucaItemTagsProvider(mod, output, registryLookup)
         }
 
         pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightBlockTagsProvider(mod, output, registryLookup)
+            NoctilucaBlockTagsProvider(mod, output, registryLookup)
         }
 
         pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightEntityTypeTagsProvider(mod, output, registryLookup)
+            NoctilucaEntityTypeTagsProvider(mod, output, registryLookup)
         }
 
         pack.addProvider { output: FabricPackOutput, registryLookup: CompletableFuture<HolderLookup.Provider> ->
-            StarlightBlockEntityTypeTagsProvider(mod, output, registryLookup)
+            NoctilucaBlockEntityTypeTagsProvider(mod, output, registryLookup)
         }
 
         onInitialize(pack)
