@@ -1,9 +1,30 @@
 package io.github.takenoko4096.starlight
 
 import io.github.takenoko4096.starlight.text.RgbColor
+import net.minecraft.resources.Identifier
 
 object Starlight : StarlightModInitializer("starlight") {
     override fun onInitialize() {
+        val debuggerNameArgumentType = commandRegistry.registerArgumentType<Debugger>("debugger") {
+            parses {
+                val first = reader.readUnquotedString()
+
+                return@parses if (reader.canRead() && reader.peek() == ':') {
+                    reader.skip()
+                    Debugger.get(Identifier.fromNamespaceAndPath(first, reader.readUnquotedString()))
+                        ?: throw exception("デバッガ '$identifier' は存在しません")
+                }
+                else {
+                    Debugger.get(Identifier.fromNamespaceAndPath(identifier, first))
+                        ?: throw exception("デバッガ '$identifier' は存在しません")
+                }
+            }
+
+            suggests {
+                strings(Debugger.keys().map(Identifier::toString))
+            }
+        }
+
         commandRegistry.register("starlight") {
             "logger" {
                 "info" {
@@ -17,6 +38,14 @@ object Starlight : StarlightModInitializer("starlight") {
                                 text(message)
                             }
                         }
+                    }
+                }
+            }
+
+            "debugger" {
+                "debugger_name"(debuggerNameArgumentType) {
+                    executes {
+                        "debugger_name"<Debugger>().debugger(this)
                     }
                 }
             }
@@ -95,6 +124,14 @@ object Starlight : StarlightModInitializer("starlight") {
                             text("✨--------------------------------------------✨")
                         }
                     }
+                }
+            }
+        }
+
+        debugger("test") {
+            context.successful {
+                gradient(RgbColor.BLUE, RgbColor.LIGHT_PURPLE, RgbColor.GRAY) {
+                    text("THIS IS A TEST MESSAGE FROM STARLIGHT!")
                 }
             }
         }

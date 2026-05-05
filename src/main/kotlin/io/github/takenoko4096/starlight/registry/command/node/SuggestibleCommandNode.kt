@@ -81,6 +81,8 @@ class SuggestibleCommandNode<S, T>(override val argumentBuilder: RequiredArgumen
 
     abstract class Suggestion<T>(protected val value: T, protected val tooltip: Message?) {
         abstract fun add(suggestionsBuilder: SuggestionsBuilder)
+
+        override fun toString(): String = value.toString()
     }
 
     class IntSuggestion internal constructor(value: Int, tooltip: Message?) : Suggestion<Int>(value, tooltip) {

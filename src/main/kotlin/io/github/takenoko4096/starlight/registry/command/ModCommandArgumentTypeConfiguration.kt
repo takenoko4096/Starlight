@@ -1,6 +1,7 @@
 package io.github.takenoko4096.starlight.registry.command
 
 import com.mojang.brigadier.StringReader
+import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.exceptions.CommandSyntaxException
 import com.mojang.brigadier.suggestion.Suggestions
@@ -11,63 +12,33 @@ import io.github.takenoko4096.starlight.registry.command.node.SuggestibleCommand
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry
 import net.minecraft.commands.synchronization.SingletonArgumentInfo
 import net.minecraft.util.StringRepresentable
+import java.util.Objects
 import java.util.concurrent.CompletableFuture
 
 @StarlightDSL
 class ModCommandArgumentTypeConfiguration<T : StringRepresentable>(private val mod: StarlightModInitializer, private val name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit) {
-    private var parser: (StringReader.() -> T)? = null
+    internal var parser: (ArgumentParser.() -> T)? = null
 
-    private var suggester: ((CommandContext<*>, SuggestionsBuilder) -> CompletableFuture<Suggestions>)? = null
+    internal var suggester: (SuggestibleCommandNode.UserInputDependingSuggestionProvider<*>.() -> Unit)? = null
 
     init {
         callback()
     }
 
     fun parses(callback: ArgumentParser.() -> T) {
-        parser = {
-            val p = ArgumentParser(this)
-            p.callback()
+        if (parser != null) {
+            throw IllegalStateException("HA??????????????????????? parser ${mod.identifier} $name $callback")
         }
+
+        parser = callback
     }
 
     fun suggests(callback: SuggestibleCommandNode.UserInputDependingSuggestionProvider<*>.() -> Unit) {
-        suggester = { context, suggestionsBuilder ->
-            val s = SuggestibleCommandNode.UserInputDependingSuggestionProvider(context, suggestionsBuilder)
-            s.callback()
-            s.suggestAbove()
-            suggestionsBuilder.buildFuture()
-        }
-    }
-
-    fun register(): () -> ModCommandArgumentType<T> {
-        if (argumentTypes.contains(name)) {
-            throw IllegalArgumentException("argument type ${mod.identifier}:$name is already registered!")
+        if (suggester != null) {
+            throw IllegalStateException("HA??????????????????????? suggester ${mod.identifier} $name $callback")
         }
 
-        if (parser == null) {
-            throw IllegalStateException("'parses' is not specified")
-        }
-
-        if (suggester == null) {
-            throw IllegalStateException("'suggests' is not specified")
-        }
-
-        val identifier = mod.identifierOf(name)
-        val constructor = { ModCommandArgumentType(identifier, parser!!, suggester!!) }
-
-        ArgumentTypeRegistry.registerArgumentType(
-            identifier,
-            ModCommandArgumentType::class.java,
-            SingletonArgumentInfo.contextFree(constructor)
-        )
-
-        argumentTypes.add(name)
-
-        return constructor
-    }
-
-    companion object {
-        private val argumentTypes = mutableSetOf<String>()
+        suggester = callback
     }
 
     class ArgumentParser internal constructor(val reader: StringReader) {

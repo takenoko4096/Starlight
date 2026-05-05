@@ -6,7 +6,6 @@ import net.minecraft.server.level.ServerPlayer
 import net.minecraft.sounds.SoundEvent
 import net.minecraft.util.Mth
 import net.minecraft.world.phys.Vec3
-import kotlin.math.min
 import kotlin.math.sqrt
 
 object PlaySound {

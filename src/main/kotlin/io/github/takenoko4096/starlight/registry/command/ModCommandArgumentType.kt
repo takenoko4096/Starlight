@@ -5,20 +5,41 @@ import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import net.minecraft.resources.Identifier
+import io.github.takenoko4096.starlight.StarlightModInitializer
+import io.github.takenoko4096.starlight.registry.command.ModCommandArgumentTypeConfiguration.ArgumentParser
+import io.github.takenoko4096.starlight.registry.command.node.SuggestibleCommandNode
 import net.minecraft.util.StringRepresentable
 import java.util.concurrent.CompletableFuture
 
-class ModCommandArgumentType<T : StringRepresentable>(
-    private val identifier: Identifier,
-    private val parser: StringReader.() -> T,
-    private val suggester: (CommandContext<*>, SuggestionsBuilder) -> CompletableFuture<Suggestions>
-) : ArgumentType<T> {
-    override fun parse(reader: StringReader): T {
-        return reader.parser()
+abstract class ModCommandArgumentType<T : StringRepresentable>(mod: StarlightModInitializer, name: String, callback: ModCommandArgumentTypeConfiguration<T>.() -> Unit) : ArgumentType<T> {
+    private val parser: ArgumentParser.() -> T
+    private val suggester: SuggestibleCommandNode.UserInputDependingSuggestionProvider<*>.() -> Unit
+
+    val identifier = mod.identifierOf(name)
+
+    init {
+        val c = ModCommandArgumentTypeConfiguration(mod, name, callback)
+
+        if (c.parser == null) {
+            throw IllegalStateException("'parses' is not specified")
+        }
+
+        if (c.suggester == null) {
+            throw IllegalStateException("'suggests' is not specified")
+        }
+
+        parser = c.parser!!
+        suggester = c.suggester!!
     }
 
-    override fun <S> listSuggestions(context: CommandContext<S>, builder: SuggestionsBuilder): CompletableFuture<Suggestions> {
-        return suggester(context, builder)
+    final override fun parse(reader: StringReader): T {
+        return ArgumentParser(reader).parser()
+    }
+
+    final override fun <S> listSuggestions(context: CommandContext<S>, suggestionsBuilder: SuggestionsBuilder): CompletableFuture<Suggestions> {
+        val s = SuggestibleCommandNode.UserInputDependingSuggestionProvider(context, suggestionsBuilder)
+        s.suggester()
+        s.suggestAbove()
+        return suggestionsBuilder.buildFuture()
     }
 }
