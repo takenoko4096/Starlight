@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block
 class ModBlockRegistry(mod: NoctilucaModInitializer) : StarlightRegistry(mod) {
     private val configurations = mutableSetOf<ModBlockConfiguration>()
 
-    private val blocks = mutableMapOf<ResourceKey<Block>, Block>()
+    internal val blocks = mutableMapOf<ResourceKey<Block>, Block>()
 
     fun register(identifier: String, configuration: ModBlockConfiguration.() -> Unit): Block {
         val o = ModBlockConfiguration(this, identifier)

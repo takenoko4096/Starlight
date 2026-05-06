@@ -14,13 +14,15 @@ import net.minecraft.client.data.models.MultiVariant
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator
 import net.minecraft.client.data.models.blockstates.PropertyDispatch
 import net.minecraft.client.renderer.block.dispatch.VariantMutator
+import net.minecraft.data.BlockFamily
 import net.minecraft.world.level.block.Block
 
 class BlockModelVariantsRegistrar internal constructor(
     internal val blockModelGenerators: BlockModelGenerators,
     internal val block: Block,
     internal val itemModelHandle: ItemModelHandle?,
-    internal val variants: PropertyVariants
+    internal val variants: PropertyVariants?,
+    internal val family: BlockFamily?
 ) {
     private fun toClientMutator(nonClientMutator: NonClientVariantMutator): VariantMutator {
         return when (nonClientMutator) {
@@ -82,15 +84,6 @@ class BlockModelVariantsRegistrar internal constructor(
     }
 
     internal fun register() {
-        val generator = when (variants) {
-            is PropertyVariants0 -> variants0(variants)
-            is PropertyVariants1<*> -> variants1(variants)
-            is PropertyVariants2<*, *> -> variants2(variants)
-            else -> throw IllegalStateException()
-        }
-
-        blockModelGenerators.blockStateOutput.accept(generator)
-
         if (itemModelHandle != null) {
             val client = ClientItemModelHandle.toClient(
                 ItemModelGenerators(blockModelGenerators.itemModelOutput, blockModelGenerators.modelOutput),
@@ -99,5 +92,23 @@ class BlockModelVariantsRegistrar internal constructor(
             )
             blockModelGenerators.itemModelOutput.accept(block.asItem(), client.convert())
         }
+
+        val generator = when (variants) {
+            is PropertyVariants0 -> variants0(variants)
+            is PropertyVariants1<*> -> variants1(variants)
+            is PropertyVariants2<*, *> -> variants2(variants)
+            null -> {
+                if (family == null) {
+                    throw IllegalStateException("cannot generate block family: maybe this is caused by both of models.block and withXX() is unset. please use one or the other")
+                }
+                else {
+                    blockModelGenerators.family(block).generateFor(family)
+                    return
+                }
+            }
+            else -> throw IllegalStateException()
+        }
+
+        blockModelGenerators.blockStateOutput.accept(generator)
     }
 }

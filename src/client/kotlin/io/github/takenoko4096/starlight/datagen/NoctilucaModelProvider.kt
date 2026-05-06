@@ -20,6 +20,7 @@ class NoctilucaModelProvider(private val mod: NoctilucaModInitializer, output: F
         for (configuration in blockRegistry.getConfigurations()) {
             val block = blockRegistry.getBlock(configuration.blockResourceKey)
             val accessor = ModBlockConfiguration.getAccessorForClient(configuration)
+            configuration.withItem()
 
             val model = accessor.blockModelLegacy()
             when (model?.textureMap) {
@@ -52,15 +53,14 @@ class NoctilucaModelProvider(private val mod: NoctilucaModInitializer, output: F
 
             val variants = accessor.blockModelVariants()
 
-            if (variants != null) {
-                val registrar = BlockModelVariantsRegistrar(
-                    blockModelGenerators,
-                    block,
-                    accessor.blockItemModel(),
-                    variants
-                )
-                registrar.register()
-            }
+            val registrar = BlockModelVariantsRegistrar(
+                blockModelGenerators,
+                block,
+                accessor.blockItemModel(),
+                variants,
+                accessor.family()
+            )
+            registrar.register()
         }
     }
 

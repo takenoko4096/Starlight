@@ -24,9 +24,6 @@ class BlockRenderingConfiguration internal constructor(private val configuration
 
     fun models(callback: ModelsConfiguration.() -> Unit) {
         modelConfig = ModelsConfiguration(configuration, callback)
-        if (modelConfig?.blockModelConfig == null) {
-            throw IllegalStateException("ブロック '${configuration.blockResourceKey.identifier()}' のブロックモデルが未設定です")
-        }
     }
 
     fun color(callback: TintConfiguration.() -> Unit) {
