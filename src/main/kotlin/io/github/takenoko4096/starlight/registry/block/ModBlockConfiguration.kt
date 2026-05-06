@@ -179,12 +179,16 @@ class ModBlockConfiguration(internal val registry: ModBlockRegistry, internal va
 
         val member = constructor(parent, BlockBehaviour.Properties.ofFullCopy(parent).setId(blockKey))
         Registry.register(BuiltInRegistries.BLOCK, blockKey, member)
-        Registry.register(BuiltInRegistries.ITEM, itemKey, BlockItem(member, itemProperties))
 
         val translationKey = "block.${registry.mod.identifier}.${identifier.path}"
         registry.mod.translationRegistry.register(translationKey) {
             enUs = this@ModBlockConfiguration.translation.enUs + ' ' + if (suffix.length <= 1) suffix.uppercase() else suffix[0].uppercase() + suffix.slice(1..<suffix.length)
         }
+
+        Registry.register(
+            BuiltInRegistries.ITEM, itemKey,
+            BlockItem(member, itemProperties.overrideDescription(translationKey))
+        )
 
         if (familyBuilder == null) familyBuilder = BlockFamily.Builder(parent)
         familyBuilder!!.familyAppender(member)
